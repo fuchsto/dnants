@@ -1,0 +1,8 @@
+build
+*~
+*.a
+*.o
+*.log
+*.mine
+*.swp
+*.swo
