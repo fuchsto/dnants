@@ -32,9 +32,9 @@ endif(POLICY CMP0016)
 option(ENABLE_LOGGING
        "Specify whether logging should be enabled" off)
 
-set(CMAKE_RULE_MESSAGES OFF)
-set(CMAKE_VERBOSE_MAKEFILE OFF)
-set(CMAKE_COLOR_MAKEFILE ON)
+set(CMAKE_RULE_MESSAGES    ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_COLOR_MAKEFILE   ON)
 
 ## Install path
 if (INSTALL_PREFIX)

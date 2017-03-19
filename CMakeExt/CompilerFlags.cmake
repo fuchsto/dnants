@@ -1,8 +1,8 @@
 
 find_package(OpenMP)
 
-set (CC_WARN_FLAG  "${CC_WARN_FLAG}  -Wall -Wextra -Wpedantic")
-set (CXX_WARN_FLAG "${CXX_WARN_FLAG} -Wall -Wextra -Wpedantic")
+# set (CC_WARN_FLAG  "${CC_WARN_FLAG}  -Wall -Wpedantic")
+# set (CXX_WARN_FLAG "${CXX_WARN_FLAG} -Wall -Wpedantic")
 
 set (CXX_STD_FLAG "--std=c++11"
      CACHE STRING "C++ compiler std flag")

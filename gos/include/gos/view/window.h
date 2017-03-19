@@ -1,7 +1,7 @@
 #ifndef GOS__WINDOW_H__INCLUDED
 #define GOS__WINDOW_H__INCLUDED
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include <stdexcept>
 
@@ -22,11 +22,11 @@ class window {
       throw std::runtime_error("SDL init failed");
     }
     if (SDL_CreateWindowAndRenderer(
-      width,
-      height,
-      SDL_WINDOW_OPENGL,
-      &_window,
-      &_renderer) == 0) {
+          width,
+          height,
+          SDL_WINDOW_OPENGL,
+          &_window,
+          &_renderer) != 0) {
       SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                    "Couldn't create window and renderer: %s",
                    SDL_GetError());

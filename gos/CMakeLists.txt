@@ -25,6 +25,7 @@ include_directories(
 
 add_executable(
   ${DNANTS_MAIN_TARGET_NAME}
+  ${DNANTS_MAIN_HEADERS}
   ${DNANTS_MAIN_SOURCES}
 )
 
@@ -50,4 +51,3 @@ set_target_properties(
 install(
   TARGETS ${DNANTS_MAIN_TARGET_NAME}
   DESTINATION bin/)
-
