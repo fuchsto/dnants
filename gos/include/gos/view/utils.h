@@ -9,14 +9,14 @@ namespace view {
 
 static int next_time;
 
-Uint32 timeLeft(void) {
+static Uint32 timeLeft(void) {
   Uint32 now = SDL_GetTicks();
   return ( next_time <= now
            ? 0
            : next_time - now );
 }
 
-void 
+static void 
 cap_framerate(int tick_interval = 20) {
   SDL_Delay(timeLeft());
   next_time += tick_interval;
