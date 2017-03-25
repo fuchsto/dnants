@@ -1,6 +1,9 @@
 #ifndef GOS__RULE_ENGINE_H__INCLUDED
 #define GOS__RULE_ENGINE_H__INCLUDED
 
+#include <gos/state/game_state.h>
+
+
 namespace gos {
 
 class rule_engine
@@ -8,7 +11,7 @@ class rule_engine
  public:
   rule_engine();
 
-  game_state & next_state(game_state & prev_state);
+  state::game_state & next_state(state::game_state & prev_state);
 };
 
 } // namespace

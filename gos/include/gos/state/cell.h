@@ -7,25 +7,24 @@ namespace gos {
 namespace state {
 
 enum cell_type : int {
-  plain = 0;
-  grass;
-  water;
-  material;
-  food;
-}
+  plain = 0,
+  grass,
+  water,
+  material,
+  food
+};
 
 /**
  * State of a single cell in the grid.
  *
  */
-template
 class cell {
   bool _taken    = false;
   bool _obstacle = false;
 
  public:
-  constexpr cell(bool is_obstable = false)
-  : _obstacle(is_obstable)
+  constexpr cell(bool obstacle = false)
+  : _obstacle(obstacle)
   { }
 
   virtual void on_enter(const ant &) { };
@@ -34,8 +33,8 @@ class cell {
   void enter(ant & a) { _taken = true;  this->on_enter(a); }
   void leave(ant & a) { _taken = false; this->on_exit(a); }
 
-  virtual constexpr void is_obstable() const noexcept {
-    return false;
+  virtual constexpr bool is_obstable() const noexcept {
+    return _obstacle;
   }
   constexpr bool taken() const noexcept {
     return _taken;
@@ -79,7 +78,7 @@ class resource_cell : public cell {
 
 class water_cell : public resource_cell {
  public:
-  water_cell() : cell(true) { }
+  water_cell() : resource_cell(true) { }
 };
 
 class food_cell : public resource_cell {

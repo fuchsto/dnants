@@ -3,8 +3,8 @@
 
 #include <gos/app_state.h>
 
-// #include <gos/rule_engine.h>
-// #include <gos/state.h>
+#include <gos/rule_engine.h>
+#include <gos/state.h>
 
 
 namespace gos {

@@ -27,7 +27,7 @@ class grid {
   , _cols(cols)
   { }
 
-  constexpr const cell & at(int row, int col) const {
+  const cell & at(int row, int col) const {
     return _cells[row][col];
   }
 

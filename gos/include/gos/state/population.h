@@ -16,7 +16,7 @@ class population {
   : _teams(teams)
   { }
 
-  constexpr const std::vector<ant_team> & teams() const noexcept {
+  const std::vector<ant_team> & teams() const noexcept {
     return _teams;
   }
 

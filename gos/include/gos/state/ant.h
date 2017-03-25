@@ -10,11 +10,11 @@ namespace state {
 class ant {
  public:
   enum mode : int {
-    waiting  = 0; // do nothing
-    scouting;     // move without following a pheromone trace
-    tracing;      // follow the closes pheromone trace
-    eating;       // eat and gain strength
-  }
+    waiting  = 0, // do nothing
+    scouting,     // move without following a pheromone trace
+    tracing,      // follow the closes pheromone trace
+    eating        // eat and gain strength
+  };
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
@@ -34,7 +34,7 @@ class ant {
   ant(const position & pos) : _pos(pos) { }
   ant(position && pos)      : _pos(std::move(pos)) { }
 
-  constexpr const position & position() const noexcept {
+  const position & pos() const noexcept {
     return _pos;
   }
 
