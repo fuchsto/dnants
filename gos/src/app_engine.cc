@@ -14,13 +14,14 @@ app_engine::app_engine(
   std::string title,
   int         width,
   int         height,
-  int         bpp)
-: _window(*this, title, width, height, bpp) {
+  app_state * init_state)
+: _window(*this, title, width, height, 0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
 //SDL_WM_SetCaption(title, title);
 //int flags = 0;
-//_screen   = SDL_SetVideoMode(width, height, bpp, flags);
+//_screen   = SDL_SetVideoMode(width, height, 0, flags);
   _is_running = true;
+  change_state(init_state);
   GOS__LOG_DEBUG("app_engine", "app_engine >");
 }
 
@@ -65,21 +66,18 @@ void app_engine::pop_state() {
 }
 
 void app_engine::handle_events() {
-  GOS__LOG_DEBUG("app_engine", "handle_events");
   if (_states.empty()) { return; }
 
   _states.back()->handle_events(this);
 }
 
 void app_engine::update() {
-  GOS__LOG_DEBUG("app_engine", "update");
   if (_states.empty()) { return; }
 
   _states.back()->update(this);
 }
 
 void app_engine::draw() {
-  GOS__LOG_DEBUG("app_engine", "draw");
   if (_states.empty()) { return; }
 
   _frame_time      = SDL_GetTicks();

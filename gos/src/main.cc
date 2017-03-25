@@ -1,20 +1,20 @@
 
-// #include <gos/rule_engine.h>
-// #include <gos/state.h>
 #include <gos/app_engine.h>
-#include <gos/view.h>
+#include <gos/app_play_state.h>
 
 #include <cstdlib>
 
 
 using gos::app_engine;
+using gos::app_play_state;
 using gos::view::window;
-// using gos::rule_engine;
-// using gos::game_state;
 
 int main(int argc, char * argv[])
 {
-  app_engine app("game'-._.of'._.survive", 800, 800);
+  app_engine app(
+    "game'-._.of'._.survive",
+    800, 800,
+    app_play_state::get());
 
   while (app.is_running()) {
     app.handle_events();

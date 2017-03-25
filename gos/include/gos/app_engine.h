@@ -32,7 +32,8 @@ class app_engine
     std::string title,
     int         width,
     int         height,
-    int         bpp = 0);
+    app_state * init_state);
+
   ~app_engine();
 
   void change_state(
