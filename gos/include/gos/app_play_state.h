@@ -17,6 +17,7 @@ class app_play_state : public app_state {
   static app_play_state _instance;
 
  private:
+  bool             _active        = true;
   int              _grid_spacing  = 15;
   int              _num_row_cells = 30;
   int              _num_col_cells = 30;
@@ -46,6 +47,7 @@ class app_play_state : public app_state {
             break;
         case SDL_KEYDOWN:
             if (event.key.keysym.sym == SDLK_ESCAPE)
+              app->change_state(app_play_state::get());
             break;
         default:
             break;
@@ -57,6 +59,8 @@ class app_play_state : public app_state {
   }
 
   virtual void draw(app_engine * app) {
+    if (!_active) { return; }
+
     SDL_SetRenderDrawColor(
       app->win().renderer(), 0xc3, 0xc3, 0xc3, 0x00);
     SDL_RenderClear(
@@ -71,6 +75,8 @@ class app_play_state : public app_state {
 
  private:
   void render_objects(gos::view::window & win) {
+    if (!_active) { return; }
+
     auto ext     = win.view_extents();
     int  nrows   = _grid_front->nrows();
     int  ncols   = _grid_front->ncols();
@@ -82,8 +88,10 @@ class app_play_state : public app_state {
           case gos::state::cell_type::grass:
             render_grass_cell(cell_x, cell_y);
             break;
-          default:
+          case gos::state::cell_type::food:
             render_food_cell(cell_x, cell_y);
+            break;
+          default:
             break;
         }
       }
