@@ -28,6 +28,15 @@ class app_engine
   Uint32                     _min_frame_time  = 1000 / _fps;
 
  public:
+  struct app_settings {
+    int grid_cols;
+    int grid_rows;
+  };
+
+ private:
+  app_settings _settings { 80, 80 };
+
+ public:
   app_engine(
     std::string title,
     int         width,
@@ -46,9 +55,11 @@ class app_engine
   void update();
   void draw();
 
-  bool is_running()         const { return _is_running;  }
-  gos::view::window & win()       { return _window;   }
-  void quit()                     { _is_running = false; }
+  app_settings & settings() { return _settings;    }
+
+  bool is_running()   const { return _is_running;  }
+  gos::view::window & win() { return _window;      }
+  void quit()               { _is_running = false; }
 };
 
 } // namespace gos
