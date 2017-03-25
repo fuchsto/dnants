@@ -19,13 +19,15 @@ enum cell_type : int {
  *
  */
 class cell {
-  bool _taken    = false;
-  bool _obstacle = false;
+  bool      _taken     = false;
+  cell_type _cell_type = cell_type::plain;
 
  public:
-  constexpr cell(bool obstacle = false)
-  : _obstacle(obstacle)
+  constexpr cell(cell_type ct)
+  : _cell_type(ct)
   { }
+
+  cell_type type() const { return _cell_type; }
 
   virtual void on_enter(const ant &) { };
   virtual void on_exit(const ant &)  { };
@@ -33,8 +35,8 @@ class cell {
   void enter(ant & a) { _taken = true;  this->on_enter(a); }
   void leave(ant & a) { _taken = false; this->on_exit(a); }
 
-  virtual constexpr bool is_obstable() const noexcept {
-    return _obstacle;
+  virtual constexpr bool is_obstacle() const noexcept {
+    return false;
   }
   constexpr bool taken() const noexcept {
     return _taken;
@@ -43,18 +45,21 @@ class cell {
 
 
 class plain_cell : public cell {
+ public:
+  plain_cell() : cell(cell_type::plain) { }
 };
 
 class grass_cell : public cell {
  public:
-  grass_cell() : cell(true) { }
+  grass_cell() : cell(cell_type::grass) { }
 };
 
 class resource_cell : public cell {
   int _amount = 1;
  public:
-  constexpr resource_cell()        : _amount(1)   { }
-  constexpr resource_cell(int cap) : _amount(cap) { }
+  resource_cell() = delete;
+  constexpr resource_cell(cell_type ct)          : cell(ct), _amount(1)   { }
+  constexpr resource_cell(cell_type ct, int cap) : cell(ct), _amount(cap) { }
 
   virtual void on_enter(const ant & a) {
     if (_amount > 0) { --_amount; }
@@ -78,13 +83,17 @@ class resource_cell : public cell {
 
 class water_cell : public resource_cell {
  public:
-  water_cell() : resource_cell(true) { }
+  water_cell() : resource_cell(cell_type::water) { }
 };
 
 class food_cell : public resource_cell {
+ public:
+  food_cell() : resource_cell(cell_type::food) { }
 };
 
 class material_cell : public resource_cell {
+ public:
+  material_cell() : resource_cell(cell_type::material) { }
 };
 
 

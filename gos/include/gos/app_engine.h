@@ -24,7 +24,7 @@ class app_engine
   Uint32                     _last_frame_time = 0;
   Uint32                     _delta_time      = 0;
 
-  Uint32                     _fps             = 1;
+  Uint32                     _fps             = 60;
   Uint32                     _min_frame_time  = 1000 / _fps;
 
  public:

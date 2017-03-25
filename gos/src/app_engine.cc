@@ -44,7 +44,7 @@ void app_engine::change_state(app_state * state) {
     _states.pop_back();
   }
   _states.push_back(state);
-  _states.back()->initialize();
+  _states.back()->initialize(this);
 }
 
 void app_engine::push_state(app_state * state) {
@@ -52,7 +52,7 @@ void app_engine::push_state(app_state * state) {
     _states.back()->pause();
   }
   _states.push_back(state);
-  _states.back()->initialize();
+  _states.back()->initialize(this);
 }
 
 void app_engine::pop_state() {

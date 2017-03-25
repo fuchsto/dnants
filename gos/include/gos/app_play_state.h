@@ -17,22 +17,29 @@ class app_play_state : public app_state {
   static app_play_state _instance;
 
  private:
-  int     _grid_spacing    = 15;
+  int              _grid_spacing  = 15;
+  int              _num_row_cells = 30;
+  int              _num_col_cells = 30;
+
+  app_engine       * _app         = nullptr;
+
+  gos::state::grid * _grid_front  = nullptr;
+  gos::state::grid * _grid_back   = nullptr;
 
  public:
   static app_play_state * get() { return &_instance; }
 
   virtual ~app_play_state() { }
 
-  virtual void initialize() { }
-  virtual void finalize()   { }
+  virtual void initialize(app_engine * app);
+  virtual void finalize();
 
   virtual void pause()      { }
   virtual void resume()     { }
 
   virtual void handle_events(app_engine * app) {
     SDL_Event event;
-    if(SDL_PollEvent(&event))  {
+    while(SDL_PollEvent(&event))  {
         switch (event.type) {
         case SDL_QUIT:
             app->quit();
@@ -65,18 +72,32 @@ class app_play_state : public app_state {
  private:
   void render_objects(gos::view::window & win) {
     auto ext     = win.view_extents();
-    int  nrows   = ext.h / _grid_spacing;
-    int  ncols   = ext.w / _grid_spacing;
+    int  nrows   = _grid_front->nrows();
+    int  ncols   = _grid_front->ncols();
 
-    Uint32 ticks = SDL_GetTicks();
+    for (int cell_x = 0; cell_x < ncols; ++cell_x) {
+      for (int cell_y = 0; cell_y < nrows; ++cell_y) {
+        const auto & grid_cell = _grid_front->at(cell_x, cell_y);
+        switch (grid_cell.type()) {
+          case gos::state::cell_type::grass:
+            render_grass_cell(cell_x, cell_y);
+            break;
+          default:
+            render_food_cell(cell_x, cell_y);
+            break;
+        }
+      }
+    }
+  }
 
-    int  cell_x  = ticks % ncols;
-    int  cell_y  = ticks % nrows;
-
-    draw_cell_rectangle(
-      win, cell_x, cell_y, rgba { 0xaf, 0xef, 0x9f, 0xff });
+  void render_grass_cell(int cell_x, int cell_y) {
     draw_cell_triangle(
-      win, cell_x, cell_y, rgba { 0x34, 0x98, 0x9f, 0x99 });
+      _app->win(), cell_x, cell_y, rgba { 0x09, 0xa8, 0x56, 0xff });
+  }
+
+  void render_food_cell(int cell_x, int cell_y) {
+    draw_cell_rectangle(
+      _app->win(), cell_x, cell_y, rgba { 0xaf, 0xef, 0x9f, 0xff });
   }
 
   void render_grid(gos::view::window & win) {
