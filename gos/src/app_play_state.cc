@@ -37,8 +37,8 @@ void app_play_state::initialize(app_engine * app) {
       for (int ry = 0; ry < region_ext; ++ry) {
         int cell_x = (start_col + rx) - (region_ext / 2);
         int cell_y = (start_row + ry) - (region_ext / 2);
-        if (cell_x < 0 || cell_x > _num_col_cells ||
-            cell_y < 0 || cell_y > _num_row_cells) {
+        if (cell_x < 0 || cell_x >= _num_col_cells ||
+            cell_y < 0 || cell_y >= _num_row_cells) {
           continue;
         }
         double center_dist_x = static_cast<double>(

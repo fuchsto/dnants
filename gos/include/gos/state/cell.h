@@ -35,7 +35,7 @@ class cell {
   void enter(ant & a) { _taken = true;  this->on_enter(a); }
   void leave(ant & a) { _taken = false; this->on_exit(a); }
 
-  virtual constexpr bool is_obstacle() const noexcept {
+  virtual bool is_obstacle() const noexcept {
     return false;
   }
   constexpr bool taken() const noexcept {
