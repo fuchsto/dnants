@@ -1,4 +1,6 @@
 build
+tags
+.*
 *~
 *.a
 *.o
@@ -6,3 +8,4 @@ build
 *.mine
 *.swp
 *.swo
+compile_commands.json

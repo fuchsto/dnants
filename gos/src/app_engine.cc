@@ -17,9 +17,6 @@ app_engine::app_engine(
   app_state * init_state)
 : _window(*this, title, width, height, 0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
-//SDL_WM_SetCaption(title, title);
-//int flags = 0;
-//_screen   = SDL_SetVideoMode(width, height, 0, flags);
   _is_running = true;
   change_state(init_state);
   GOS__LOG_DEBUG("app_engine", "app_engine >");
@@ -31,10 +28,6 @@ app_engine::~app_engine() {
     _states.back()->finalize();
     _states.pop_back();
   }
-  // reset video mode, for example to exit from fullscreen
-  // mode:
-//_screen = SDL_SetVideoMode(640, 480, 0, 0);
-//SDL_Quit();
   GOS__LOG_DEBUG("app_engine", "~app_engine >");
 }
 
