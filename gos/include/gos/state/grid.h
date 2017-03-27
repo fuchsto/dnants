@@ -3,6 +3,9 @@
 
 #include <gos/types.h>
 #include <gos/state/cell.h>
+#include <gos/util/logging.h>
+
+#include <vector>
 
 
 namespace gos {
@@ -19,7 +22,7 @@ class grid {
   int _rows;
   int _cols;
 
-  std::vector< std::vector<plain_cell> > _cells;
+  std::vector< std::vector<cell> > _cells;
 
  public:
 

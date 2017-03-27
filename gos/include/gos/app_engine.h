@@ -29,12 +29,13 @@ class app_engine
 
  public:
   struct app_settings {
-    int grid_cols;
-    int grid_rows;
+    extents grid_extents;
+    int     tick_per_sec;
+    bool    show_grid;
   };
 
  private:
-  app_settings _settings { 80, 80 };
+  app_settings _settings { { 80, 80 }, 5, false };
 
  public:
   app_engine(

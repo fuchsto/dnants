@@ -17,8 +17,9 @@ class map_generator
   int _num_rows          = 30;
   int _num_cols          = 30;
   int _num_grass_regions = 0;
+  int _num_food_regions  = 0;
   int _num_teams         = 0;
-public:
+ public:
   map_generator()        = delete;
 
   map_generator(int nrows, int ncols)
@@ -31,12 +32,23 @@ public:
     return *this;
   }
 
+  self_t & set_num_food_regions(int nregions) {
+    _num_food_regions = nregions;
+    return *this;
+  }
+
   self_t & set_num_teams(int nteams) {
     _num_teams = nteams;
     return *this;
   }
 
   gos::state::grid * make_grid();
+
+ private:
+  void add_region(
+         gos::state::grid      * grid_in,
+         gos::point              region_center,
+         gos::state::cell_type   type);
 };
 
 } // namespace state

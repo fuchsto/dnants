@@ -1,7 +1,9 @@
 #ifndef GOS__TYPES_H__INCLUDED
 #define GOS__TYPES_H__INCLUDED
 
+#include <SDL.h>
 #include <array>
+
 
 namespace gos {
 
@@ -15,6 +17,11 @@ typedef std::array<int, 2> direction;
 struct extents {
   int w;
   int h;
+};
+
+struct point {
+  int x;
+  int y;
 };
 
 struct rgba {

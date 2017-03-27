@@ -1,6 +1,8 @@
 #ifndef GOS__APP_PLAY_STATE_H__INCLUDED
 #define GOS__APP_PLAY_STATE_H__INCLUDED
 
+#include <SDL.h>
+
 #include <gos/app_state.h>
 
 #include <gos/rule_engine.h>
@@ -46,8 +48,11 @@ class app_play_state : public app_state {
             app->quit();
             break;
         case SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_ESCAPE)
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
               app->change_state(app_play_state::get());
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_G) {
+              app->settings().show_grid = !(app->settings().show_grid);
+            }
             break;
         default:
             break;
@@ -67,7 +72,9 @@ class app_play_state : public app_state {
       app->win().renderer());
 
     render_objects(app->win());
-    render_grid(app->win());
+    if (app->settings().show_grid) {
+      render_grid(app->win());
+    }
 
     SDL_RenderPresent(
       app->win().renderer());

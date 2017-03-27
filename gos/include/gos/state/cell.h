@@ -3,6 +3,9 @@
 
 #include <gos/state/ant.h>
 
+#include <memory>
+
+
 namespace gos {
 namespace state {
 
@@ -14,63 +17,48 @@ enum cell_type : int {
   food
 };
 
-/**
- * State of a single cell in the grid.
- *
- */
-class cell {
-  bool      _taken     = false;
-  cell_type _cell_type = cell_type::plain;
+class cell;
+
+class cell_state {
+  cell & _cell;
+  bool   _taken   = false;
 
  public:
-  constexpr cell(cell_type ct)
-  : _cell_type(ct)
+  cell_state(cell & c)
+  : _cell(c)
   { }
 
-  cell_type type() const { return _cell_type; }
+  virtual ~cell_state() { }
 
-  virtual void on_enter(const ant &) { };
-  virtual void on_exit(const ant &)  { };
+  virtual void on_enter(ant &);
+  virtual void on_exit(ant &);
 
-  void enter(ant & a) { _taken = true;  this->on_enter(a); }
-  void leave(ant & a) { _taken = false; this->on_exit(a); }
-
-  virtual bool is_obstacle() const noexcept {
-    return false;
-  }
-  constexpr bool taken() const noexcept {
+  bool taken() const noexcept {
     return _taken;
   }
+
+  bool is_obstacle() const noexcept {
+    return true;
+  }
 };
 
-
-class plain_cell : public cell {
- public:
-  plain_cell() : cell(cell_type::plain) { }
-};
-
-class grass_cell : public cell {
- public:
-  grass_cell() : cell(cell_type::grass) { }
-};
-
-class resource_cell : public cell {
+class resource_cell_state : public cell_state {
   int _amount = 1;
  public:
-  resource_cell() = delete;
-  constexpr resource_cell(cell_type ct)          : cell(ct), _amount(1)   { }
-  constexpr resource_cell(cell_type ct, int cap) : cell(ct), _amount(cap) { }
+  resource_cell_state(cell & c, int amount = 1)
+  : cell_state(c)
+  , _amount(amount)
+  { }
 
-  virtual void on_enter(const ant & a) {
-    if (_amount > 0) { --_amount; }
-  }
+  virtual ~resource_cell_state() { }
 
-  virtual void on_exit(const ant & a)  { }
+  virtual void on_enter(ant &);
+  virtual void on_exit(ant &);
 
-  constexpr int amount_left() const noexcept {
+  int amount_left() const noexcept {
     return _amount;
   }
-  constexpr bool depleted() const noexcept {
+  bool depleted() const noexcept {
     return amount_left() == 0;
   }
 
@@ -81,21 +69,75 @@ class resource_cell : public cell {
   }
 };
 
-class water_cell : public resource_cell {
+class plain_cell_state : public cell_state {
  public:
-  water_cell() : resource_cell(cell_type::water) { }
+  plain_cell_state(cell & c)
+  : cell_state(c)
+  { }
 };
 
-class food_cell : public resource_cell {
+class grass_cell_state : public cell_state {
  public:
-  food_cell() : resource_cell(cell_type::food) { }
+  grass_cell_state(cell & c)
+  : cell_state(c)
+  { }
 };
 
-class material_cell : public resource_cell {
+class water_cell_state : public resource_cell_state {
  public:
-  material_cell() : resource_cell(cell_type::material) { }
+  water_cell_state(cell & c, int amount = 1)
+  : resource_cell_state(c, amount)
+  { }
 };
 
+class food_cell_state : public resource_cell_state {
+ public:
+  food_cell_state(cell & c, int amount = 1)
+  : resource_cell_state(c, amount)
+  { }
+};
+
+/**
+ * Single cell in the grid.
+ *
+ */
+class cell {
+  cell_type                   _type = cell_type::plain;
+  std::shared_ptr<cell_state> _state;
+
+ public:
+  cell(cell_type ct, std::shared_ptr<cell_state> cs)
+  : _type(ct)
+  , _state(cs)
+  { }
+
+  cell(cell_type ct = cell_type::plain)
+  : _type(ct)
+  {
+    switch (ct) {
+      case cell_type::grass:
+        _state = std::make_shared<grass_cell_state>(*this);
+        break;
+      case cell_type::water:
+        _state = std::make_shared<water_cell_state>(*this);
+        break;
+      case cell_type::food:
+        _state = std::make_shared<food_cell_state>(*this);
+        break;
+      case cell_type::plain:
+      default: // fall-through
+        _state = std::make_shared<plain_cell_state>(*this);
+        break;
+    }
+  }
+
+  cell_type          type()  const { return _type; }
+  cell_state       & state()       { return *_state.get(); }
+  const cell_state & state() const { return *_state.get(); }
+
+  void enter(ant & a) { _state->on_enter(a); }
+  void leave(ant & a) { _state->on_exit(a);  }
+};
 
 } // namespace state
 } // namespace gos
