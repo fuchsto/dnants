@@ -7,21 +7,27 @@
 
 namespace gos {
 
+struct point {
+  int x;
+  int y;
+};
+
 // A position in the grid.
-typedef std::array<int, 2> position;
+struct position {
+  int x;
+  int y;
+};
 
 // For example, an ant with movement direction { 3, -2 } would move 3 cells
-// south and 2 cells west every 5 ticks.
-typedef std::array<int, 2> direction;
+// west and 2 cells south every 5 ticks.
+struct direction {
+  int dx;
+  int dy;
+};
 
 struct extents {
   int w;
   int h;
-};
-
-struct point {
-  int x;
-  int y;
 };
 
 struct rgba {

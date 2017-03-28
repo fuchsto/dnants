@@ -18,6 +18,7 @@ class game_state {
   using population_state = gos::state::population;
   using map_generator    = gos::state::map_generator;
 
+  size_t             _round_count   = 0;
   extents            _grid_extents;
   grid_state       * _grid_front    = nullptr;
   grid_state       * _grid_back     = nullptr;
@@ -50,7 +51,7 @@ class game_state {
 
   /// Blocks until back state is ready, then swaps front and back state
   /// and performs asynchronous update of new back state.
-  void               update()     { }
+  void               next()       { ++_round_count; }
 
   grid_state       & grid()       { return *_grid_front;  }
   population_state & population() { return *_popul_front; }

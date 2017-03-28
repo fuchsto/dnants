@@ -20,13 +20,13 @@ class app_play_state : public app_state {
   static app_play_state _instance;
 
  private:
-  bool         _active        = true;
-  int          _grid_spacing  = 15;
+  bool         _active          = true;
+  timestamp_t  _last_round_ms   = 0;
+  int          _grid_spacing    = 15;
   extents      _grid_extents;
 
-  app_engine * _app           = nullptr;
-
-  game_state * _game_state    = nullptr;
+  app_engine * _app             = nullptr;
+  game_state * _game_state      = nullptr;
 
  public:
   static app_play_state * get() { return &_instance; }
@@ -60,7 +60,14 @@ class app_play_state : public app_state {
   }
 
   virtual void update(app_engine * app) {
-    _game_state->update();
+    auto ms             = gos::timestamp_ns() / 1000000;
+    auto rounds_per_sec = app->settings().rounds_per_sec;
+    auto ms_per_round   = 1000 / rounds_per_sec;
+    if (ms - _last_round_ms >= ms_per_round) {
+      GOS__LOG_DEBUG("app_play_state.update", "round ms: " << ms);
+      _last_round_ms = ms;
+      _game_state->next();
+    }
   }
 
   virtual void draw(app_engine * app) {
@@ -71,6 +78,7 @@ class app_play_state : public app_state {
     SDL_RenderClear(
       app->win().renderer());
 
+    render_map(app->win());
     render_objects(app->win());
 
     if (app->settings().show_grid) {
@@ -82,9 +90,7 @@ class app_play_state : public app_state {
   }
 
  private:
-  void render_objects(gos::view::window & win) {
-    if (!_active) { return; }
-
+  void render_map(gos::view::window & win) {
     auto         ext   = win.view_extents();
     const auto & grid  = _game_state->grid();
     int          nrows = grid.nrows();
@@ -105,6 +111,12 @@ class app_play_state : public app_state {
         }
       }
     }
+  }
+
+  void render_objects(gos::view::window & win) {
+    // const auto & population = _game_state->population();
+    // for (const auto & team : population.teams()) {
+    // }
   }
 
   void render_grass_cell(int cell_x, int cell_y) {

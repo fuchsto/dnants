@@ -43,19 +43,19 @@ class grid {
   int ncols() const { return _cols; }
 
   const cell & operator[](const position & pos) const {
-    return at(pos[0], pos[1]);
+    return at(pos.x, pos.y);
   }
 
   cell & operator[](const position & pos) {
-    return at(pos[0], pos[1]);
+    return at(pos.x, pos.y);
   }
 
-  const cell & at(int row, int col) const {
-    return _cells[row][col];
+  const cell & at(int x, int y) const {
+    return _cells[y][x];
   }
 
-  cell & at(int row, int col) {
-    return _cells[row][col];
+  cell & at(int x, int y) {
+    return _cells[y][x];
   }
 
 };

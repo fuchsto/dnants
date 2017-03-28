@@ -6,7 +6,16 @@
 
 namespace gos {
 
-static unsigned long long timestamp_ns() {
+typedef unsigned long long timestamp_t;
+
+static inline timestamp_t timestamp_us() {
+  auto ts_now = std::chrono::system_clock::now();
+  return std::chrono::duration_cast<
+           std::chrono::milliseconds
+         >(ts_now.time_since_epoch()).count();
+}
+
+static inline timestamp_t timestamp_ns() {
   auto ts_now = std::chrono::system_clock::now();
   return std::chrono::duration_cast<
            std::chrono::nanoseconds

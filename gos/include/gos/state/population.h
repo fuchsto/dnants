@@ -1,7 +1,7 @@
 #ifndef GOS__STATE__POPULATION_H__INCLUDED
 #define GOS__STATE__POPULATION_H__INCLUDED
 
-#include <gos/state/ant_team.h>
+#include <gos/state/ant.h>
 
 #include <vector>
 

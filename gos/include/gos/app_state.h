@@ -2,6 +2,7 @@
 #define GOS__APP_STATE_H__INCLUDED
 
 #include <gos/app_engine.h>
+#include <gos/util/timestamp.h>
 
 #include <SDL.h>
 
@@ -13,7 +14,8 @@ class app_state
  protected:
   app_state() { }
 
-  unsigned long get_ticks() const { return SDL_GetTicks(); }
+  Uint32             get_ms() const { return SDL_GetTicks(); }
+  unsigned long long get_us() const { return gos::timestamp_us(); }
 
  public:
   virtual ~app_state() { }

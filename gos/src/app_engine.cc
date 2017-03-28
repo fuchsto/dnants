@@ -79,8 +79,10 @@ void app_engine::draw() {
 
   _states.back()->draw(this);
 
-  if ((SDL_GetTicks() - _frame_time) < _min_frame_time) {
-    SDL_Delay(_min_frame_time - (SDL_GetTicks() - _frame_time));
+  auto min_frame_time = 1000 / _settings.frames_per_sec;
+
+  if ((SDL_GetTicks() - _frame_time) < min_frame_time) {
+    SDL_Delay(min_frame_time - (SDL_GetTicks() - _frame_time));
   }
 }
 

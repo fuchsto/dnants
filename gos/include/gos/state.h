@@ -4,7 +4,6 @@
 #include <gos/state/grid.h>
 #include <gos/state/cell.h>
 #include <gos/state/ant.h>
-#include <gos/state/ant_team.h>
 #include <gos/state/population.h>
 #include <gos/state/game_state.h>
 #include <gos/state/map_generator.h>

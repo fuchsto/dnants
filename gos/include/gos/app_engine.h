@@ -24,18 +24,16 @@ class app_engine
   Uint32                     _last_frame_time = 0;
   Uint32                     _delta_time      = 0;
 
-  Uint32                     _fps             = 60;
-  Uint32                     _min_frame_time  = 1000 / _fps;
-
  public:
   struct app_settings {
     extents grid_extents;
-    int     tick_per_sec;
+    int     frames_per_sec;
+    int     rounds_per_sec;
     bool    show_grid;
   };
 
  private:
-  app_settings _settings { { 80, 80 }, 5, false };
+  app_settings _settings { { 80, 80 }, 30, 2, false };
 
  public:
   app_engine(
