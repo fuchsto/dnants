@@ -1,8 +1,9 @@
 #ifndef GOS__STATE__MAP_GENERATOR_H__INCLUDED
 #define GOS__STATE__MAP_GENERATOR_H__INCLUDED
 
-#include <gos/app_play_state.h>
 #include <gos/state/cell.h>
+#include <gos/state/grid.h>
+
 #include <gos/util/logging.h>
 
 
@@ -22,9 +23,9 @@ class map_generator
  public:
   map_generator()        = delete;
 
-  map_generator(int nrows, int ncols)
-  : _num_rows(nrows)
-  , _num_cols(ncols)
+  map_generator(extents grid_extents)
+  : _num_rows(grid_extents.h)
+  , _num_cols(grid_extents.w)
   { }
 
   self_t & set_num_grass_regions(int nregions) {
@@ -48,6 +49,7 @@ class map_generator
   void add_region(
          gos::state::grid      * grid_in,
          gos::point              region_center,
+         gos::extents            region_ext,
          gos::state::cell_type   type);
 };
 

@@ -4,14 +4,15 @@
 #include <SDL.h>
 
 #include <gos/app_state.h>
-
-#include <gos/rule_engine.h>
+#include <gos/state/game_state.h>
 #include <gos/state.h>
 
 
 namespace gos {
 
 class app_play_state : public app_state {
+  using game_state = gos::state::game_state;
+
  protected:
   app_play_state() { }
 
@@ -19,15 +20,13 @@ class app_play_state : public app_state {
   static app_play_state _instance;
 
  private:
-  bool             _active        = true;
-  int              _grid_spacing  = 15;
-  int              _num_row_cells = 30;
-  int              _num_col_cells = 30;
+  bool         _active        = true;
+  int          _grid_spacing  = 15;
+  extents      _grid_extents;
 
-  app_engine       * _app         = nullptr;
+  app_engine * _app           = nullptr;
 
-  gos::state::grid * _grid_front  = nullptr;
-  gos::state::grid * _grid_back   = nullptr;
+  game_state * _game_state    = nullptr;
 
  public:
   static app_play_state * get() { return &_instance; }
@@ -61,6 +60,7 @@ class app_play_state : public app_state {
   }
 
   virtual void update(app_engine * app) {
+    _game_state->update();
   }
 
   virtual void draw(app_engine * app) {
@@ -72,6 +72,7 @@ class app_play_state : public app_state {
       app->win().renderer());
 
     render_objects(app->win());
+
     if (app->settings().show_grid) {
       render_grid(app->win());
     }
@@ -84,13 +85,14 @@ class app_play_state : public app_state {
   void render_objects(gos::view::window & win) {
     if (!_active) { return; }
 
-    auto ext     = win.view_extents();
-    int  nrows   = _grid_front->nrows();
-    int  ncols   = _grid_front->ncols();
+    auto         ext   = win.view_extents();
+    const auto & grid  = _game_state->grid();
+    int          nrows = grid.nrows();
+    int          ncols = grid.ncols();
 
     for (int cell_x = 0; cell_x < ncols; ++cell_x) {
       for (int cell_y = 0; cell_y < nrows; ++cell_y) {
-        const auto & grid_cell = _grid_front->at(cell_x, cell_y);
+        const auto & grid_cell = grid.at(cell_x, cell_y);
         switch (grid_cell.type()) {
           case gos::state::cell_type::grass:
             render_grass_cell(cell_x, cell_y);
