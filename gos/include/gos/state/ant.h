@@ -69,14 +69,18 @@ class ant {
   , _pos(std::move(pos))
   { }
 
-  void tick() {
+  void update() {
     ++_nticks_not_fed;
     switch (_mode) {
       case ant::mode::eating:
         _nticks_not_fed = 0;
+        ++_strength;
         break;
       default:
         break;
+    }
+    if (_strength > 0 && _nticks_not_fed > 50) {
+      --_strength;
     }
   }
 

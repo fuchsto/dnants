@@ -13,7 +13,7 @@ int main(int argc, char * argv[])
 {
   app_engine app(
     "game'-._.of'._.survive",
-    800, 800,
+    900, 900,
     app_play_state::get());
 
   while (app.is_running()) {
