@@ -20,6 +20,7 @@ class ant_team {
   friend class ant;
 
   int                   _team_id;
+  int                   _team_size;
   game_state &          _game_state;
   std::vector<ant>      _ants;
   std::vector<position> _spawn_points;
@@ -28,9 +29,11 @@ class ant_team {
 
   ant_team(
     int              team_id,
+    int              init_team_size,
     const position & spawn_point,
     game_state     & gs)
   : _team_id(team_id)
+  , _team_size(init_team_size)
   , _game_state(gs) {
     _spawn_points.push_back(spawn_point);
   }
@@ -78,6 +81,9 @@ class ant {
   int          _rand           = 0;
 
  public:
+  static const int max_strength() { return 20; }
+
+ public:
   ant() = delete;
   ant(ant_team  & team,
       int         id,
@@ -107,6 +113,10 @@ class ant {
 
   int id() const noexcept {
     return _id;
+  }
+
+  int strength() const noexcept {
+    return _strength;
   }
 
   const position & pos() const noexcept {

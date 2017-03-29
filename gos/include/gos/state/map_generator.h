@@ -22,6 +22,7 @@ class map_generator
   extents      _extents           { 80, 80 };
   int          _num_grass_regions = 0;
   int          _num_food_regions  = 0;
+  int          _num_barriers      = 0;
   int          _num_teams         = 0;
  public:
   map_generator()                 = delete;
@@ -38,6 +39,11 @@ class map_generator
     return *this;
   }
 
+  self_t & set_num_barriers(int nbarriers) {
+    _num_barriers = nbarriers;
+    return *this;
+  }
+
   self_t & set_num_teams(int nteams) {
     _num_teams = nteams;
     return *this;
@@ -46,7 +52,8 @@ class map_generator
   gos::state::grid       * make_grid(
                              gos::state::game_state & g_state);
   gos::state::population * make_population(
-                             gos::state::game_state & g_state);
+                             gos::state::game_state & g_state,
+                             int                      team_size);
 
  private:
   void add_region(

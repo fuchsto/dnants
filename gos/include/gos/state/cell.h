@@ -11,6 +11,7 @@ namespace state {
 
 enum cell_type : int {
   plain = 0,
+  barrier,
   grass,
   water,
   material,
@@ -33,9 +34,7 @@ class cell_state {
   virtual void on_enter(ant &);
   virtual void on_exit(ant &);
 
-  bool is_obstacle() const noexcept {
-    return is_taken();
-  }
+  bool is_obstacle() const noexcept;
 
   bool is_taken() const noexcept {
     return _taken;
@@ -105,6 +104,8 @@ class cell {
   cell_type                   _type = cell_type::plain;
   std::shared_ptr<cell_state> _state;
 
+  friend cell_state;
+
  public:
   cell(cell_type ct, std::shared_ptr<cell_state> cs)
   : _type(ct)
@@ -117,6 +118,9 @@ class cell {
     switch (ct) {
       case cell_type::grass:
         _state = std::make_shared<grass_cell_state>(*this);
+        break;
+      case cell_type::material:
+        _state = std::make_shared<plain_cell_state>(*this);
         break;
       case cell_type::water:
         _state = std::make_shared<water_cell_state>(*this);
@@ -131,7 +135,8 @@ class cell {
     }
   }
 
-  bool               is_taken() const { return _state->is_taken(); }
+  bool               is_taken()    const { return _state->is_taken();    }
+  bool               is_obstacle() const { return _state->is_obstacle(); }
 
   cell_type          type()     const { return _type;         }
   cell_state       & state()          { return *_state.get(); }

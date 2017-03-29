@@ -2,8 +2,8 @@
 #define GOS__STATE__GAME_STATE_H__INCLUDED
 
 #include <gos/app_engine.h>
-
 #include <gos/types.h>
+
 
 
 namespace gos {
@@ -13,14 +13,14 @@ class population;
 class grid;
 
 class game_state {
-  size_t             _round_count   = 0;
+  app_engine       * _app           = nullptr;
+  int                _nteams        = 1;
   extents            _grid_extents;
+  size_t             _round_count   = 0;
   grid             * _grid_front    = nullptr;
   grid             * _grid_back     = nullptr;
   population       * _popul_front   = nullptr;
   population       * _popul_back    = nullptr;
-  app_engine       * _app           = nullptr;
-  int                _nteams        = 1;
 
  public:
   game_state(app_engine * app, int nteams = 1);

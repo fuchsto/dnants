@@ -118,6 +118,9 @@ class app_play_state : public app_state {
           case gos::state::cell_type::food:
             render_food_cell(cell_x, cell_y);
             break;
+          case gos::state::cell_type::barrier:
+            render_barrier_cell(cell_x, cell_y);
+            break;
           default:
             break;
         }
@@ -138,6 +141,12 @@ class app_play_state : public app_state {
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
+      std::min<int>(
+        (_grid_spacing / 2) +
+          ((ant.strength() * _grid_spacing) /
+           (ant.strength() * gos::state::ant::max_strength())),
+        _grid_spacing
+      ),
       _team_colors[ant.team().id()]);
   }
 
@@ -149,6 +158,11 @@ class app_play_state : public app_state {
   void render_food_cell(int cell_x, int cell_y) {
     draw_cell_rectangle(
       _app->win(), cell_x, cell_y, rgba { 0xaf, 0xef, 0x9f, 0xff });
+  }
+
+  void render_barrier_cell(int cell_x, int cell_y) {
+    draw_cell_rectangle(
+      _app->win(), cell_x, cell_y, rgba { 0x56, 0x56, 0x56, 0xff });
   }
 
   void render_grid(gos::view::window & win) {
@@ -180,12 +194,13 @@ class app_play_state : public app_state {
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
+    int  radius,
     rgba col) {
     SDL_SetRenderDrawColor(
       win.renderer(), col.r, col.g, col.b, col.a);
-    int spacing = _grid_spacing;
+    int spacing = radius;
     while (spacing--) {
-      if (spacing < _grid_spacing-1) {
+      if (spacing < radius-1) {
         SDL_SetRenderDrawColor(
           win.renderer(), col.r, col.g, col.b, col.a);
       } else {
@@ -196,14 +211,14 @@ class app_play_state : public app_state {
       int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
       SDL_Point points[7] = {
         // top left
-        { center_x - (spacing / 3) + 1,
+        { center_x - (spacing / 2) + 1,
           center_y - (spacing / 2) + 1 },
         // top right
-        { center_x + (spacing / 3) + 1,
+        { center_x + (spacing / 2) + 1,
           center_y - (spacing / 2) + 1 },
         // center right
         { center_x + (spacing / 2) - 1,
-          center_y + (spacing / 3) - 1 },
+          center_y + (spacing / 2) - 1 },
         // bottom right
         { center_x + (spacing / 2) - 1,
           center_y + (spacing / 2) - 1 },
@@ -212,9 +227,9 @@ class app_play_state : public app_state {
           center_y + (spacing / 2) - 1 },
         // center left
         { center_x - (spacing / 2) - 1,
-          center_y + (spacing / 3) - 1 },
+          center_y + (spacing / 2) - 1 },
         // top left
-        { center_x - (spacing / 3) + 1,
+        { center_x - (spacing / 2) + 1,
           center_y - (spacing / 2) + 1 }
       };
       SDL_RenderDrawLines(

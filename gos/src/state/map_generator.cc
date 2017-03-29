@@ -6,6 +6,7 @@
 
 #include <gos/util/logging.h>
 #include <gos/util/timestamp.h>
+#include <gos/util/random.h>
 
 #include <gos/app_play_state.h>
 
@@ -90,17 +91,53 @@ gos::state::grid * map_generator::make_grid(
         { _extents.w / 2, _extents.h / 2 },
         gos::state::cell_type::food);
   }
+
+  rnd_i = static_cast<int>(gos::random());
+
+  position max_excenter { _extents.w / 4,
+                          _extents.h / 4 };
+  gos::position  barrier_cell { _extents.w / 2,
+                                _extents.h / 2 };
+  gos::direction barrier_dir  { (rnd_i % 3) - 1,
+                                (rnd_i % 3) - 1 };
+  barrier_cell.x += (gos::random() % max_excenter.x) -
+                    (max_excenter.x / 2);
+  barrier_cell.y += (gos::random() % max_excenter.y) -
+                    (max_excenter.y / 2);
+  int barrier_length = max_excenter.x;
+  for (int br = 0; br < _num_barriers;) {
+    for (int bl = 0; bl < barrier_length; ++bl) {
+      barrier_cell.x += barrier_dir.dx;
+      barrier_cell.y += barrier_dir.dy;
+      if (gen_grid->contains_position(barrier_cell)) {
+        gen_grid->at(barrier_cell.x, barrier_cell.y) =
+          gos::state::cell(gos::state::cell_type::barrier);
+        ++br;
+      } else {
+        break;
+      }
+      rnd_i = static_cast<int>(gos::random());
+      if (bl % 3 == 0) {
+        barrier_dir.dx = ((rnd_i / 2) % 3) - 1;
+      } else if (bl % 5 == 0) {
+        barrier_dir.dy = ((rnd_i * 7) % 3) - 1;
+      }
+    }
+  }
+
   return gen_grid;
 }
 
 gos::state::population * map_generator::make_population(
-  gos::state::game_state & g_state) {
+  gos::state::game_state & g_state,
+  int                      team_size) {
   std::vector<ant_team> teams;
   for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
     position spawn_point {
                _extents.w / 10,
                _extents.h / 10 };
     teams.push_back(ant_team(team_idx,
+                             team_size,
                              spawn_point,
                              g_state));
   }

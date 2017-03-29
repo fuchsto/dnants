@@ -5,6 +5,7 @@
 #include <gos/state/cell.h>
 
 #include <gos/types.h>
+#include <gos/util/random.h>
 
 
 namespace gos {
@@ -32,6 +33,7 @@ ant & ant_team::add_ant_at(const position & pos) {
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     if (!(_game_state.grid_state()[spawn_pos].is_taken())) {
+      if (_ants.size() >= _team_size) { return; }
       add_ant_at(spawn_pos);
     }
   }
@@ -39,7 +41,7 @@ void ant_team::spawn_ants() {
 
 void ant::update() noexcept {
   auto rc = _game_state.round_count();
-  _rand   = static_cast<int>(gos::timestamp_ns());
+  _rand   = gos::random();
   ++_nticks_not_fed;
   switch (_mode) {
     case ant::mode::eating:
@@ -47,9 +49,9 @@ void ant::update() noexcept {
       ++_strength;
       break;
     case ant::mode::scouting:
-      if (rc % 8 == 0) {
-        int dx = ((_rand ) % 3) - 1;
-        int dy = ((_rand + rc) % 3) - 1;
+      if (_rand % 8 == 0) {
+        int dx = ((_rand + rc / 2) % 3) - 1;
+        int dy = ((_rand + rc * 7) % 3) - 1;
         set_direction(direction { dx, dy });
       }
       move();
@@ -57,7 +59,7 @@ void ant::update() noexcept {
     default:
       break;
   }
-  if (_strength > 0 && _nticks_not_fed > 100) {
+  if (_strength > 1 && _nticks_not_fed > 1000) {
     --_strength;
   }
 }
@@ -65,10 +67,10 @@ void ant::update() noexcept {
 void ant::move() noexcept {
   int px = _pos.x + _dir.dx;
   int py = _pos.y + _dir.dy;
-  if (_can_move_to(px, py)) {
+  if (_game_state.grid_state().allows_move_to({ px, py })) {
     _game_state.grid_state()[{ _pos.x, _pos.y }].leave(*this);
     _pos.x = px;
-    _pos.y = px;
+    _pos.y = py;
     _game_state.grid_state()[{ _pos.x, _pos.y }].enter(*this);
   } else {
     // collision, move failed:
@@ -84,14 +86,6 @@ void ant::move() noexcept {
   else        { d += dn; ++_pos.y; }
   ++_pos.x;
 */
-}
-
-bool ant::_can_move_to(int px, int py) const noexcept {
-  return ( px > 0 &&
-           py > 0 &&
-           px < _game_state.grid_state().extents().w &&
-           py < _game_state.grid_state().extents().h &&
-           !_game_state.grid_state()[{ px, py }].is_taken() );
 }
 
 } // namespace state

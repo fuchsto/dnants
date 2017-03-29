@@ -29,6 +29,7 @@ class app_engine
     extents grid_extents;
     int     frames_per_sec;
     int     rounds_per_sec;
+    int     init_team_size;
     bool    show_grid;
   };
 
@@ -37,6 +38,7 @@ class app_engine
                   { 80, 80 }, // grid extents
                   30,         // fps
                   5,          // rps
+                  50,         // initial team size
                   false       // show grid
                };
 

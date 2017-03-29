@@ -44,6 +44,19 @@ class grid {
 
   gos::extents extents() const { return gos::extents { _cols, _rows }; }
 
+  bool contains_position(const gos::position & pos) const {
+   return ( pos.x > 0 &&
+            pos.y > 0 &&
+            pos.x < extents().w &&
+            pos.y < extents().h );
+  }
+
+  bool allows_move_to(const gos::position & pos) const {
+    return contains_position(pos) &&
+           !at(pos.x, pos.y).is_taken() &&
+           !at(pos.x, pos.y).is_obstacle();
+  }
+
   const cell & operator[](const gos::position & pos) const {
     return at(pos.x, pos.y);
   }
