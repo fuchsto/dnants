@@ -1,9 +1,9 @@
 #ifndef GOS__STATE__GRID_H__INCLUDED
 #define GOS__STATE__GRID_H__INCLUDED
 
-#include <gos/types.h>
 #include <gos/state/cell.h>
 #include <gos/util/logging.h>
+#include <gos/types.h>
 
 #include <vector>
 
@@ -42,11 +42,13 @@ class grid {
   int nrows() const { return _rows; }
   int ncols() const { return _cols; }
 
-  const cell & operator[](const position & pos) const {
+  gos::extents extents() const { return gos::extents { _cols, _rows }; }
+
+  const cell & operator[](const gos::position & pos) const {
     return at(pos.x, pos.y);
   }
 
-  cell & operator[](const position & pos) {
+  cell & operator[](const gos::position & pos) {
     return at(pos.x, pos.y);
   }
 

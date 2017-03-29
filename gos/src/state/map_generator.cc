@@ -1,6 +1,8 @@
 
 #include <gos/state/map_generator.h>
+#include <gos/state/game_state.h>
 #include <gos/state/cell.h>
+#include <gos/types.h>
 
 #include <gos/util/logging.h>
 #include <gos/util/timestamp.h>
@@ -14,6 +16,10 @@
 namespace gos {
 namespace state {
 
+map_generator::map_generator(extents ext)
+: _extents(ext)
+{ }
+
 void map_generator::add_region(
        gos::state::grid      * grid_in,
        gos::point              region_center,
@@ -24,8 +30,8 @@ void map_generator::add_region(
     for (int ry = 0; ry < region_ext.h; ++ry) {
       int cell_x = (region_center.x + rx) - (region_ext.w / 2);
       int cell_y = (region_center.y + ry) - (region_ext.h / 2);
-      if (cell_x < 0 || cell_x >= _num_cols ||
-          cell_y < 0 || cell_y >= _num_rows) {
+      if (cell_x < 0 || cell_x >= _extents.w ||
+          cell_y < 0 || cell_y >= _extents.h) {
         continue;
       }
       double center_dist_x = static_cast<double>(
@@ -49,42 +55,60 @@ void map_generator::add_region(
   grid_in->at(region_center.x, region_center.y) = gos::state::cell(type);
 }
 
-gos::state::grid * map_generator::make_grid() {
+gos::state::grid * map_generator::make_grid(
+  gos::state::game_state & g_state) {
   gos::state::grid * gen_grid = new gos::state::grid(
-                                      _num_rows,
-                                      _num_cols);
+                                      _extents.w,
+                                      _extents.h);
   int rnd_i;
   int region_idx = 0;
   for (int gr = 0; gr < _num_grass_regions; ++gr) {
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
-    int  start_row  = 4 + (rnd_i % (_num_rows - 4));
+    int  start_row  = 4 + (rnd_i % (_extents.w - 4));
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
-    int  start_col  = 4 + (rnd_i % (_num_cols - 4));
+    int  start_col  = 4 + (rnd_i % (_extents.h - 4));
 
     add_region(
         gen_grid,
-        { start_row,     start_col },
-        { _num_cols / 4, _num_rows / 3 },
+        { start_row,      start_col      },
+        { _extents.h / 4, _extents.w / 3 },
         gos::state::cell_type::grass);
   }
   for (int gr = 0; gr < _num_food_regions; ++gr) {
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
-    int  start_row  = 4 + (rnd_i % (_num_rows - 4));
+    int  start_row  = 4 + (rnd_i % (_extents.h - 4));
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
-    int  start_col  = 4 + (rnd_i % (_num_cols - 4));
+    int  start_col  = 4 + (rnd_i % (_extents.w - 4));
 
     add_region(
         gen_grid,
-        { start_row,     start_col },
-        { _num_cols / 2, _num_rows / 2 },
+        { start_row,      start_col      },
+        { _extents.w / 2, _extents.h / 2 },
         gos::state::cell_type::food);
   }
   return gen_grid;
 }
 
+gos::state::population * map_generator::make_population(
+  gos::state::game_state & g_state) {
+  std::vector<ant_team> teams;
+  for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
+    position spawn_point {
+               _extents.w / 10,
+               _extents.h / 10 };
+    teams.push_back(ant_team(team_idx,
+                             spawn_point,
+                             g_state));
+  }
+  gos::state::population * popul = new gos::state::population(
+                                         std::move(teams));
+  return popul;
+}
+
 } // namespace state
 } // namespace gos
+

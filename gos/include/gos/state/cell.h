@@ -21,7 +21,7 @@ class cell;
 
 class cell_state {
   cell & _cell;
-  bool   _taken   = false;
+  bool   _taken = false;
 
  public:
   cell_state(cell & c)
@@ -33,12 +33,12 @@ class cell_state {
   virtual void on_enter(ant &);
   virtual void on_exit(ant &);
 
-  bool taken() const noexcept {
-    return _taken;
+  bool is_obstacle() const noexcept {
+    return is_taken();
   }
 
-  bool is_obstacle() const noexcept {
-    return true;
+  bool is_taken() const noexcept {
+    return _taken;
   }
 };
 
@@ -58,7 +58,7 @@ class resource_cell_state : public cell_state {
   int amount_left() const noexcept {
     return _amount;
   }
-  bool depleted() const noexcept {
+  bool is_depleted() const noexcept {
     return amount_left() == 0;
   }
 
@@ -131,9 +131,11 @@ class cell {
     }
   }
 
-  cell_type          type()  const { return _type; }
-  cell_state       & state()       { return *_state.get(); }
-  const cell_state & state() const { return *_state.get(); }
+  bool               is_taken() const { return _state->is_taken(); }
+
+  cell_type          type()     const { return _type;         }
+  cell_state       & state()          { return *_state.get(); }
+  const cell_state & state()    const { return *_state.get(); }
 
   void enter(ant & a) { _state->on_enter(a); }
   void leave(ant & a) { _state->on_exit(a);  }

@@ -33,7 +33,12 @@ class app_engine
   };
 
  private:
-  app_settings _settings { { 80, 80 }, 30, 2, false };
+  app_settings _settings {
+                  { 80, 80 }, // grid extents
+                  30,         // fps
+                  5,          // rps
+                  false       // show grid
+               };
 
  public:
   app_engine(

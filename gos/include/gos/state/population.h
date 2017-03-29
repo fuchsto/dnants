@@ -16,12 +16,22 @@ class population {
   : _teams(teams)
   { }
 
+  population(std::vector<ant_team> && teams)
+  : _teams(std::move(teams))
+  { }
+
   const std::vector<ant_team> & teams() const noexcept {
     return _teams;
   }
 
   std::vector<ant_team> & teams() noexcept {
     return _teams;
+  }
+
+  void update() {
+    for (auto & t : _teams) {
+      t.update();
+    }
   }
 };
 

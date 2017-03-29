@@ -2,6 +2,7 @@
 #include <gos/app_play_state.h>
 
 #include <gos/state/cell.h>
+#include <gos/state/game_state.h>
 
 #include <gos/util/logging.h>
 

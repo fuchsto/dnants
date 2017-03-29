@@ -10,23 +10,23 @@
 namespace gos {
 namespace state {
 
+class population;
+class game_state;
+class grid;
+
 class map_generator
 {
  private:
   typedef gos::state::map_generator self_t;
 
-  int _num_rows          = 30;
-  int _num_cols          = 30;
-  int _num_grass_regions = 0;
-  int _num_food_regions  = 0;
-  int _num_teams         = 0;
+  extents      _extents           { 80, 80 };
+  int          _num_grass_regions = 0;
+  int          _num_food_regions  = 0;
+  int          _num_teams         = 0;
  public:
-  map_generator()        = delete;
+  map_generator()                 = delete;
 
-  map_generator(extents grid_extents)
-  : _num_rows(grid_extents.h)
-  , _num_cols(grid_extents.w)
-  { }
+  map_generator(extents ext);
 
   self_t & set_num_grass_regions(int nregions) {
     _num_grass_regions = nregions;
@@ -43,7 +43,10 @@ class map_generator
     return *this;
   }
 
-  gos::state::grid * make_grid();
+  gos::state::grid       * make_grid(
+                             gos::state::game_state & g_state);
+  gos::state::population * make_population(
+                             gos::state::game_state & g_state);
 
  private:
   void add_region(
