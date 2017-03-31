@@ -14,7 +14,7 @@ class grid;
 
 class game_state {
   app_engine       * _app           = nullptr;
-  int                _nteams        = 1;
+  int                _nteams;
   extents            _grid_extents;
   size_t             _round_count   = 0;
   grid             * _grid_front    = nullptr;
@@ -23,7 +23,8 @@ class game_state {
   population       * _popul_back    = nullptr;
 
  public:
-  game_state(app_engine * app, int nteams = 1);
+  game_state(app_engine * app);
+  game_state(app_engine * app, int nteams);
   ~game_state();
 
   /// Blocks until back state is ready, then swaps front and back state

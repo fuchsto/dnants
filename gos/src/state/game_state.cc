@@ -9,6 +9,11 @@ namespace gos {
 namespace state {
 
 game_state::game_state(
+  app_engine * app)
+: game_state(app, 2)
+{ }
+
+game_state::game_state(
   app_engine * app,
   int          nteams)
 : _app(app)

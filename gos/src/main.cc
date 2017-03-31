@@ -16,6 +16,10 @@ int main(int argc, char * argv[])
     900, 900,
     app_play_state::get());
 
+  app.settings().grid_extents   = { 60, 60 };
+  app.settings().rounds_per_sec = 5;
+  app.settings().init_team_size = 20;
+
   while (app.is_running()) {
     app.handle_events();
     app.update();

@@ -133,9 +133,11 @@ gos::state::population * map_generator::make_population(
   int                      team_size) {
   std::vector<ant_team> teams;
   for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
-    position spawn_point {
-               _extents.w / 10,
-               _extents.h / 10 };
+    position spawn_point { 1, 1 };
+    spawn_point.x += (team_idx % 2) * 5;
+    spawn_point.y += (team_idx % 2) * 5;
+    spawn_point.x *= _extents.w / 10;
+    spawn_point.y *= _extents.h / 10;
     teams.push_back(ant_team(team_idx,
                              team_size,
                              spawn_point,

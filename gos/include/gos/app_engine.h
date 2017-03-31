@@ -18,7 +18,6 @@ class app_engine
 {
   std::vector<app_state *>   _states;
   gos::view::window          _window;
-//SDL_Surface              * _screen;
   bool                       _is_running      = false;
   Uint32                     _frame_time      = 0;
   Uint32                     _last_frame_time = 0;
@@ -35,7 +34,7 @@ class app_engine
 
  private:
   app_settings _settings {
-                  { 80, 80 }, // grid extents
+                  { 40, 40 }, // grid extents
                   30,         // fps
                   5,          // rps
                   50,         // initial team size
