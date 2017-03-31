@@ -22,8 +22,9 @@ enum cell_type : int {
 class cell;
 
 class cell_state {
-  cell & _cell;
-  bool   _taken = false;
+  cell               & _cell;
+  bool                 _taken = false;
+  std::array<int, 4>   _traces { };
 
  public:
   cell_state(cell & c)
@@ -41,6 +42,14 @@ class cell_state {
 
   bool is_taken() const noexcept {
     return _taken;
+  }
+
+  int get_trace(int team_id) const noexcept {
+    return _traces[team_id];
+  }
+
+  void add_trace(int team_id) noexcept {
+    ++_traces[team_id];
   }
 };
 
@@ -134,18 +143,21 @@ class food_cell_state : public resource_cell_state {
  *
  */
 class cell {
-  cell_type                   _type = cell_type::plain;
-  std::shared_ptr<cell_state> _state;
+  cell_type                     _type = cell_type::plain;
+  std::shared_ptr<cell_state>   _state;
 
   friend cell_state;
 
  public:
-  cell(cell_type ct, std::shared_ptr<cell_state> cs)
+  cell(
+    cell_type                     ct,
+    std::shared_ptr<cell_state>   cs)
   : _type(ct)
   , _state(cs)
   { }
 
-  cell(cell_type ct = cell_type::plain)
+  cell(
+    cell_type                     ct = cell_type::plain)
   : _type(ct)
   {
     switch (ct) {

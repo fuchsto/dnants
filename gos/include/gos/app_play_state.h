@@ -24,7 +24,7 @@ class app_play_state : public app_state {
   bool         _active          = true;
   bool         _paused          = false;
   timestamp_t  _last_round_ms   = 0;
-  int          _grid_spacing    = 30;
+  int          _grid_spacing    = 5;
   extents      _grid_extents;
 
   app_engine * _app             = nullptr;

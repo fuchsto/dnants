@@ -5,8 +5,9 @@
 namespace gos {
 namespace state {
 
-void cell_state::on_enter(ant &) {
+void cell_state::on_enter(ant & a) {
   _taken = true;
+  add_trace(a.team().id());
 }
 
 void cell_state::on_exit(ant &) {

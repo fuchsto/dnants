@@ -19,6 +19,8 @@ class map_generator
  private:
   typedef gos::state::map_generator self_t;
 
+  gos::state::game_state & _game_state;
+
   extents      _extents           { 80, 80 };
   int          _num_grass_regions = 0;
   int          _num_food_regions  = 0;
@@ -27,7 +29,9 @@ class map_generator
  public:
   map_generator()                 = delete;
 
-  map_generator(extents ext);
+  map_generator(
+    gos::state::game_state & g_state,
+    extents                  ext);
 
   self_t & set_num_grass_regions(int nregions) {
     _num_grass_regions = nregions;
@@ -49,11 +53,8 @@ class map_generator
     return *this;
   }
 
-  gos::state::grid       * make_grid(
-                             gos::state::game_state & g_state);
-  gos::state::population * make_population(
-                             gos::state::game_state & g_state,
-                             int                      team_size);
+  gos::state::grid       * make_grid();
+  gos::state::population * make_population(int team_size);
 
  private:
   void add_region(

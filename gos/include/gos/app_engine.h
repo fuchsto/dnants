@@ -45,10 +45,11 @@ class app_engine
   app_engine(
     std::string title,
     int         width,
-    int         height,
-    app_state * init_state);
+    int         height);
 
   ~app_engine();
+
+  void run(app_state * init_state);
 
   void change_state(
          app_state  * state);

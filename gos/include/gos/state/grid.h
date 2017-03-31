@@ -57,6 +57,12 @@ class grid {
            !at(pos.x, pos.y).is_obstacle();
   }
 
+  inline void set_cell_type(
+    const gos::position   & pos,
+    gos::state::cell_type   type) noexcept {
+    _cells[pos.y][pos.x] = gos::state::cell(type);
+  }
+
   inline const cell & operator[](const gos::position & pos) const {
     return at(pos.x, pos.y);
   }

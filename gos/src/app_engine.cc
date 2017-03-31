@@ -13,13 +13,19 @@ namespace gos {
 app_engine::app_engine(
   std::string title,
   int         width,
-  int         height,
-  app_state * init_state)
+  int         height)
 : _window(*this, title, width, height, 0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
+  GOS__LOG_DEBUG("app_engine", "app_engine >");
+}
+
+void app_engine::run(
+  app_state * init_state)
+{
+  GOS__LOG_DEBUG("app_engine", "run()");
   _is_running = true;
   change_state(init_state);
-  GOS__LOG_DEBUG("app_engine", "app_engine >");
+  GOS__LOG_DEBUG("app_engine", "run >");
 }
 
 app_engine::~app_engine() {

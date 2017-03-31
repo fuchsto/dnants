@@ -17,8 +17,11 @@
 namespace gos {
 namespace state {
 
-map_generator::map_generator(extents ext)
-: _extents(ext)
+map_generator::map_generator(
+  gos::state::game_state & g_state,
+  extents                  ext)
+: _game_state(g_state)
+, _extents(ext)
 { }
 
 void map_generator::add_region(
@@ -49,20 +52,20 @@ void map_generator::add_region(
                  (region_ext.w * rx) + ry);
       double rnd = (static_cast<double>(std::rand()) / RAND_MAX);
       if (center_dist < rnd * 0.8) {
-        grid_in->at(cell_x, cell_y) = gos::state::cell(type);
+        grid_in->set_cell_type({ cell_x, cell_y }, type);
       }
     }
   }
-  grid_in->at(region_center.x, region_center.y) = gos::state::cell(type);
+  grid_in->set_cell_type({ region_center.x, region_center.y }, type);
 }
 
-gos::state::grid * map_generator::make_grid(
-  gos::state::game_state & g_state)
+gos::state::grid * map_generator::make_grid()
 {
   gos::state::grid * gen_grid = new gos::state::grid(_extents);
 
   int rnd_i;
   int region_idx = 0;
+  GOS__LOG_DEBUG("map_generator.make_grid", "grass regions ...");
   for (int gr = 0; gr < _num_grass_regions; ++gr) {
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
@@ -77,6 +80,7 @@ gos::state::grid * map_generator::make_grid(
         { _extents.h / 2, _extents.w / 3 },
         gos::state::cell_type::grass);
   }
+  GOS__LOG_DEBUG("map_generator.make_grid", "food regions ...");
   for (int gr = 0; gr < _num_food_regions; ++gr) {
     std::srand(gos::timestamp_ns() + gr + ++region_idx);
     rnd_i = std::rand();
@@ -92,29 +96,32 @@ gos::state::grid * map_generator::make_grid(
         gos::state::cell_type::food);
   }
 
-  rnd_i = static_cast<int>(gos::random());
+  GOS__LOG_DEBUG("map_generator.make_grid", "barriers ...");
 
   position max_excenter { _extents.w / 4,
                           _extents.h / 4 };
-  gos::position  barrier_cell { _extents.w / 2,
-                                _extents.h / 2 };
-  gos::direction barrier_dir  { (rnd_i % 3) - 1,
-                                (rnd_i % 3) - 1 };
-  barrier_cell.x += (gos::random() % max_excenter.x) -
-                    (max_excenter.x / 2);
-  barrier_cell.y += (gos::random() % max_excenter.y) -
-                    (max_excenter.y / 2);
   int barrier_length = max_excenter.x;
-  for (int br = 0; br < _num_barriers;) {
+  for (int br = 0; br < _num_barriers; ++br) {
+    rnd_i = static_cast<int>(gos::random());
+    gos::position  barrier_cell { _extents.w / 2,
+                                  _extents.h / 2 };
+    gos::direction barrier_dir  { (rnd_i % 3) - 1,
+                                  (rnd_i % 3) - 1 };
+    barrier_cell.x += (gos::random() % max_excenter.x) -
+                      (max_excenter.x / 2);
+    barrier_cell.y += (gos::random() % max_excenter.y) -
+                      (max_excenter.y / 2);
     for (int bl = 0; bl < barrier_length; ++bl) {
       barrier_cell.x += barrier_dir.dx;
       barrier_cell.y += barrier_dir.dy;
       if (gen_grid->contains_position(barrier_cell)) {
-        gen_grid->at(barrier_cell.x, barrier_cell.y) =
-          gos::state::cell(gos::state::cell_type::barrier);
-        ++br;
+        gen_grid->set_cell_type(barrier_cell, 
+                                gos::state::cell_type::barrier);
       } else {
-        break;
+        rnd_i = static_cast<int>(gos::random());
+        barrier_dir = { (rnd_i % 3) - 1,
+                        (rnd_i % 3) - 1 };
+        continue;
       }
       rnd_i = static_cast<int>(gos::random());
       if (bl % 3 == 0) {
@@ -129,22 +136,29 @@ gos::state::grid * map_generator::make_grid(
 }
 
 gos::state::population * map_generator::make_population(
-  gos::state::game_state & g_state,
-  int                      team_size) {
+  int team_size)
+{
+  GOS__LOG_DEBUG("map_generator", "make_population()");
   std::vector<ant_team> teams;
   for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
     position spawn_point { 1, 1 };
-    spawn_point.x += (team_idx % 2) * 5;
-    spawn_point.y += (team_idx % 2) * 5;
-    spawn_point.x *= _extents.w / 10;
-    spawn_point.y *= _extents.h / 10;
+    spawn_point.x += (team_idx % 2) * 3;
+    spawn_point.y += (team_idx % 2) * 3;
+    spawn_point.x *= _extents.w / 5;
+    spawn_point.y *= _extents.h / 5;
+    spawn_point.x -= 1;
+    spawn_point.y -= 1;
+    GOS__LOG_DEBUG("map_generator.make_population",
+                   "team "  << team_idx << " " <<
+                   "spawn:" << spawn_point.x << "," << spawn_point.y);
     teams.push_back(ant_team(team_idx,
                              team_size,
                              spawn_point,
-                             g_state));
+                             _game_state));
   }
   gos::state::population * popul = new gos::state::population(
                                          std::move(teams));
+  GOS__LOG_DEBUG("map_generator", "make_population >");
   return popul;
 }
 
