@@ -12,6 +12,7 @@ namespace state {
 enum cell_type : int {
   plain = 0,
   barrier,
+  spawn_point,
   grass,
   water,
   material,
@@ -63,8 +64,8 @@ class resource_cell_state : public cell_state {
     return amount_left() == 0;
   }
 
-  int consume(int strength) noexcept {
-    int consumed = std::min<int>(strength, _amount);
+  int consume() noexcept {
+    int consumed = std::min<int>(1, _amount);
     _amount -= consumed;
     return consumed;
   }
@@ -80,6 +81,17 @@ class plain_cell_state : public cell_state {
 class barrier_cell_state : public cell_state {
  public:
   barrier_cell_state(cell & c)
+  : cell_state(c)
+  { }
+
+  virtual bool is_obstacle() const noexcept {
+    return true;
+  }
+};
+
+class spawn_cell_state : public cell_state {
+ public:
+  spawn_cell_state(cell & c)
   : cell_state(c)
   { }
 
@@ -104,7 +116,7 @@ class water_cell_state : public resource_cell_state {
 
 class food_cell_state : public resource_cell_state {
  public:
-  static constexpr int max_amount() { return 3; }
+  static constexpr int max_amount() { return 10; }
 
   food_cell_state(cell & c, int amount)
   : resource_cell_state(c, std::max(max_amount(), amount))
@@ -113,6 +125,8 @@ class food_cell_state : public resource_cell_state {
   food_cell_state(cell & c)
   : resource_cell_state(c, max_amount())
   { }
+
+  virtual void on_enter(ant &);
 };
 
 /**
@@ -137,6 +151,9 @@ class cell {
     switch (ct) {
       case cell_type::grass:
         _state = std::make_shared<grass_cell_state>(*this);
+        break;
+      case cell_type::spawn_point:
+        _state = std::make_shared<spawn_cell_state>(*this);
         break;
       case cell_type::material:
         _state = std::make_shared<plain_cell_state>(*this);

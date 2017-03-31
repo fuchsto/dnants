@@ -39,6 +39,13 @@ void ant_team::spawn_ants() {
   }
 }
 
+void ant::on_food_cell(gos::state::food_cell_state & food_cell)
+{
+  if (_strength < max_strength()) {
+    _strength += food_cell.consume();
+  }
+}
+
 void ant::update() noexcept {
   auto rc = _game_state.round_count();
   _rand   = gos::random();

@@ -171,14 +171,14 @@ class app_play_state : public app_state {
           ((ant.strength() * _grid_spacing) /
            gos::state::ant::max_strength()),
           _grid_spacing)
-        - 2,
+          - 2,
         _grid_spacing / 5);
 
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
-      ant_size,
-      ant_size - 1,
+      ant_size / 2,
+      3,
       gos::orientation::none,
       _team_colors[ant.team().id()]
     );
@@ -186,8 +186,8 @@ class app_play_state : public app_state {
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
-      ant_size - 2,
-      ant_size - 3,
+      ant_size / 4 + 1,
+      ant_size / 4 + 0,
       ant.orientation(),
       _team_colors[ant.team().id()]
     );

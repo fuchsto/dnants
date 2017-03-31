@@ -15,11 +15,15 @@ void cell_state::on_exit(ant &) {
 
 void resource_cell_state::on_enter(ant & a) {
   cell_state::on_enter(a);
-  if (_amount > 0) { --_amount; }
 }
 
 void resource_cell_state::on_exit(ant & a) {
   cell_state::on_exit(a);
+}
+
+void food_cell_state::on_enter(ant & a) {
+  resource_cell_state::on_enter(a);
+  a.on_food_cell(*this);
 }
 
 } // namespace state

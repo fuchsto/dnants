@@ -2,8 +2,9 @@
 #define GOS__STATE__ANT_H__INCLUDED
 
 #include <gos/types.h>
-#include <gos/state/game_state.h>
 #include <gos/util/timestamp.h>
+
+#include <gos/state/game_state.h>
 
 #include <vector>
 
@@ -13,6 +14,7 @@ namespace state {
 
 class ant;
 class game_state;
+class food_cell_state;
 
 class ant_team {
   using game_state = gos::state::game_state;
@@ -121,6 +123,8 @@ class ant {
   gos::orientation orientation() const noexcept {
     return gos::dir2or(_dir);
   }
+
+  void on_food_cell(gos::state::food_cell_state & food_cell);
 
   void update() noexcept;
 
