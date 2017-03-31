@@ -118,6 +118,10 @@ class ant {
     return _dir;
   }
 
+  gos::orientation orientation() const noexcept {
+    return gos::dir2or(_dir);
+  }
+
   void update() noexcept;
 
   const ant_team & team() const noexcept {

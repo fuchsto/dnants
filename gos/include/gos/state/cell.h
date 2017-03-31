@@ -104,8 +104,14 @@ class water_cell_state : public resource_cell_state {
 
 class food_cell_state : public resource_cell_state {
  public:
-  food_cell_state(cell & c, int amount = 1)
-  : resource_cell_state(c, amount)
+  static constexpr int max_amount() { return 3; }
+
+  food_cell_state(cell & c, int amount)
+  : resource_cell_state(c, std::max(max_amount(), amount))
+  { }
+
+  food_cell_state(cell & c)
+  : resource_cell_state(c, max_amount())
   { }
 };
 
@@ -154,9 +160,9 @@ class cell {
   bool               is_taken()    const { return _state->is_taken();    }
   bool               is_obstacle() const { return _state->is_obstacle(); }
 
-  cell_type          type()     const { return _type;         }
-  cell_state       & state()          { return *_state.get(); }
-  const cell_state & state()    const { return *_state.get(); }
+  cell_type          type()     const { return _type;        }
+  cell_state       * state()          { return _state.get(); }
+  const cell_state * state()    const { return _state.get(); }
 
   void enter(ant & a) { _state->on_enter(a); }
   void leave(ant & a) { _state->on_exit(a);  }

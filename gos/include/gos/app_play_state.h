@@ -36,7 +36,7 @@ class app_play_state : public app_state {
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
   rgba         _blocked_color   { 0xff, 0x12, 0x12, 0xff };
-  rgba         _taken_color     { 0x23, 0xef, 0x12, 0xff };
+  rgba         _taken_color     { 0x23, 0x45, 0x45, 0xff };
   rgba         _food_color      { 0xfa, 0xb7, 0x05, 0xff };
   rgba         _grass_color     { 0xaa, 0xde, 0x87, 0xff };
  public:
@@ -128,13 +128,6 @@ class app_play_state : public app_state {
     for (int cell_x = 0; cell_x < grid_ext.w; ++cell_x) {
       for (int cell_y = 0; cell_y < grid_ext.h; ++cell_y) {
         const auto & grid_cell = grid.at(cell_x, cell_y);
-        if (grid_cell.is_taken()) {
-          draw_cell_rectangle(
-            _app->win(),
-            cell_x, cell_y, _grid_spacing - 1,
-            _taken_color
-          );
-        }
         switch (grid_cell.type()) {
           case gos::state::cell_type::grass:
             render_grass_cell(cell_x, cell_y);
@@ -161,6 +154,7 @@ class app_play_state : public app_state {
           spawn_point.x, spawn_point.y,
           _grid_spacing - 1,
           _grid_spacing - 3,
+          gos::orientation::none,
           _team_colors[team.id()]
         );
       }
@@ -172,16 +166,29 @@ class app_play_state : public app_state {
 
   void render_ant(const gos::state::ant & ant) {
     int ant_size = 
-      std::min<int>(
-        ((ant.strength() * _grid_spacing) /
-         gos::state::ant::max_strength()),
-        _grid_spacing);
+      std::max<int>(
+        std::min<int>(
+          ((ant.strength() * _grid_spacing) /
+           gos::state::ant::max_strength()),
+          _grid_spacing)
+        - 2,
+        _grid_spacing / 5);
 
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
       ant_size,
+      ant_size - 1,
+      gos::orientation::none,
+      _team_colors[ant.team().id()]
+    );
+
+    draw_cell_circle(
+      _app->win(),
+      ant.pos().x, ant.pos().y,
+      ant_size - 2,
       ant_size - 3,
+      ant.orientation(),
       _team_colors[ant.team().id()]
     );
 
@@ -202,9 +209,22 @@ class app_play_state : public app_state {
   }
 
   void render_food_cell(int cell_x, int cell_y) {
+    const auto & cell = _game_state->grid_state().at(cell_x, cell_y);
+    const gos::state::food_cell_state * cell_state =
+            reinterpret_cast<const gos::state::food_cell_state *>(
+              cell.state());
+    int rect_size = 
+      std::min<int>(
+          ((cell_state->amount_left() * _grid_spacing) /
+           cell_state->max_amount()),
+        _grid_spacing);
+
+    if (rect_size <= 0) { return; }
+
     draw_cell_fill_rectangle(
       _app->win(),
-      cell_x, cell_y, _grid_spacing - 2,
+      cell_x, cell_y,
+      rect_size,
       _food_color);
   }
 
@@ -223,6 +243,7 @@ class app_play_state : public app_state {
     int  cell_y,
     int  radius_outer,
     int  radius_inner,
+    gos::orientation ornt,
     rgba col);
 
   void draw_cell_rectangle(

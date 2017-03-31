@@ -64,14 +64,35 @@ void app_play_state::draw_cell_circle(
   int  cell_y,
   int  radius_outer,
   int  radius_inner,
+  gos::orientation ornt,
   rgba col)
 {
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
-  int r = radius_outer;
+  int r        = radius_outer;
+  int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
+  int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
+  if (ornt == gos::orientation::north ||
+      ornt == gos::orientation::northwest ||
+      ornt == gos::orientation::northeast) {
+    center_y -= radius_outer;
+  }
+  else if (ornt == gos::orientation::south ||
+           ornt == gos::orientation::southwest ||
+           ornt == gos::orientation::southeast) {
+    center_y += radius_outer;
+  }
+  if (ornt == gos::orientation::west ||
+      ornt == gos::orientation::northwest ||
+      ornt == gos::orientation::southwest) {
+    center_x -= radius_outer;
+  }
+  else if (ornt == gos::orientation::east ||
+           ornt == gos::orientation::northeast ||
+           ornt == gos::orientation::southeast) {
+    center_x += radius_outer;
+  }
   do {
-    int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
-    int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
     int x0       = (center_x - r + 1);
     int x1       = (center_x - (r / 2) - 1);
     int x2       = (center_x);
@@ -125,8 +146,8 @@ void app_play_state::draw_cell_fill_rectangle(
   rgba col)
 {
   SDL_Rect rect;
-  rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size);
-  rect.y = (cell_y * _grid_spacing) + (_grid_spacing - size);
+  rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size) / 2;
+  rect.y = (cell_y * _grid_spacing) + (_grid_spacing - size) / 2;
   rect.w = size;
   rect.h = size;
 
