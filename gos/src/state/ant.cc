@@ -59,7 +59,7 @@ void ant::update() noexcept {
     default:
       break;
   }
-  if (_strength > 1 && _nticks_not_fed > 100) {
+  if (_strength > 1 && (_nticks_not_fed % 100) == 0) {
     --_strength;
   }
 }

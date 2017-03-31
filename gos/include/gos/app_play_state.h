@@ -154,9 +154,9 @@ class app_play_state : public app_state {
   void render_ant(const gos::state::ant & ant) {
     int ant_size = 
       std::min<int>(
-        (_grid_spacing / 2) +
-          ((ant.strength()                  * _grid_spacing) /
-           (gos::state::ant::max_strength() * _grid_spacing)),
+        (_grid_spacing / 5) +
+          ((ant.strength() * _grid_spacing) /
+           gos::state::ant::max_strength()),
         _grid_spacing);
 
     draw_cell_circle(
