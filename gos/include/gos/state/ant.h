@@ -44,6 +44,10 @@ class ant_team {
   inline std::vector<ant>       & ants()       { return _ants; }
   inline const std::vector<ant> & ants() const { return _ants; }
 
+  inline const std::vector<position> & spawn_points() const {
+    return _spawn_points;
+  }
+
   ant & add_ant_at(position && pos);
   ant & add_ant_at(const position & pos);
   void  spawn_ants();
@@ -70,7 +74,7 @@ class ant {
   // strength is less than the cumulative strength of the enemy ants in
   // adjacent cells (von-Neumann neighborhood, diagonals are considered
   // neighbor cells).
-  int          _strength       = 10;
+  int          _strength       = 5;
   // If an ant carries food or material, its strength available for fights
   // is reduced by the carried weight.
   int          _carry_weight   = 0;
@@ -82,7 +86,7 @@ class ant {
   bool         _blocked        = false;
 
  public:
-  static const int max_strength() { return 20; }
+  static const int max_strength() { return 10; }
 
  public:
   ant() = delete;

@@ -57,10 +57,10 @@ void map_generator::add_region(
 }
 
 gos::state::grid * map_generator::make_grid(
-  gos::state::game_state & g_state) {
-  gos::state::grid * gen_grid = new gos::state::grid(
-                                      _extents.w,
-                                      _extents.h);
+  gos::state::game_state & g_state)
+{
+  gos::state::grid * gen_grid = new gos::state::grid(_extents);
+
   int rnd_i;
   int region_idx = 0;
   for (int gr = 0; gr < _num_grass_regions; ++gr) {
@@ -74,7 +74,7 @@ gos::state::grid * map_generator::make_grid(
     add_region(
         gen_grid,
         { start_row,      start_col      },
-        { _extents.h / 4, _extents.w / 3 },
+        { _extents.h / 2, _extents.w / 3 },
         gos::state::cell_type::grass);
   }
   for (int gr = 0; gr < _num_food_regions; ++gr) {
@@ -88,7 +88,7 @@ gos::state::grid * map_generator::make_grid(
     add_region(
         gen_grid,
         { start_row,      start_col      },
-        { _extents.w / 2, _extents.h / 2 },
+        { _extents.w / 4, _extents.h / 4 },
         gos::state::cell_type::food);
   }
 

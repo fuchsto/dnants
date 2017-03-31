@@ -112,6 +112,25 @@ void app_play_state::draw_cell_rectangle(
 
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
+  SDL_RenderDrawRect(
+    win.renderer(), &rect);
+}
+
+void app_play_state::draw_cell_fill_rectangle(
+  gos::view::window & win,
+  int  cell_x,
+  int  cell_y,
+  int  size,
+  rgba col)
+{
+  SDL_Rect rect;
+  rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size);
+  rect.y = (cell_y * _grid_spacing) + (_grid_spacing - size);
+  rect.w = size;
+  rect.h = size;
+
+  SDL_SetRenderDrawColor(
+    win.renderer(), col.r, col.g, col.b, col.a);
   SDL_RenderFillRect(
     win.renderer(), &rect);
 }

@@ -19,38 +19,36 @@ namespace state {
 class grid {
   typedef grid self_t;
 
-  int _rows;
-  int _cols;
+  gos::extents _extents;
 
   std::vector< std::vector<cell> > _cells;
 
  public:
 
-  grid(int rows, int cols)
-  : _rows(rows)
-  , _cols(cols)
+  grid(gos::extents ext)
+  : _extents(ext)
   {
     GOS__LOG_DEBUG("state::grid",
-                   "initialize(" << _rows << "," << _cols << ")");
-    _cells.resize(_rows);
-    for (int r = 0; r < _rows; ++r) {
-      _cells[r].resize(_cols);
+                   "initialize(" << _extents.w << "," << _extents.h << ")");
+    _cells.resize(_extents.h);
+    for (int r = 0; r < _extents.h; ++r) {
+      _cells[r].resize(_extents.w);
     }
     GOS__LOG_DEBUG("state::grid", "initialize >");
   }
 
-  inline int nrows() const { return _rows; }
-  inline int ncols() const { return _cols; }
+  inline int nrows() const { return _extents.h; }
+  inline int ncols() const { return _extents.w; }
 
-  inline gos::extents extents() const {
-    return gos::extents { _cols, _rows };
+  inline const gos::extents & extents() const {
+    return _extents;
   }
 
   inline bool contains_position(const gos::position & pos) const {
    return ( pos.x > 0 &&
             pos.y > 0 &&
-            pos.x < extents().w &&
-            pos.y < extents().h );
+            pos.x < _extents.w &&
+            pos.y < _extents.h );
   }
 
   inline bool allows_move_to(const gos::position & pos) const {
