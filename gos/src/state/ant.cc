@@ -59,7 +59,7 @@ void ant::update() noexcept {
     default:
       break;
   }
-  if (_strength > 1 && _nticks_not_fed > 1000) {
+  if (_strength > 1 && _nticks_not_fed > 100) {
     --_strength;
   }
 }
@@ -68,11 +68,13 @@ void ant::move() noexcept {
   int px = _pos.x + _dir.dx;
   int py = _pos.y + _dir.dy;
   if (_game_state.grid_state().allows_move_to({ px, py })) {
+    _blocked = false;
     _game_state.grid_state()[{ _pos.x, _pos.y }].leave(*this);
     _pos.x = px;
     _pos.y = py;
     _game_state.grid_state()[{ _pos.x, _pos.y }].enter(*this);
   } else {
+    _blocked = true;
     // collision, move failed:
     if (_rand % 2) { _dir.dx *= -1; }
     else           { _dir.dy *= -1; }

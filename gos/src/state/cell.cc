@@ -13,10 +13,6 @@ void cell_state::on_exit(ant &) {
   _taken = false;
 }
 
-bool cell_state::is_obstacle() const noexcept {
-  return _cell.type() == cell_type::barrier;
-}
-
 void resource_cell_state::on_enter(ant & a) {
   cell_state::on_enter(a);
   if (_amount > 0) { --_amount; }

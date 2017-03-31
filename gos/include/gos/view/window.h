@@ -25,7 +25,6 @@ class window {
 
   SDL_Window      * _window;
   SDL_Renderer    * _renderer;
-
 // TTF_Font       * _font = nullptr;
 // LTexture         _text_texture;
 
@@ -49,7 +48,7 @@ class window {
     if (SDL_CreateWindowAndRenderer(
           width,
           height,
-          SDL_WINDOW_RESIZABLE,
+          0, // SDL_WINDOW_RESIZABLE,
           &_window,
           &_renderer) != 0) {
       SDL_LogError(
@@ -59,6 +58,7 @@ class window {
     }
     GOS__LOG_DEBUG("view::window", "set window position ...");
     SDL_SetWindowPosition(_window, 100, 100);
+    SDL_RaiseWindow(_window);
   }
 
   ~window() {

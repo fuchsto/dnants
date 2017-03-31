@@ -17,7 +17,7 @@ app_play_state app_play_state::_instance;
 void app_play_state::initialize(app_engine * app) {
   GOS__LOG_DEBUG("app_play_state", "initialize()");
   _active        = true;
-  _halted        = false;
+  _paused        = false;
   _app           = app;
   _grid_extents  = app->settings().grid_extents;
   _grid_spacing  = app->win().view_extents().w / _grid_extents.w;
@@ -68,25 +68,25 @@ void app_play_state::draw_cell_circle(
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
   int r = radius;
-  while (r--) {
+  do {
     int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
     int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
     int x0       = (center_x - r + 1);
-    int x1       = (center_x - (r / 2));
+    int x1       = (center_x - (r / 2) - 1);
     int x2       = (center_x);
-    int x3       = (center_x + (r / 2));
+    int x3       = (center_x + (r / 2) + 1);
     int x4       = (center_x + r - 1);
     int y0       = (center_y - r + 1);
-    int y1       = (center_y - (r / 2));
+    int y1       = (center_y - (r / 2) - 1);
     int y2       = (center_y);
-    int y3       = (center_y + (r / 2));
+    int y3       = (center_y + (r / 2) + 1);
     int y4       = (center_y + r - 1);
     SDL_Point points[9] = {
       { x2, y0 }, // center top
       { x3, y1 },
       { x4, y2 }, // right center
       { x3, y3 },
-      { x2, y2 }, // center
+      { x2, y4 }, // center
       { x1, y3 },
       { x0, y2 }, // left center
       { x1, y1 },
@@ -94,20 +94,21 @@ void app_play_state::draw_cell_circle(
     };
     SDL_RenderDrawLines(
       win.renderer(), points, 9);
-  }
+  } while (r-- > 3);
 }
 
 void app_play_state::draw_cell_rectangle(
   gos::view::window & win,
   int  cell_x,
   int  cell_y,
+  int  size,
   rgba col)
 {
   SDL_Rect rect;
-  rect.x = cell_x * _grid_spacing;
-  rect.y = cell_y * _grid_spacing;
-  rect.w = _grid_spacing;
-  rect.h = _grid_spacing;
+  rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size);
+  rect.y = (cell_y * _grid_spacing) + (_grid_spacing - size);
+  rect.w = size;
+  rect.h = size;
 
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);

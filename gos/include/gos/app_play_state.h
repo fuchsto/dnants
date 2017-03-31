@@ -22,7 +22,7 @@ class app_play_state : public app_state {
 
  private:
   bool         _active          = true;
-  bool         _halted          = false;
+  bool         _paused          = false;
   timestamp_t  _last_round_ms   = 0;
   int          _grid_spacing    = 30;
   extents      _grid_extents;
@@ -35,6 +35,7 @@ class app_play_state : public app_state {
                                   { 0x49, 0x48, 0x16, 0xff },
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
+  rgba         _blocked_color   { 0xff, 0x12, 0x12, 0xff };
  public:
   static app_play_state * get() { return &_instance; }
 
@@ -71,9 +72,9 @@ class app_play_state : public app_state {
               if (app->settings().rounds_per_sec > 1) {
                 app->settings().rounds_per_sec--;
               }
-            } else if( event.key.keysym.scancode == SDL_SCANCODE_H) {
-              // halt
-              _halted = !_halted;
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_P) {
+              // pause
+              _paused = !_paused;
             }
             break;
         default:
@@ -89,7 +90,7 @@ class app_play_state : public app_state {
     if (ms - _last_round_ms >= ms_per_round) {
       GOS__LOG_DEBUG("app_play_state.update", "round ms: " << ms);
       _last_round_ms = ms;
-      if (!_halted) {
+      if (!_paused) {
         _game_state->next();
       }
     }
@@ -151,16 +152,27 @@ class app_play_state : public app_state {
   }
 
   void render_ant(const gos::state::ant & ant) {
+    int ant_size = 
+      std::min<int>(
+        (_grid_spacing / 2) +
+          ((ant.strength()                  * _grid_spacing) /
+           (gos::state::ant::max_strength() * _grid_spacing)),
+        _grid_spacing);
+
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
-      std::min<int>(
-        (_grid_spacing / 2) +
-          ((ant.strength() * _grid_spacing) /
-           (ant.strength() * gos::state::ant::max_strength())),
-        _grid_spacing
-      ),
-      _team_colors[ant.team().id()]);
+      ant_size,
+      _team_colors[ant.team().id()]
+    );
+
+    if (ant.is_blocked()) {
+      draw_cell_rectangle(
+        _app->win(),
+        ant.pos().x, ant.pos().y, 3,
+        _blocked_color
+      );
+    }
   }
 
   void render_grass_cell(int cell_x, int cell_y) {
@@ -170,12 +182,16 @@ class app_play_state : public app_state {
 
   void render_food_cell(int cell_x, int cell_y) {
     draw_cell_rectangle(
-      _app->win(), cell_x, cell_y, rgba { 0xaf, 0xef, 0x9f, 0xff });
+      _app->win(),
+      cell_x, cell_y, _grid_spacing,
+      rgba { 0xaf, 0xef, 0x9f, 0xff });
   }
 
   void render_barrier_cell(int cell_x, int cell_y) {
     draw_cell_rectangle(
-      _app->win(), cell_x, cell_y, rgba { 0x56, 0x56, 0x56, 0xff });
+      _app->win(),
+      cell_x, cell_y, _grid_spacing,
+      rgba { 0x56, 0x56, 0x56, 0xff });
   }
 
   void render_grid(gos::view::window & win);
@@ -191,6 +207,7 @@ class app_play_state : public app_state {
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
+    int  size,
     rgba col);
 
   void draw_cell_triangle(

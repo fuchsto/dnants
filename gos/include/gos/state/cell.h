@@ -34,7 +34,9 @@ class cell_state {
   virtual void on_enter(ant &);
   virtual void on_exit(ant &);
 
-  bool is_obstacle() const noexcept;
+  virtual bool is_obstacle() const noexcept {
+    return false;
+  }
 
   bool is_taken() const noexcept {
     return _taken;
@@ -73,6 +75,17 @@ class plain_cell_state : public cell_state {
   plain_cell_state(cell & c)
   : cell_state(c)
   { }
+};
+
+class barrier_cell_state : public cell_state {
+ public:
+  barrier_cell_state(cell & c)
+  : cell_state(c)
+  { }
+
+  virtual bool is_obstacle() const noexcept {
+    return true;
+  }
 };
 
 class grass_cell_state : public cell_state {
@@ -127,6 +140,9 @@ class cell {
         break;
       case cell_type::food:
         _state = std::make_shared<food_cell_state>(*this);
+        break;
+      case cell_type::barrier:
+        _state = std::make_shared<barrier_cell_state>(*this);
         break;
       case cell_type::plain:
       default: // fall-through

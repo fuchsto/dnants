@@ -39,37 +39,39 @@ class grid {
     GOS__LOG_DEBUG("state::grid", "initialize >");
   }
 
-  int nrows() const { return _rows; }
-  int ncols() const { return _cols; }
+  inline int nrows() const { return _rows; }
+  inline int ncols() const { return _cols; }
 
-  gos::extents extents() const { return gos::extents { _cols, _rows }; }
+  inline gos::extents extents() const {
+    return gos::extents { _cols, _rows };
+  }
 
-  bool contains_position(const gos::position & pos) const {
+  inline bool contains_position(const gos::position & pos) const {
    return ( pos.x > 0 &&
             pos.y > 0 &&
             pos.x < extents().w &&
             pos.y < extents().h );
   }
 
-  bool allows_move_to(const gos::position & pos) const {
+  inline bool allows_move_to(const gos::position & pos) const {
     return contains_position(pos) &&
            !at(pos.x, pos.y).is_taken() &&
            !at(pos.x, pos.y).is_obstacle();
   }
 
-  const cell & operator[](const gos::position & pos) const {
+  inline const cell & operator[](const gos::position & pos) const {
     return at(pos.x, pos.y);
   }
 
-  cell & operator[](const gos::position & pos) {
+  inline cell & operator[](const gos::position & pos) {
     return at(pos.x, pos.y);
   }
 
-  const cell & at(int x, int y) const {
+  inline const cell & at(int x, int y) const {
     return _cells[y][x];
   }
 
-  cell & at(int x, int y) {
+  inline cell & at(int x, int y) {
     return _cells[y][x];
   }
 

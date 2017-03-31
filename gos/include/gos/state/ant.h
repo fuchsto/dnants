@@ -79,6 +79,7 @@ class ant {
   direction    _dir;
   mode         _mode           = ant::mode::scouting;
   int          _rand           = 0;
+  bool         _blocked        = false;
 
  public:
   static const int max_strength() { return 20; }
@@ -103,6 +104,14 @@ class ant {
   , _id(id)
   , _pos(pos) {
     move_to(_pos);
+  }
+
+  bool is_blocked() const noexcept {
+    return _blocked;
+  }
+
+  const direction & dir() const noexcept {
+    return _dir;
   }
 
   void update() noexcept;
@@ -140,9 +149,6 @@ class ant {
   void move_to(position && pos) noexcept {
     _pos = std::move(pos);
   }
- 
- private:
-  bool _can_move_to(int px, int py) const noexcept;
 
 };
 
