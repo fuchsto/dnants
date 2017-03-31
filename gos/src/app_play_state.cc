@@ -65,7 +65,7 @@ void app_play_state::draw_cell_circle(
   int  radius_outer,
   int  radius_inner,
   gos::orientation ornt,
-  rgba col)
+  const rgba & col)
 {
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
@@ -124,7 +124,7 @@ void app_play_state::draw_cell_rectangle(
   int  cell_x,
   int  cell_y,
   int  size,
-  rgba col)
+  const rgba & col)
 {
   SDL_Rect rect;
   rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size);
@@ -143,7 +143,7 @@ void app_play_state::draw_cell_fill_rectangle(
   int  cell_x,
   int  cell_y,
   int  size,
-  rgba col)
+  const rgba & col)
 {
   SDL_Rect rect;
   rect.x = (cell_x * _grid_spacing) + (_grid_spacing - size) / 2;
@@ -151,6 +151,8 @@ void app_play_state::draw_cell_fill_rectangle(
   rect.w = size;
   rect.h = size;
 
+  SDL_SetRenderDrawBlendMode(
+    win.renderer(), SDL_BLENDMODE_BLEND);
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
   SDL_RenderFillRect(
@@ -161,7 +163,7 @@ void app_play_state::draw_cell_triangle(
   gos::view::window & win,
   int  cell_x,
   int  cell_y,
-  rgba col)
+  const rgba & col)
 {
   int spacing = _grid_spacing;
   SDL_SetRenderDrawColor(

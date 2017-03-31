@@ -28,8 +28,10 @@ class app_engine
     extents grid_extents;
     int     frames_per_sec;
     int     rounds_per_sec;
+    int     trace_rounds;
     int     init_team_size;
     bool    show_grid;
+    bool    show_traces;
   };
 
  private:
@@ -37,8 +39,10 @@ class app_engine
                   { 40, 40 }, // grid extents
                   30,         // fps
                   5,          // rps
+                  30,         // trace rounds
                   50,         // initial team size
-                  false       // show grid
+                  false,      // show grid
+                  false       // show traces
                };
 
  public:

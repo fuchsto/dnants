@@ -15,7 +15,7 @@ int main(int argc, char * argv[])
     "game'-._.of'._.survive",
     900, 900);
 
-  app.settings().grid_extents   = { 60, 60 };
+  app.settings().grid_extents   = { 40, 40 };
   app.settings().rounds_per_sec = 5;
   app.settings().init_team_size = 20;
 

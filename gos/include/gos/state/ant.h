@@ -98,9 +98,8 @@ class ant {
   : _game_state(team._game_state)
   , _team(team)
   , _id(id)
-  , _pos(std::move(pos)) {
-    move_to(_pos);
-  }
+  , _pos(std::move(pos))
+  { }
 
   ant(ant_team       & team,
       int              id,
@@ -108,9 +107,8 @@ class ant {
   : _game_state(team._game_state)
   , _team(team)
   , _id(id)
-  , _pos(pos) {
-    move_to(_pos);
-  }
+  , _pos(pos)
+  { }
 
   bool is_blocked() const noexcept {
     return _blocked;
@@ -153,14 +151,6 @@ class ant {
   }
 
   void move() noexcept;
-
-  void move_to(const position & pos) noexcept {
-    _pos = pos;
-  }
-
-  void move_to(position && pos) noexcept {
-    _pos = std::move(pos);
-  }
 
 };
 

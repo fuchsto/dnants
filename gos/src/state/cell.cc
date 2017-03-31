@@ -1,29 +1,45 @@
 
 #include <gos/state/cell.h>
 #include <gos/state/ant.h>
+#include <gos/state/game_state.h>
 
 namespace gos {
 namespace state {
 
-void cell_state::on_enter(ant & a) {
+void cell_state::on_enter(
+  gos::state::ant               & a,
+  const gos::state::game_state & gs)
+{
   _taken = true;
-  add_trace(a.team().id());
+  add_trace(a.team().id(), gs.round_count());
 }
 
-void cell_state::on_exit(ant &) {
+void cell_state::on_exit(
+  gos::state::ant              & a,
+  const gos::state::game_state & gs)
+{
   _taken = false;
 }
 
-void resource_cell_state::on_enter(ant & a) {
-  cell_state::on_enter(a);
+void resource_cell_state::on_enter(
+  gos::state::ant              & a,
+  const gos::state::game_state & gs)
+{
+  cell_state::on_enter(a, gs);
 }
 
-void resource_cell_state::on_exit(ant & a) {
-  cell_state::on_exit(a);
+void resource_cell_state::on_exit(
+  gos::state::ant              & a,
+  const gos::state::game_state & gs)
+{
+  cell_state::on_exit(a, gs);
 }
 
-void food_cell_state::on_enter(ant & a) {
-  resource_cell_state::on_enter(a);
+void food_cell_state::on_enter(
+  gos::state::ant              & a,
+  const gos::state::game_state & gs)
+{
+  resource_cell_state::on_enter(a, gs);
   a.on_food_cell(*this);
 }
 

@@ -76,10 +76,12 @@ void ant::move() noexcept {
   int py = _pos.y + _dir.dy;
   if (_game_state.grid_state().allows_move_to({ px, py })) {
     _blocked = false;
-    _game_state.grid_state()[{ _pos.x, _pos.y }].leave(*this);
+    _game_state.grid_state()[{ _pos.x, _pos.y }]
+               .leave(*this, _game_state);
     _pos.x = px;
     _pos.y = py;
-    _game_state.grid_state()[{ _pos.x, _pos.y }].enter(*this);
+    _game_state.grid_state()[{ _pos.x, _pos.y }]
+               .enter(*this, _game_state);
   } else {
     _blocked = true;
     // collision, move failed:

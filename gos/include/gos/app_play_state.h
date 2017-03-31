@@ -64,6 +64,9 @@ class app_play_state : public app_state {
             } else if( event.key.keysym.scancode == SDL_SCANCODE_G) {
               // toggle grid
               app->settings().show_grid = !(app->settings().show_grid);
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_T) {
+              // toggle traces
+              app->settings().show_traces = !(app->settings().show_traces);
             } else if( event.key.keysym.scancode == SDL_SCANCODE_S) {
               // speed up
               if (app->settings().rounds_per_sec <
@@ -108,6 +111,9 @@ class app_play_state : public app_state {
     SDL_RenderClear(
       app->win().renderer());
 
+    SDL_SetRenderDrawBlendMode(
+      app->win().renderer(), SDL_BLENDMODE_BLEND);
+
     render_map(app->win());
     render_objects(app->win());
 
@@ -122,15 +128,17 @@ class app_play_state : public app_state {
  private:
   void render_map(gos::view::window & win) {
     auto         ext      = win.view_extents();
+    int          n_trace  = _app->settings().trace_rounds;
     const auto & grid     = _game_state->grid_state();
     const auto & grid_ext = grid.extents();
+    const auto & popul    = _game_state->population_state();
 
     for (int cell_x = 0; cell_x < grid_ext.w; ++cell_x) {
       for (int cell_y = 0; cell_y < grid_ext.h; ++cell_y) {
         const auto & grid_cell = grid.at(cell_x, cell_y);
         switch (grid_cell.type()) {
           case gos::state::cell_type::grass:
-            render_grass_cell(cell_x, cell_y);
+          //render_grass_cell(cell_x, cell_y);
             break;
           case gos::state::cell_type::food:
             render_food_cell(cell_x, cell_y);
@@ -140,6 +148,20 @@ class app_play_state : public app_state {
             break;
           default:
             break;
+        }
+        if (_app->settings().show_traces) {
+          for (const auto & team : popul.teams()) {
+            int team_id   = team.id();
+            int trace_rc  = grid_cell.state()->get_trace(team_id);
+            int trace_age = _game_state->round_count() - trace_rc;
+            int trace_val = n_trace - trace_age;
+            if (trace_rc > 0 && trace_val > 0) {
+              render_trace_cell(
+                cell_x, cell_y,
+                trace_val,
+                _team_colors[team_id]);
+            }
+          }
         }
       }
     }
@@ -201,6 +223,22 @@ class app_play_state : public app_state {
     }
   }
 
+  void render_trace_cell(
+    int          cell_x,
+    int          cell_y,
+    int          trace_value,
+    const rgba & col) {
+    rgba trace_col = col;
+    int max_trace_rounds = _app->settings().trace_rounds;
+    trace_col.a = static_cast<Uint8>(
+                    (trace_value * 256) / max_trace_rounds
+                  ) / 2;
+    draw_cell_fill_rectangle(
+      _app->win(),
+      cell_x, cell_y, _grid_spacing / 2,
+      trace_col);
+  }
+
   void render_grass_cell(int cell_x, int cell_y) {
     draw_cell_fill_rectangle(
       _app->win(),
@@ -244,27 +282,27 @@ class app_play_state : public app_state {
     int  radius_outer,
     int  radius_inner,
     gos::orientation ornt,
-    rgba col);
+    const rgba & col);
 
   void draw_cell_rectangle(
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
     int  size,
-    rgba col);
+    const rgba & col);
 
   void draw_cell_fill_rectangle(
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
     int  size,
-    rgba col);
+    const rgba & col);
 
   void draw_cell_triangle(
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
-    rgba col);
+    const rgba & col);
 
 };
 

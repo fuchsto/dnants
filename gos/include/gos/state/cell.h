@@ -23,8 +23,8 @@ class cell;
 
 class cell_state {
   cell               & _cell;
-  bool                 _taken = false;
-  std::array<int, 4>   _traces { };
+  bool                 _taken  = false;
+  std::array<int, 4>   _traces = { };
 
  public:
   cell_state(cell & c)
@@ -33,8 +33,8 @@ class cell_state {
 
   virtual ~cell_state() { }
 
-  virtual void on_enter(ant &);
-  virtual void on_exit(ant &);
+  virtual void on_enter(ant &, const gos::state::game_state &);
+  virtual void on_exit(ant &, const gos::state::game_state &);
 
   virtual bool is_obstacle() const noexcept {
     return false;
@@ -48,8 +48,8 @@ class cell_state {
     return _traces[team_id];
   }
 
-  void add_trace(int team_id) noexcept {
-    ++_traces[team_id];
+  void add_trace(int team_id, int round_count) noexcept {
+    _traces[team_id] = round_count;
   }
 };
 
@@ -63,8 +63,8 @@ class resource_cell_state : public cell_state {
 
   virtual ~resource_cell_state() { }
 
-  virtual void on_enter(ant &);
-  virtual void on_exit(ant &);
+  virtual void on_enter(ant &, const gos::state::game_state &);
+  virtual void on_exit(ant &, const gos::state::game_state &);
 
   int amount_left() const noexcept {
     return _amount;
@@ -135,7 +135,7 @@ class food_cell_state : public resource_cell_state {
   : resource_cell_state(c, max_amount())
   { }
 
-  virtual void on_enter(ant &);
+  virtual void on_enter(ant &, const gos::state::game_state &);
 };
 
 /**
@@ -193,8 +193,12 @@ class cell {
   cell_state       * state()          { return _state.get(); }
   const cell_state * state()    const { return _state.get(); }
 
-  void enter(ant & a) { _state->on_enter(a); }
-  void leave(ant & a) { _state->on_exit(a);  }
+  void enter(ant & a, const gos::state::game_state & gs) {
+    _state->on_enter(a, gs);
+  }
+  void leave(ant & a, const gos::state::game_state & gs) {
+    _state->on_exit(a, gs);
+  }
 };
 
 } // namespace state
