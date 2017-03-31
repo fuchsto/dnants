@@ -156,9 +156,11 @@ class app_play_state : public app_state {
     auto & population = _game_state->population_state();
     for (const auto & team : population.teams()) {
       for (const auto & spawn_point : team.spawn_points()) {
-        draw_cell_triangle(
+        draw_cell_circle(
           _app->win(),
           spawn_point.x, spawn_point.y,
+          _grid_spacing - 1,
+          _grid_spacing - 3,
           _team_colors[team.id()]
         );
       }
@@ -179,6 +181,7 @@ class app_play_state : public app_state {
       _app->win(),
       ant.pos().x, ant.pos().y,
       ant_size,
+      ant_size - 3,
       _team_colors[ant.team().id()]
     );
 
@@ -218,7 +221,8 @@ class app_play_state : public app_state {
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
-    int  radius,
+    int  radius_outer,
+    int  radius_inner,
     rgba col);
 
   void draw_cell_rectangle(

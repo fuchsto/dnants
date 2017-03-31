@@ -62,12 +62,13 @@ void app_play_state::draw_cell_circle(
   gos::view::window & win,
   int  cell_x,
   int  cell_y,
-  int  radius,
+  int  radius_outer,
+  int  radius_inner,
   rgba col)
 {
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
-  int r = radius;
+  int r = radius_outer;
   do {
     int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
     int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
@@ -94,7 +95,7 @@ void app_play_state::draw_cell_circle(
     };
     SDL_RenderDrawLines(
       win.renderer(), points, 9);
-  } while (r-- > 3);
+  } while (r-- && r > radius_inner);
 }
 
 void app_play_state::draw_cell_rectangle(
