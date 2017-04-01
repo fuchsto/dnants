@@ -163,7 +163,7 @@ class app_play_state : public app_state {
                 render_trace_cell(
                   cell_x, cell_y,
                   trace_val, ort,
-                  _team_colors[team_id]);
+                  team_id);
               }
             }
           }
@@ -236,15 +236,25 @@ class app_play_state : public app_state {
     int          cell_y,
     int          trace_value,
     orientation  ort,
-    const rgba & col)
+    int          team_id)
   {
     int max_trace_rounds = _app->settings().trace_rounds;
     int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
     int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
 
+    if (team_id % 2) {
+      center_x -= 2;
+      center_y -= 2;
+    } else {
+      center_x += 2;
+      center_y += 2;
+    }
+
+    const rgba & col = _team_colors[team_id];
     Uint8 tcol_a = static_cast<Uint8>(
-                     (trace_value * 256) / max_trace_rounds
-                   ) / 2;
+                     ( ((trace_value * 256) / max_trace_rounds)
+                       * 2)
+                     / 3);
     SDL_SetRenderDrawColor(
       _app->win().renderer(),
       col.r, col.g, col.b, tcol_a);

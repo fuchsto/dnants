@@ -41,8 +41,8 @@ class app_engine
                   5,          // rps
                   30,         // trace rounds
                   50,         // initial team size
-                  false,      // show grid
-                  false       // show traces
+                  true,       // show grid
+                  true        // show traces
                };
 
  public:

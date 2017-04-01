@@ -15,9 +15,9 @@ int main(int argc, char * argv[])
     "game'-._.of'._.survive",
     900, 900);
 
-  app.settings().grid_extents   = { 40, 40 };
-  app.settings().rounds_per_sec = 2;
-  app.settings().init_team_size = 20;
+  app.settings().grid_extents   = { 30, 30 };
+  app.settings().rounds_per_sec = 4;
+  app.settings().init_team_size = 30;
 
   app.run(app_play_state::get());
 

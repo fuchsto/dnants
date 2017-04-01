@@ -22,12 +22,26 @@ enum class orientation : unsigned char {
 struct point {
   int x;
   int y;
+
+  bool operator==(const point & rhs) const noexcept {
+    return x == rhs.x && y == rhs.y;
+  }
+  bool operator!=(const point & rhs) const noexcept {
+    return x != rhs.x || y != rhs.y;
+  }
 };
 
 // A position in the grid.
 struct position {
   int x;
   int y;
+
+  bool operator==(const position & rhs) const noexcept {
+    return x == rhs.x && y == rhs.y;
+  }
+  bool operator!=(const position & rhs) const noexcept {
+    return x != rhs.x || y != rhs.y;
+  }
 };
 
 // For example, an ant with movement direction { 3, -2 } would move 3 cells

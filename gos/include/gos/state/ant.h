@@ -40,8 +40,7 @@ class ant_team {
     _spawn_points.push_back(spawn_point);
   }
 
-  void update_positions();
-  void update_reactions();
+  void update();
 
   inline int                      id()   const { return _team_id; }
   inline std::vector<ant>       & ants()       { return _ants; }
@@ -80,6 +79,7 @@ class ant {
   // adjacent cells (von-Neumann neighborhood, diagonals are considered
   // neighbor cells).
   int          _strength       = 5;
+  int          _attack_str     = 0;
   // If an ant carries food or material, its strength available for fights
   // is reduced by the carried weight.
   int          _carry_weight   = 0;
@@ -113,10 +113,16 @@ class ant {
   , _pos(pos)
   { }
 
+  ant(const ant & other) = default;
+  ant(ant && other)      = default;
+
+  ant & operator=(const ant & rhs) = default;
+  ant & operator=(ant && rhs)      = default;
+
   void on_food_cell(gos::state::food_cell_state & food_cell);
 
   void update_position() noexcept;
-
+  void update_action()   noexcept;
   void update_reaction() noexcept;
 
   void attack(gos::state::ant & enemy) noexcept;
@@ -145,12 +151,16 @@ class ant {
     return gos::dir2or(_dir);
   }
 
-  inline const ant_team & team() const noexcept {
-    return *_team;
-  }
-
   inline int id() const noexcept {
     return _id;
+  }
+
+  inline int team_id() const noexcept {
+    return _team->id();
+  }
+
+  inline const ant_team & team() const noexcept {
+    return *_team;
   }
 
   inline int strength() const noexcept {
@@ -163,6 +173,12 @@ class ant {
 
   inline void set_direction(const direction & dir) noexcept {
     _dir = dir;
+  }
+
+  inline void switch_mode(ant::mode m) noexcept {
+    if (_mode != ant::mode::dead) {
+      _mode = m;
+    }
   }
 
  private:

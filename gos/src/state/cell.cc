@@ -18,13 +18,13 @@ void cell_state::on_exit(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
+  _taken = false;
   if (a.is_alive()) {
     add_trace(
       a.team().id(),
       dir2or(a.dir()),
       gs.round_count() - 1);
   }
-  _taken = false;
   _ant   = nullptr;
 }
 

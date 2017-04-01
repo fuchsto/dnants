@@ -28,16 +28,22 @@ class cell_state {
   typedef std::array<int, 8> traces;
 
  private:
-  cell                  & _cell;
+  cell                  * _cell;
   bool                    _taken  = false;
   gos::state::ant       * _ant    = nullptr;
   std::array<traces, 4>   _traces = {{ }};
 
  public:
   cell_state(cell & c)
-  : _cell(c)
+  : _cell(&c)
   , _ant(nullptr)
   { }
+
+  cell_state()                                   = delete;
+  cell_state(const cell_state & other)           = default;
+  cell_state(cell_state && other)                = default;
+  cell_state & operator=(const cell_state & rhs) = default;
+  cell_state & operator=(cell_state && rhs)      = default;
 
   virtual ~cell_state() { }
 
@@ -71,6 +77,7 @@ class cell_state {
 class resource_cell_state : public cell_state {
   int _amount = 1;
  public:
+  resource_cell_state() = delete;
   resource_cell_state(cell & c, int amount = 1)
   : cell_state(c)
   , _amount(amount)
@@ -165,14 +172,14 @@ class cell {
 
  public:
   cell(
-    cell_type                     ct,
-    std::shared_ptr<cell_state>   cs)
+    cell_type ct,
+    std::shared_ptr<cell_state> cs)
   : _type(ct)
   , _state(cs)
   { }
 
   cell(
-    cell_type                     ct = cell_type::plain)
+    cell_type ct = cell_type::plain)
   : _type(ct)
   {
     switch (ct) {
