@@ -1,13 +1,11 @@
 #ifndef GOS__WINDOW_H__INCLUDED
 #define GOS__WINDOW_H__INCLUDED
 
-#include <SDL.h>
-// #include <SDL_Image.h>
-// #include <SDL_ttf.h>
-
 #include <gos/types.h>
 #include <gos/util/logging.h>
 #include <gos/view/utils.h>
+
+#include <SDL.h>
 
 #include <stdexcept>
 
@@ -25,8 +23,6 @@ class window {
 
   SDL_Window      * _window;
   SDL_Renderer    * _renderer;
-// TTF_Font       * _font = nullptr;
-// LTexture         _text_texture;
 
  public:
   window(

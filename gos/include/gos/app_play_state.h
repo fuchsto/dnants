@@ -32,8 +32,8 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
-  rgba         _team_colors[4]  { { 0xc8, 0x37, 0x37, 0xff },
-                                  { 0x34, 0x12, 0xcf, 0xff },
+  rgba         _team_colors[4]  { { 0xe8, 0x87, 0x57, 0xff },
+                                  { 0x54, 0x22, 0xef, 0xff },
                                   { 0x49, 0x48, 0x16, 0xff },
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
@@ -230,7 +230,7 @@ class app_play_state : public app_state {
 
     const rgba & col = _team_colors[ant.team().id()];
 
-    int size   = 32;
+    int size   = 16;
     int cell_x = ant.pos().x;
     int cell_y = ant.pos().y;
     SDL_Point center { (cell_x * _grid_spacing),
@@ -238,14 +238,14 @@ class app_play_state : public app_state {
     SDL_Rect dst_rect;
     dst_rect.x = center.x + (_grid_spacing - size) / 2;
     dst_rect.y = center.y + (_grid_spacing - size) / 2;
-    dst_rect.w = 32;
-    dst_rect.h = 32;
+    dst_rect.w = 16;
+    dst_rect.h = 16;
 
     SDL_SetRenderDrawBlendMode(
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = SDL_LoadBMP("bug32x32.bmp");
+    SDL_Surface * surface = SDL_LoadBMP("ant-4_16.bmp");
     SDL_SetColorKey(
       surface, SDL_TRUE,
       SDL_MapRGB(surface->format, 255, 0, 255));
@@ -263,6 +263,9 @@ class app_play_state : public app_state {
                      gos::or2deg(ant.orientation()),
                      0,
                      SDL_FLIP_NONE);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
     /*
     int ant_size = 
       std::max<int>(
@@ -322,8 +325,8 @@ class app_play_state : public app_state {
     const rgba & col = _team_colors[team_id];
     Uint8 tcol_a = static_cast<Uint8>(
                      ( ((trace_value * 256) / max_trace_rounds)
-                       * 2)
-                     / 3);
+                       * 5)
+                     / 4);
     SDL_SetRenderDrawColor(
       _app->win().renderer(),
       col.r, col.g, col.b, tcol_a);
@@ -353,6 +356,46 @@ class app_play_state : public app_state {
     const gos::state::food_cell_state * cell_state =
             reinterpret_cast<const gos::state::food_cell_state *>(
               cell.state());
+    int amount_left = cell_state->amount_left();
+    int amount_max  = cell_state->max_amount();
+    int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
+    if (amount_left == 0) { return; }
+
+    std::string sprite_file;
+    if      (amount_qurt >= 4) { sprite_file = "sugah-4_16.bmp"; }
+    else if (amount_qurt >= 3) { sprite_file = "sugah-3_16.bmp"; }
+    else if (amount_qurt >= 2) { sprite_file = "sugah-2_16.bmp"; }
+    else                       { sprite_file = "sugah-1_16.bmp"; }
+
+    SDL_Point center { (cell_x * _grid_spacing),
+                       (cell_y * _grid_spacing) };
+    int size = 16;
+    SDL_Rect dst_rect;
+    dst_rect.x = center.x + (_grid_spacing - size) / 2;
+    dst_rect.y = center.y + (_grid_spacing - size) / 2;
+    dst_rect.w = size;
+    dst_rect.h = size;
+    SDL_SetRenderDrawBlendMode(
+      _app->win().renderer(),
+      SDL_BLENDMODE_BLEND);
+
+    SDL_Surface * surface = SDL_LoadBMP(sprite_file.c_str());
+    SDL_SetColorKey(
+      surface, SDL_TRUE,
+      SDL_MapRGB(surface->format, 255, 0, 255));
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(
+        _app->win().renderer(),
+        surface);
+
+    SDL_RenderCopy(_app->win().renderer(),
+                   texture,
+                   0,
+                   &dst_rect);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+    /*
     int rect_size = 
       std::min<int>(
           ((cell_state->amount_left() * _grid_spacing) /
@@ -366,13 +409,44 @@ class app_play_state : public app_state {
       cell_x, cell_y,
       rect_size,
       _food_color);
+    */
   }
 
   void render_barrier_cell(int cell_x, int cell_y) {
+    SDL_Point center { (cell_x * _grid_spacing),
+                       (cell_y * _grid_spacing) };
+    int size = 16;
+    SDL_Rect dst_rect;
+    dst_rect.x = center.x + (_grid_spacing - size) / 2;
+    dst_rect.y = center.y + (_grid_spacing - size) / 2;
+    dst_rect.w = size;
+    dst_rect.h = size;
+    SDL_SetRenderDrawBlendMode(
+      _app->win().renderer(),
+      SDL_BLENDMODE_BLEND);
+
+    SDL_Surface * surface = SDL_LoadBMP("rock_16.bmp");
+    SDL_SetColorKey(
+      surface, SDL_TRUE,
+      SDL_MapRGB(surface->format, 255, 0, 255));
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(
+        _app->win().renderer(),
+        surface);
+
+    SDL_RenderCopy(_app->win().renderer(),
+                   texture,
+                   0,
+                   &dst_rect);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+    /*
     draw_cell_fill_rectangle(
       _app->win(),
       cell_x, cell_y, _grid_spacing,
       rgba { 0x56, 0x56, 0x56, 0xff });
+    */
   }
 
   void render_grid(gos::view::window & win);
