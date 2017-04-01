@@ -151,10 +151,10 @@ gos::state::population * map_generator::make_population(
     GOS__LOG_DEBUG("map_generator.make_population",
                    "team "  << team_idx << " " <<
                    "spawn:" << spawn_point.x << "," << spawn_point.y);
-    teams.push_back(ant_team(team_idx,
-                             team_size,
-                             spawn_point,
-                             _game_state));
+    teams.emplace_back(ant_team(team_idx,
+                                team_size,
+                                spawn_point,
+                                _game_state));
   }
   gos::state::population * popul = new gos::state::population(
                                          std::move(teams));

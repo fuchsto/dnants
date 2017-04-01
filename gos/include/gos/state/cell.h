@@ -30,13 +30,12 @@ class cell_state {
  private:
   cell                  * _cell;
   bool                    _taken  = false;
-  gos::state::ant       * _ant    = nullptr;
+  gos::state::ant_id      _ant_id = { -1, -1 };
   std::array<traces, 4>   _traces = {{ }};
 
  public:
   cell_state(cell & c)
   : _cell(&c)
-  , _ant(nullptr)
   { }
 
   cell_state()                                   = delete;
@@ -62,8 +61,8 @@ class cell_state {
     return _traces[team_id];
   }
 
-  gos::state::ant * ant() {
-    return (_taken ? _ant : nullptr);
+  gos::state::ant_id ant() const {
+    return (_taken ? _ant_id : gos::state::ant_id { -1, -1 });
   }
 
   void add_trace(
@@ -166,44 +165,37 @@ class food_cell_state : public resource_cell_state {
  */
 class cell {
   cell_type                     _type = cell_type::plain;
-  std::shared_ptr<cell_state>   _state;
+  std::unique_ptr<cell_state>   _state;
 
   friend cell_state;
 
  public:
-  cell(
-    cell_type ct,
-    std::shared_ptr<cell_state> cs)
-  : _type(ct)
-  , _state(cs)
-  { }
-
   cell(
     cell_type ct = cell_type::plain)
   : _type(ct)
   {
     switch (ct) {
       case cell_type::grass:
-        _state = std::make_shared<grass_cell_state>(*this);
+        _state = std::make_unique<grass_cell_state>(*this);
         break;
       case cell_type::spawn_point:
-        _state = std::make_shared<spawn_cell_state>(*this);
+        _state = std::make_unique<spawn_cell_state>(*this);
         break;
       case cell_type::material:
-        _state = std::make_shared<plain_cell_state>(*this);
+        _state = std::make_unique<plain_cell_state>(*this);
         break;
       case cell_type::water:
-        _state = std::make_shared<water_cell_state>(*this);
+        _state = std::make_unique<water_cell_state>(*this);
         break;
       case cell_type::food:
-        _state = std::make_shared<food_cell_state>(*this);
+        _state = std::make_unique<food_cell_state>(*this);
         break;
       case cell_type::barrier:
-        _state = std::make_shared<barrier_cell_state>(*this);
+        _state = std::make_unique<barrier_cell_state>(*this);
         break;
       case cell_type::plain:
       default: // fall-through
-        _state = std::make_shared<plain_cell_state>(*this);
+        _state = std::make_unique<plain_cell_state>(*this);
         break;
     }
   }
@@ -211,11 +203,11 @@ class cell {
   bool               is_taken()    const { return _state->is_taken();    }
   bool               is_obstacle() const { return _state->is_obstacle(); }
 
-  gos::state::ant  * ant()            { return _state->ant(); }
+  gos::state::ant_id ant()    const { return _state->ant(); }
 
-  cell_type          type()     const { return _type;        }
-  cell_state       * state()          { return _state.get(); }
-  const cell_state * state()    const { return _state.get(); }
+  cell_type          type()   const { return _type;         }
+  cell_state       * state()        { return _state.get();  }
+  const cell_state * state()  const { return _state.get();  }
 
   void enter(gos::state::ant & a, const gos::state::game_state & gs) {
     _state->on_enter(a, gs);

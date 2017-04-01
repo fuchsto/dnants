@@ -31,9 +31,15 @@ class game_state {
   /// and performs asynchronous update of new back state.
   void next();
 
-  size_t                   round_count() const { return _round_count;  }
-  gos::state::grid       & grid_state()        { return *_grid_front;  }
-  gos::state::population & population_state()  { return *_popul_front; }
+  size_t                        round_count() const { return _round_count;  }
+
+  gos::state::grid             & grid_state()       { return *_grid_front;  }
+  const gos::state::grid       & grid_state() const { return *_grid_front;  }
+
+  gos::state::population       & population_state() {
+	                               return *_popul_front; }
+  const gos::state::population & population_state() const {
+	                               return *_popul_front; }
 
 };
 

@@ -3,6 +3,7 @@
 #include <gos/state/game_state.h>
 #include <gos/state/grid.h>
 #include <gos/state/cell.h>
+#include <gos/state/population.h>
 
 #include <gos/types.h>
 #include <gos/util/random.h>
@@ -12,24 +13,24 @@ namespace gos {
 namespace state {
 
 void ant_team::update() {
-  if (_game_state.round_count() % 20) {
+  if (_game_state->round_count() % 20) {
     spawn_ants();
   }
 }
 
 ant & ant_team::add_ant_at(position && pos) {
-  _ants.push_back(ant(*this, _ants.size(), std::move(pos)));
+  _ants.emplace_back(ant(*this, _ants.size(), std::move(pos)));
   return _ants.back();
 }
 
 ant & ant_team::add_ant_at(const position & pos) {
-  _ants.push_back(ant(*this, _ants.size(), pos));
+  _ants.emplace_back(ant(*this, _ants.size(), pos));
   return _ants.back();
 }
 
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
-    if (!(_game_state.grid_state()[spawn_pos].is_taken())) {
+    if (!(_game_state->grid_state()[spawn_pos].is_taken())) {
       if (_ants.size() >= _team_size) { return; }
       add_ant_at(spawn_pos);
     }
@@ -77,13 +78,13 @@ void ant::die() noexcept {
                  "id:"  << id() << " " <<
                  "at (" << pos().x << "," << pos().y << ")");
   _mode = mode::dead;
-  _game_state->grid_state()[_pos]
-             .leave(*this, *_game_state);
+  this->game_state().grid_state()[_pos]
+                    .leave(*this, this->game_state());
 }
 
 void ant::update_position() noexcept {
   if (!is_alive()) { return; }
-  auto rc     = _game_state->round_count();
+  auto rc     = this->game_state().round_count();
   _rand       = gos::random();
   _attack_str = 0;
   ++_nticks_not_fed;
@@ -109,23 +110,25 @@ void ant::update_position() noexcept {
 
 void ant::update_action() noexcept {
   if (!is_alive()) { return; }
-  gos::state::ant * enemy = nullptr;
-  for (int y = -1; enemy == nullptr && y <= 1; ++y) {
-    for (int x = -1; enemy == nullptr && x <= 1; ++x) {
+  gos::state::ant_id enemy_id { -1, -1 };
+  gos::state::ant *  enemy = nullptr;
+  for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
+    for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
       position adj_pos { _pos.x + x,
                          _pos.y + y };
       if ((x == 0 && y == 0) ||
-          !_game_state->grid_state().contains_position(adj_pos)) {
+          !this->game_state().grid_state().contains_position(adj_pos)) {
         continue;
       }
-      enemy = _game_state->grid_state()[adj_pos].ant();
-      if (enemy != nullptr &&
-          enemy->team_id() != team_id() &&
-          enemy->is_alive()) {
-        _dir  = direction { x, y };
+      enemy_id = this->game_state().grid_state()[adj_pos].ant();
+
+      if (enemy_id.id != -1 &&
+          enemy_id.team_id != team_id()) {
+		  enemy = &(this->game_state().population_state()
+			                          .teams()[enemy_id.team_id]
+			                          .ants()[enemy_id.id]);
+		  _dir = direction { x, y };
         break;
-      } else {
-        enemy = nullptr;
       }
     }
   }
@@ -151,7 +154,7 @@ void ant::update_reaction() noexcept {
 void ant::eat() noexcept {
   if (!is_alive()) { return; }
   int consumed = 0;
-  gos::state::cell & pos_cell =_game_state->grid_state()[_pos];
+  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
   if (pos_cell.type() == gos::state::cell_type::food) {
     gos::state::cell_state      * c_state   = pos_cell.state();
     gos::state::food_cell_state * food_cell =
@@ -174,11 +177,11 @@ void ant::move() noexcept {
   if (pos_next == _pos) {
     return;
   }
-  if (_game_state->grid_state().allows_move_to(pos_next)) {
-    _game_state->grid_state()[_pos]
-                .leave(*this, *_game_state);
-    _game_state->grid_state()[pos_next]
-                .enter(*this, *_game_state);
+  if (this->game_state().grid_state().allows_move_to(pos_next)) {
+	this->game_state().grid_state()[_pos]
+                .leave(*this, this->game_state());
+	this->game_state().grid_state()[pos_next]
+                .enter(*this, this->game_state());
     _pos = pos_next;
   } else {
     switch_mode(mode::collision);

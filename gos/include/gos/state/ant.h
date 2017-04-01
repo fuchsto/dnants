@@ -16,16 +16,21 @@ class ant;
 class game_state;
 class food_cell_state;
 
+struct ant_id {
+	int team_id;
+	int id;
+};
+
 class ant_team {
   using game_state = gos::state::game_state;
 
   friend class ant;
 
-  int                   _team_id;
-  int                   _team_size;
-  game_state &          _game_state;
-  std::vector<ant>      _ants;
-  std::vector<position> _spawn_points;
+  int                     _team_id;
+  size_t                  _team_size;
+  game_state            * _game_state;
+  std::vector<ant>        _ants;
+  std::vector<position>   _spawn_points;
  public:
   ant_team() = delete;
 
@@ -36,9 +41,14 @@ class ant_team {
     game_state     & gs)
   : _team_id(team_id)
   , _team_size(init_team_size)
-  , _game_state(gs) {
+  , _game_state(&gs) {
     _spawn_points.push_back(spawn_point);
   }
+
+  ant_team(const ant_team & other)           = delete;
+  ant_team & operator=(const ant_team & rhs) = delete;
+  ant_team(ant_team && other)                = default;
+  ant_team & operator=(ant_team && rhs)      = default;
 
   void update();
 
@@ -71,7 +81,6 @@ class ant {
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
-  game_state * _game_state;
   ant_team   * _team;
   int          _id;
   // When an ant is in a cell next to ants of another team, it dies if its
@@ -87,7 +96,7 @@ class ant {
   position     _pos;
   direction    _dir;
   mode         _mode           = ant::mode::scouting;
-  int          _rand           = 0;
+  size_t       _rand           = 0;
 
  public:
   static const int max_strength() { return 10; }
@@ -97,8 +106,7 @@ class ant {
   ant(ant_team  & team,
       int         id,
       position && pos)
-  : _game_state(&team._game_state)
-  , _team(&team)
+  : _team(&team)
   , _id(id)
   , _pos(std::move(pos))
   { }
@@ -106,16 +114,15 @@ class ant {
   ant(ant_team       & team,
       int              id,
       const position & pos)
-  : _game_state(&team._game_state)
-  , _team(&team)
+  : _team(&team)
   , _id(id)
   , _pos(pos)
   { }
 
-  ant(const ant & other) = default;
+  ant(const ant & other) = delete;
   ant(ant && other)      = default;
 
-  ant & operator=(const ant & rhs) = default;
+  ant & operator=(const ant & rhs) = delete;
   ant & operator=(ant && rhs)      = default;
 
   void on_food_cell(gos::state::food_cell_state & food_cell);
@@ -159,8 +166,20 @@ class ant {
     return _team->id();
   }
 
+  inline const gos::state::game_state & game_state() const noexcept {
+	return *(_team->_game_state);
+  }
+
+  inline gos::state::game_state & game_state() noexcept {
+    return *(_team->_game_state);
+  }
+
   inline const ant_team & team() const noexcept {
     return *_team;
+  }
+
+  inline ant_team & team() noexcept {
+	return *_team;
   }
 
   inline int strength() const noexcept {

@@ -10,8 +10,8 @@ void cell_state::on_enter(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
-  _ant   = &a;
-  _taken = true;
+  _ant_id = { a.team_id(), a.id() };
+  _taken  = true;
 }
 
 void cell_state::on_exit(
@@ -25,7 +25,7 @@ void cell_state::on_exit(
       dir2or(a.dir()),
       gs.round_count() - 1);
   }
-  _ant   = nullptr;
+  _ant_id = { -1, -1 };
 }
 
 void resource_cell_state::on_enter(

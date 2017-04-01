@@ -7,7 +7,7 @@
 namespace gos {
 namespace view {
 
-static int next_time;
+static Uint32 next_time;
 
 static Uint32 timeLeft(void) {
   Uint32 now = SDL_GetTicks();
