@@ -10,8 +10,8 @@ void cell_state::on_enter(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
-  _taken = true;
   _ant   = &a;
+  _taken = true;
 }
 
 void cell_state::on_exit(

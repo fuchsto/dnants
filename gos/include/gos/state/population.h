@@ -30,7 +30,10 @@ class population {
 
   void update() {
     for (auto & t : _teams) {
-      t.update();
+      t.update_positions();
+    }
+    for (auto & t : _teams) {
+      t.update_reactions();
     }
   }
 };

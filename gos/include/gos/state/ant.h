@@ -40,7 +40,8 @@ class ant_team {
     _spawn_points.push_back(spawn_point);
   }
 
-  void update();
+  void update_positions();
+  void update_reactions();
 
   inline int                      id()   const { return _team_id; }
   inline std::vector<ant>       & ants()       { return _ants; }
@@ -65,13 +66,14 @@ class ant {
     scouting,     // move without following a pheromone trace
     fighting,     // fighting enemy in adjacent cell
     tracing,      // follow the closes pheromone trace
-    eating        // eat and gain strength
+    eating,       // eat and gain strength
+    dead          // ant has died
   };
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
-  game_state & _game_state;
-  ant_team   & _team;
+  game_state * _game_state;
+  ant_team   * _team;
   int          _id;
   // When an ant is in a cell next to ants of another team, it dies if its
   // strength is less than the cumulative strength of the enemy ants in
@@ -87,7 +89,6 @@ class ant {
   mode         _mode           = ant::mode::scouting;
   int          _rand           = 0;
   bool         _blocked        = false;
-  bool         _alive          = true;
 
  public:
   static const int max_strength() { return 10; }
@@ -97,8 +98,8 @@ class ant {
   ant(ant_team  & team,
       int         id,
       position && pos)
-  : _game_state(team._game_state)
-  , _team(team)
+  : _game_state(&team._game_state)
+  , _team(&team)
   , _id(id)
   , _pos(std::move(pos))
   { }
@@ -106,11 +107,17 @@ class ant {
   ant(ant_team       & team,
       int              id,
       const position & pos)
-  : _game_state(team._game_state)
-  , _team(team)
+  : _game_state(&team._game_state)
+  , _team(&team)
   , _id(id)
   , _pos(pos)
   { }
+
+  void on_food_cell(gos::state::food_cell_state & food_cell);
+
+  void update_position() noexcept;
+
+  void update_reaction() noexcept;
 
   void attack(gos::state::ant & enemy) noexcept;
 
@@ -119,7 +126,7 @@ class ant {
   void die() noexcept;
 
   inline bool is_alive() const noexcept {
-    return _alive;
+    return _mode != mode::dead;
   }
 
   inline bool is_blocked() const noexcept {
@@ -138,12 +145,8 @@ class ant {
     return gos::dir2or(_dir);
   }
 
-  void on_food_cell(gos::state::food_cell_state & food_cell);
-
-  void update() noexcept;
-
   inline const ant_team & team() const noexcept {
-    return _team;
+    return *_team;
   }
 
   inline int id() const noexcept {
@@ -162,6 +165,7 @@ class ant {
     _dir = dir;
   }
 
+ private:
   void move() noexcept;
 
 };

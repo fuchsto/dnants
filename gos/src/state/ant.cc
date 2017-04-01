@@ -11,12 +11,22 @@
 namespace gos {
 namespace state {
 
-void ant_team::update() {
+void ant_team::update_positions() {
   if (_game_state.round_count() % 20) {
     spawn_ants();
   }
   for (auto & a : _ants) {
-    a.update();
+    if (a.is_alive()) {
+      a.update_position();
+    }
+  }
+}
+
+void ant_team::update_reactions() {
+  for (auto & a : _ants) {
+    if (a.is_alive()) {
+      a.update_reaction();
+    }
   }
 }
 
@@ -58,6 +68,7 @@ void ant::attacked_by(gos::state::ant & enemy) noexcept {
   GOS__LOG_DEBUG("ant.attacked_by", "enemy: " <<
                  "team:" << enemy.team().id() << " " <<
                  "id:"   << enemy.id());
+  _mode = mode::fighting;
   if (_strength <= enemy.strength()) {
     if (_strength > 1) {
       --_strength;
@@ -68,16 +79,13 @@ void ant::attacked_by(gos::state::ant & enemy) noexcept {
 }
 
 void ant::die() noexcept {
-  _alive = false;
-  _game_state.grid_state()[_pos]
-             .leave(*this, _game_state);
+  _mode = mode::dead;
+  _game_state->grid_state()[_pos]
+             .leave(*this, *_game_state);
 }
 
-void ant::update() noexcept {
-  if (!is_alive()) {
-    return;
-  }
-  auto rc = _game_state.round_count();
+void ant::update_position() noexcept {
+  auto rc = _game_state->round_count();
   _rand   = gos::random();
   ++_nticks_not_fed;
   switch (_mode) {
@@ -99,41 +107,53 @@ void ant::update() noexcept {
   if (_strength > 1 && (_nticks_not_fed % 100) == 0) {
     --_strength;
   }
+}
+
+void ant::update_reaction() noexcept {
   gos::state::ant * enemy = nullptr;
   for (int y = -1; enemy == nullptr && y <= 1; ++y) {
     for (int x = -1; enemy == nullptr && x <= 1; ++x) {
       position adj_pos { _pos.x + x,
                          _pos.y + y };
-      if (!_game_state.grid_state().contains_position(adj_pos)) {
+      if ((x == 0 && y == 0) ||
+          !_game_state->grid_state().contains_position(adj_pos)) {
         continue;
       }
-      enemy = _game_state.grid_state()[adj_pos].ant();
+      enemy = _game_state->grid_state()[adj_pos].ant();
+      if (enemy != nullptr && enemy->team().id() != team().id()) {
+        break;
+        _dir  = direction { x, y };
+      } else {
+        enemy = nullptr;
+      }
     }
   }
   if (enemy != nullptr && enemy->team().id() != team().id()) {
-    GOS__LOG_DEBUG("ant.update", "ant: " <<
-                   "team:" << team().id() << " " <<
-                   "id:"   << id() << " " <<
-                   "attacks enemy at " <<
-                   enemy->pos().x << "," << enemy->pos().y);
+    GOS__LOG_DEBUG("ant.update", "ant " <<
+                   "t:"  << team().id() << " " << "id:"   << id() << " " <<
+                   "at " << pos().x << "," << pos().y << " " <<
+                   "attacks enemy " <<
+                   "at " << enemy->pos().x << "," << enemy->pos().y);
     attack(*enemy);
     if (is_alive() && !enemy->is_alive()) {
       _mode = mode::scouting;
     }
+  } else {
+    _mode = mode::scouting;
   }
 }
 
 void ant::move() noexcept {
   int px = _pos.x + _dir.dx;
   int py = _pos.y + _dir.dy;
-  if (_game_state.grid_state().allows_move_to({ px, py })) {
+  if (_game_state->grid_state().allows_move_to({ px, py })) {
     _blocked = false;
-    _game_state.grid_state()[_pos]
-               .leave(*this, _game_state);
+    _game_state->grid_state()[_pos]
+                .leave(*this, *_game_state);
     _pos.x = px;
     _pos.y = py;
-    _game_state.grid_state()[{ px, py }]
-               .enter(*this, _game_state);
+    _game_state->grid_state()[{ px, py }]
+                .enter(*this, *_game_state);
   } else {
     _blocked = true;
     // collision, move failed:

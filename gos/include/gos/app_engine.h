@@ -36,7 +36,7 @@ class app_engine
 
  private:
   app_settings _settings {
-                  { 40, 40 }, // grid extents
+                  { 30, 30 }, // grid extents
                   30,         // fps
                   5,          // rps
                   30,         // trace rounds

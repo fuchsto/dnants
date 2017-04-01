@@ -36,6 +36,7 @@ class cell_state {
  public:
   cell_state(cell & c)
   : _cell(c)
+  , _ant(nullptr)
   { }
 
   virtual ~cell_state() { }
@@ -56,7 +57,7 @@ class cell_state {
   }
 
   gos::state::ant * ant() {
-    return _ant;
+    return (_taken ? _ant : nullptr);
   }
 
   void add_trace(
