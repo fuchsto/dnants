@@ -130,15 +130,6 @@ void ant::update_action() noexcept {
     }
   }
   if (enemy != nullptr) {
-    GOS__LOG_DEBUG(
-        "ant.reaction", "ant " <<
-        "t:"   << team_id() << " " <<
-        "id:"  << id() << " " <<
-        "at (" << pos().x << "," << pos().y << ") " <<
-        "attacks enemy " <<
-        "t:"   << enemy->team_id() << " " <<
-        "id:"  << enemy->id() << " " <<
-        "at (" << enemy->pos().x << "," << enemy->pos().y << ")");
     attack(*enemy);
   }
   if (_mode == mode::fighting && (enemy == nullptr || !enemy->is_alive())) {
