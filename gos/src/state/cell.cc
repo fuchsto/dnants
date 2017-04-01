@@ -3,6 +3,10 @@
 #include <gos/state/ant.h>
 #include <gos/state/game_state.h>
 
+#include <iostream>
+#include <sstream>
+
+
 namespace gos {
 namespace state {
 
@@ -48,6 +52,30 @@ void food_cell_state::on_enter(
 {
   resource_cell_state::on_enter(a, gs);
   a.on_food_cell(*this);
+}
+
+std::ostream & operator<<(
+  std::ostream           & os,
+  const gos::state::cell & c)
+{
+  std::ostringstream ss;
+  ss << "cell { ";
+  if (c.is_obstacle()) {
+    ss << "obstacle ";
+  }
+  if (c.is_taken()) {
+    ss << "ant:" << c.ant().id
+       << "-t"   << c.ant().team_id << " ";
+  }
+  if (c.type() == cell_type::food ||
+      c.type() == cell_type::plain) {
+    const gos::state::resource_cell_state * cs =
+      reinterpret_cast<const gos::state::resource_cell_state *>(
+        c.state());
+    ss << "food:" << cs->amount_left() << " ";
+  }
+  ss << "}";
+  return operator<<(os, ss.str());
 }
 
 } // namespace state

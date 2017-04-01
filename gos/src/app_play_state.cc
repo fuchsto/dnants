@@ -25,6 +25,17 @@ void app_play_state::initialize(app_engine * app) {
   _grid_spacing  = app->win().view_extents().w / _grid_extents.w;
   _game_state    = new gos::state::game_state(_app);
 
+
+  _sprites[(int)sprite_tag::rock]    = SDL_LoadBMP("rock_16.bmp");
+  _sprites[(int)sprite_tag::sugah_1] = SDL_LoadBMP("sugah-1_16.bmp");
+  _sprites[(int)sprite_tag::sugah_2] = SDL_LoadBMP("sugah-2_16.bmp");
+  _sprites[(int)sprite_tag::sugah_3] = SDL_LoadBMP("sugah-3_16.bmp");
+  _sprites[(int)sprite_tag::sugah_4] = SDL_LoadBMP("sugah-4_16.bmp");
+  _sprites[(int)sprite_tag::ant_1]   = SDL_LoadBMP("ant-1_16.bmp");
+  _sprites[(int)sprite_tag::ant_2]   = SDL_LoadBMP("ant-2_16.bmp");
+  _sprites[(int)sprite_tag::ant_3]   = SDL_LoadBMP("ant-3_16.bmp");
+  _sprites[(int)sprite_tag::ant_4]   = SDL_LoadBMP("ant-4_16.bmp");
+
   _active        = true;
   GOS__LOG_DEBUG("app_play_state", "initialize >");
 }
@@ -32,6 +43,11 @@ void app_play_state::initialize(app_engine * app) {
 void app_play_state::finalize() {
   _active = false;
   delete _game_state;
+
+  for (SDL_Surface * surface : _sprites) {
+    SDL_FreeSurface(surface);
+  }
+  _sprites = { };
 }
 
 void app_play_state::render_grid(gos::view::window & win)

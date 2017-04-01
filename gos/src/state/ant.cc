@@ -8,6 +8,9 @@
 #include <gos/types.h>
 #include <gos/util/random.h>
 
+#include <iostream>
+#include <sstream>
+
 
 namespace gos {
 namespace state {
@@ -44,7 +47,7 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
       food_cell.amount_left() > 0) {
     switch_mode(mode::eating);
   } else {
-    switch_mode(mode::scouting);
+    switch_mode(mode::harvesting);
   }
 }
 
@@ -91,6 +94,13 @@ void ant::update_position() noexcept {
   switch (_mode) {
     case ant::mode::eating:
       eat();
+      break;
+    case ant::mode::harvesting:
+      harvest();
+      break;
+    case ant::mode::tracing:
+      trace_back();
+      move();
       break;
     case ant::mode::scouting:
       if (_rand % 8 == 0) {
@@ -170,6 +180,65 @@ void ant::eat() noexcept {
   }
 }
 
+void ant::harvest() noexcept {
+  if (!is_alive()) { return; }
+  int consumed = 0;
+  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+  if (pos_cell.type() == gos::state::cell_type::food) {
+    gos::state::cell_state      * c_state   = pos_cell.state();
+    gos::state::food_cell_state * food_cell =
+      reinterpret_cast<gos::state::food_cell_state *>(c_state);
+    consumed = food_cell->consume();
+    if (consumed > 0) {
+      _num_carrying += consumed;
+    }
+  }
+  if (consumed == 0 || _num_carrying == strength() - 1) {
+    switch_mode(mode::tracing);
+  }
+}
+
+void ant::trace_back() noexcept {
+  if (!is_alive()) { return; }
+  int consumed = 0;
+  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+
+  direction backtrace_dir { };
+  int max_trace_intensity = 0;
+  for (int y = -1; y <= 1; ++y) {
+    for (int x = -1; x <= 1; ++x) {
+      position adj_pos { _pos.x + x,
+                         _pos.y + y };
+      if ((x == 0 && y == 0) ||
+          !this->game_state().grid_state().contains_position(adj_pos)) {
+        continue;
+      }
+      // find traces in adjacent cells that leads to the ant's current
+      // cell; from those, move to the cell with the most recent trace:
+      const auto & adj_cell   = this->game_state().grid_state()[adj_pos];
+      const auto & adj_traces = adj_cell.state()->get_traces(team_id());
+      // for example, the trace in the north-west adjacent cell leading
+      // to this cell has orientation south-east.
+      gos::orientation adj_cell_ort = dir2or(direction { -x, -y });
+      gos::orientation in_trace_ort = dir2or(direction { -x, -y });
+      int in_trace_ort_idx          = or2int(in_trace_ort);
+      int adj_cell_ort_idx          = or2int(adj_cell_ort);
+      int in_trace_intensity        = adj_traces[in_trace_ort_idx];
+      if (in_trace_intensity > max_trace_intensity) {
+        max_trace_intensity = in_trace_intensity;
+        backtrace_dir = { x, y };
+      }
+    }
+  }
+  if (backtrace_dir.dx != 0 && backtrace_dir.dy != 0) {
+    // trace found:
+    set_direction(backtrace_dir);
+  } else {
+    // no trace found, just turn around:
+    turn(4);
+  }
+}
+
 void ant::move() noexcept {
   if (!is_alive()) { return; }
   position pos_next { _pos.x + _dir.dx,
@@ -196,6 +265,21 @@ void ant::move() noexcept {
   else        { d += dn; ++_pos.y; }
   ++_pos.x;
 */
+}
+
+std::ostream & operator<<(
+  std::ostream          & os,
+  const gos::state::ant & a)
+{
+  std::ostringstream ss;
+  ss << "ant { " << a.id()
+     << "-t"   << a.team_id()  << " "
+     << "mod:" << a.ant_mode() << " "
+     << "str:" << a.strength() << " "
+     << "dir:" << "(" << a.dir().dx << "," << a.dir().dy << ") "
+     << "att:" << a.attacker_strength() << " "
+     << "}";
+  return operator<<(os, ss.str());
 }
 
 } // namespace state

@@ -7,6 +7,7 @@
 #include <gos/state/game_state.h>
 
 #include <vector>
+#include <iostream>
 
 
 namespace gos {
@@ -76,6 +77,7 @@ class ant {
     fighting,       // fighting enemy in adjacent cell
     tracing,        // follow the closes pheromone trace
     eating,         // eat and gain strength
+    harvesting,     // eat and gain strength
     dead            // ant has died
   };
   // Ants can detect pheromone traces and distinguish friendly (own team)
@@ -91,7 +93,7 @@ class ant {
   int          _attack_str     = 0;
   // If an ant carries food or material, its strength available for fights
   // is reduced by the carried weight.
-  int          _carry_weight   = 0;
+  int          _num_carrying   = 0;
   int          _nticks_not_fed = 0;
   position     _pos;
   direction    _dir;
@@ -166,6 +168,18 @@ class ant {
     return _team->id();
   }
 
+  inline ant::mode ant_mode() const noexcept {
+    return _mode;
+  }
+
+  inline int strength() const noexcept {
+    return _strength;
+  }
+
+  inline int attacker_strength() const noexcept {
+    return _attack_str;
+  }
+
   inline const gos::state::game_state & game_state() const noexcept {
     return *(_team->_game_state);
   }
@@ -182,16 +196,22 @@ class ant {
     return *_team;
   }
 
-  inline int strength() const noexcept {
-    return _strength;
-  }
-
   inline void set_direction(direction && dir) noexcept {
     _dir = std::move(dir);
   }
 
   inline void set_direction(const direction & dir) noexcept {
     _dir = dir;
+  }
+
+  inline void turn(int turn_dir) noexcept {
+    // for example, turn_dir +4 or -4 is reverse direction:
+    int ort_idx = or2int(this->orientation());
+    ort_idx += turn_dir;
+    if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
+    if (ort_idx > 7) { ort_idx -= ort_idx;     }
+    auto ort = int2or(ort_idx);
+    _dir = or2dir(ort);
   }
 
   inline void switch_mode(ant::mode m) noexcept {
@@ -201,10 +221,16 @@ class ant {
   }
 
  private:
-  void eat()  noexcept;
-  void move() noexcept;
+  void eat()        noexcept;
+  void harvest()    noexcept;
+  void trace_back() noexcept;
+  void move()       noexcept;
 
 };
+
+std::ostream & operator<<(
+  std::ostream          & os,
+  const gos::state::ant & a);
 
 } // namespace state
 } // namespace gos

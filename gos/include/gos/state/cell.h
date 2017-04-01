@@ -4,6 +4,7 @@
 #include <gos/state/ant.h>
 
 #include <memory>
+#include <iostream>
 
 
 namespace gos {
@@ -101,13 +102,6 @@ class resource_cell_state : public cell_state {
   }
 };
 
-class plain_cell_state : public cell_state {
- public:
-  plain_cell_state(cell & c)
-  : cell_state(c)
-  { }
-};
-
 class barrier_cell_state : public cell_state {
  public:
   barrier_cell_state(cell & c)
@@ -130,23 +124,16 @@ class spawn_cell_state : public cell_state {
   }
 };
 
-class grass_cell_state : public cell_state {
+class plain_cell_state : public resource_cell_state {
  public:
-  grass_cell_state(cell & c)
-  : cell_state(c)
-  { }
-};
-
-class water_cell_state : public resource_cell_state {
- public:
-  water_cell_state(cell & c, int amount = 1)
-  : resource_cell_state(c, amount)
+  plain_cell_state(cell & c)
+  : resource_cell_state(c, 0)
   { }
 };
 
 class food_cell_state : public resource_cell_state {
  public:
-  static constexpr int max_amount() { return 10; }
+  static constexpr int max_amount() { return 4; }
 
   food_cell_state(cell & c, int amount)
   : resource_cell_state(c, std::max(max_amount(), amount))
@@ -175,17 +162,8 @@ class cell {
   : _type(ct)
   {
     switch (ct) {
-      case cell_type::grass:
-        _state = std::make_shared<grass_cell_state>(*this);
-        break;
       case cell_type::spawn_point:
         _state = std::make_shared<spawn_cell_state>(*this);
-        break;
-      case cell_type::material:
-        _state = std::make_shared<plain_cell_state>(*this);
-        break;
-      case cell_type::water:
-        _state = std::make_shared<water_cell_state>(*this);
         break;
       case cell_type::food:
         _state = std::make_shared<food_cell_state>(*this);
@@ -216,6 +194,10 @@ class cell {
     _state->on_exit(a, gs);
   }
 };
+
+std::ostream & operator<<(
+  std::ostream           & os,
+  const gos::state::cell & c);
 
 } // namespace state
 } // namespace gos

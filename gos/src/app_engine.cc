@@ -18,8 +18,8 @@ app_engine::app_engine(
 : _settings(settings)
 , _window(
     *this, title,
-    settings.grid_extents.w * (max_width / settings.grid_extents.w),
-    settings.grid_extents.h * (max_width / settings.grid_extents.w),
+    settings.grid_extents.w * 16, // (max_width / settings.grid_extents.w),
+    settings.grid_extents.h * 16, // (max_width / settings.grid_extents.w),
     0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
   GOS__LOG_DEBUG("app_engine", "app_engine >");

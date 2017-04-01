@@ -15,6 +15,18 @@ class app_play_state : public app_state {
   using game_state  = gos::state::game_state;
   using cell_traces = gos::state::cell_state::traces;
 
+  enum class sprite_tag : int {
+    rock = 0,
+    sugah_1,
+    sugah_2,
+    sugah_3,
+    sugah_4,
+    ant_1,
+    ant_2,
+    ant_3,
+    ant_4
+  };
+
  protected:
   app_play_state() { }
 
@@ -32,8 +44,10 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
+  std::array<SDL_Surface *, 9> _sprites { };
+
   rgba         _team_colors[4]  { { 0xe8, 0x87, 0x57, 0xff },
-                                  { 0x54, 0x22, 0xef, 0xff },
+                                  { 0x87, 0x57, 0xe8, 0xff },
                                   { 0x49, 0x48, 0x16, 0xff },
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
@@ -70,6 +84,7 @@ class app_play_state : public app_state {
                              "(" << clicked_cell_pos.x <<
                              "," << clicked_cell_pos.y << ")");
               _marked_cell = clicked_cell_pos;
+              log_cell(_marked_cell);
             }
             break;
         case SDL_KEYDOWN:
@@ -228,6 +243,10 @@ class app_play_state : public app_state {
           - 2,
         _grid_spacing / 5);
 
+    int strength_qurt = (((ant.strength() * 100) /
+                           ant.max_strength()) / 25
+                        ) + 1;
+
     const rgba & col = _team_colors[ant.team().id()];
 
     int size   = 16;
@@ -245,7 +264,13 @@ class app_play_state : public app_state {
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = SDL_LoadBMP("ant-4_16.bmp");
+    sprite_tag sprite;
+    if      (strength_qurt >= 4) { sprite = sprite_tag::ant_4; }
+    else if (strength_qurt >= 3) { sprite = sprite_tag::ant_3; }
+    else if (strength_qurt >= 2) { sprite = sprite_tag::ant_2; }
+    else                         { sprite = sprite_tag::ant_1; }
+
+    SDL_Surface * surface = _sprites[(int)sprite];
     SDL_SetColorKey(
       surface, SDL_TRUE,
       SDL_MapRGB(surface->format, 255, 0, 255));
@@ -264,43 +289,7 @@ class app_play_state : public app_state {
                      0,
                      SDL_FLIP_NONE);
 
-    SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
-    /*
-    int ant_size = 
-      std::max<int>(
-        std::min<int>(
-          ((ant.strength() * _grid_spacing) /
-           gos::state::ant::max_strength()),
-          _grid_spacing)
-          - 2,
-        _grid_spacing / 5);
-    draw_cell_circle(
-      _app->win(),
-      ant.pos().x, ant.pos().y,
-      ant_size / 2,
-      3,
-      gos::orientation::none,
-      _team_colors[ant.team().id()]
-    );
-
-    draw_cell_circle(
-      _app->win(),
-      ant.pos().x, ant.pos().y,
-      ant_size / 4 + 1,
-      ant_size / 4 + 0,
-      ant.orientation(),
-      _team_colors[ant.team().id()]
-    );
-
-    if (ant.is_blocked()) {
-      draw_cell_rectangle(
-        _app->win(),
-        ant.pos().x, ant.pos().y, 3,
-        _blocked_color
-      );
-    }
-    */
   }
 
   void render_trace_cell(
@@ -361,11 +350,11 @@ class app_play_state : public app_state {
     int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
     if (amount_left == 0) { return; }
 
-    std::string sprite_file;
-    if      (amount_qurt >= 4) { sprite_file = "sugah-4_16.bmp"; }
-    else if (amount_qurt >= 3) { sprite_file = "sugah-3_16.bmp"; }
-    else if (amount_qurt >= 2) { sprite_file = "sugah-2_16.bmp"; }
-    else                       { sprite_file = "sugah-1_16.bmp"; }
+    sprite_tag sprite;
+    if      (amount_qurt >= 4) { sprite = sprite_tag::sugah_4; }
+    else if (amount_qurt >= 3) { sprite = sprite_tag::sugah_3; }
+    else if (amount_qurt >= 2) { sprite = sprite_tag::sugah_2; }
+    else                       { sprite = sprite_tag::sugah_1; }
 
     SDL_Point center { (cell_x * _grid_spacing),
                        (cell_y * _grid_spacing) };
@@ -379,7 +368,7 @@ class app_play_state : public app_state {
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = SDL_LoadBMP(sprite_file.c_str());
+    SDL_Surface * surface = _sprites[(int)sprite];
     SDL_SetColorKey(
       surface, SDL_TRUE,
       SDL_MapRGB(surface->format, 255, 0, 255));
@@ -393,23 +382,7 @@ class app_play_state : public app_state {
                    0,
                    &dst_rect);
 
-    SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
-    /*
-    int rect_size = 
-      std::min<int>(
-          ((cell_state->amount_left() * _grid_spacing) /
-           cell_state->max_amount()),
-        _grid_spacing);
-
-    if (rect_size <= 0) { return; }
-
-    draw_cell_fill_rectangle(
-      _app->win(),
-      cell_x, cell_y,
-      rect_size,
-      _food_color);
-    */
   }
 
   void render_barrier_cell(int cell_x, int cell_y) {
@@ -425,7 +398,7 @@ class app_play_state : public app_state {
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = SDL_LoadBMP("rock_16.bmp");
+    SDL_Surface * surface = _sprites[(int)sprite_tag::rock];
     SDL_SetColorKey(
       surface, SDL_TRUE,
       SDL_MapRGB(surface->format, 255, 0, 255));
@@ -439,14 +412,7 @@ class app_play_state : public app_state {
                    0,
                    &dst_rect);
 
-    SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
-    /*
-    draw_cell_fill_rectangle(
-      _app->win(),
-      cell_x, cell_y, _grid_spacing,
-      rgba { 0x56, 0x56, 0x56, 0xff });
-    */
   }
 
   void render_grid(gos::view::window & win);
@@ -489,6 +455,17 @@ class app_play_state : public app_state {
     int  cell_y,
     const rgba & col);
 
+  void log_cell(const position & cell_pos) {
+    const auto & grid      = _game_state->grid_state();
+    const auto & grid_cell = grid.at(cell_pos.x, cell_pos.y);
+    GOS__LOG_DEBUG("app_play_state", "marked cell: " << grid_cell);
+    if (grid_cell.is_taken()) {
+      gos::state::ant_id aid = grid_cell.ant();
+      const auto & popul     = _game_state->population_state();
+      const auto & cell_ant  = popul.teams()[aid.team_id].ants()[aid.id];
+      GOS__LOG_DEBUG("app_play_state", "marked ant: " << cell_ant);
+    }
+  }
 };
 
 } // namespace gos
