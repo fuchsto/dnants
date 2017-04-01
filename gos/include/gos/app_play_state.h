@@ -314,8 +314,8 @@ class app_play_state : public app_state {
     const rgba & col = _team_colors[team_id];
     Uint8 tcol_a = static_cast<Uint8>(
                      ( ((trace_value * 256) / max_trace_rounds)
-                       * 5)
-                     / 4);
+                       * 4)
+                     / 5);
     SDL_SetRenderDrawColor(
       _app->win().renderer(),
       col.r, col.g, col.b, tcol_a);

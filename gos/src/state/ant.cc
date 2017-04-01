@@ -80,8 +80,10 @@ void ant::attacked_by(gos::state::ant & enemy) noexcept {
   GOS__LOG_DEBUG("ant.attacked_by", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
                  "id:" << enemy.id());
-  switch_mode(mode::fighting);
   _attack_str += enemy.strength();
+  if (_num_carrying == 0) {
+    switch_mode(mode::fighting);
+  }
 }
 
 void ant::die() noexcept {
@@ -113,9 +115,10 @@ void ant::update_position() noexcept {
       break;
     case ant::mode::scouting:
       if (_rand % 4 == 0) {
-        int dx = ((_rand + rc / 2) % 3) - 1;
-        int dy = ((_rand + rc * 7) % 3) - 1;
-        set_direction(direction { dx, dy });
+      // int dx = ((_rand + rc / 2) % 3) - 1;
+      // int dy = ((_rand + rc * 7) % 3) - 1;
+      // set_direction(direction { dx, dy });
+        turn(((_rand + rc * 7) % 5) - 2);
       }
       move();
       break;
