@@ -60,13 +60,13 @@ class ant_team {
 class ant {
  public:
   enum mode : int {
-    waiting  = 0, // do nothing
-    blocked,      // collision, move failed
-    scouting,     // move without following a pheromone trace
-    fighting,     // fighting enemy in adjacent cell
-    tracing,      // follow the closes pheromone trace
-    eating,       // eat and gain strength
-    dead          // ant has died
+    waiting    = 0, // do nothing
+    collision,      // collision, move failed
+    scouting,       // move without following a pheromone trace
+    fighting,       // fighting enemy in adjacent cell
+    tracing,        // follow the closes pheromone trace
+    eating,         // eat and gain strength
+    dead            // ant has died
   };
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
@@ -88,7 +88,6 @@ class ant {
   direction    _dir;
   mode         _mode           = ant::mode::scouting;
   int          _rand           = 0;
-  bool         _blocked        = false;
 
  public:
   static const int max_strength() { return 10; }
@@ -120,6 +119,7 @@ class ant {
   ant & operator=(ant && rhs)      = default;
 
   void on_food_cell(gos::state::food_cell_state & food_cell);
+  void on_collision();
 
   void update_position() noexcept;
   void update_action()   noexcept;
@@ -136,7 +136,7 @@ class ant {
   }
 
   inline bool is_blocked() const noexcept {
-    return _blocked;
+    return _mode == mode::collision;
   }
 
   inline const position & pos() const noexcept {
@@ -182,6 +182,7 @@ class ant {
   }
 
  private:
+  void eat()  noexcept;
   void move() noexcept;
 
 };

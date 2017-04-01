@@ -36,14 +36,24 @@ void ant_team::spawn_ants() {
   }
 }
 
-void ant::on_food_cell(gos::state::food_cell_state & food_cell)
-{
+
+
+void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
   if (_strength < max_strength() &&
       food_cell.amount_left() > 0) {
-    _strength += food_cell.consume();
     switch_mode(mode::eating);
+  } else {
+    switch_mode(mode::scouting);
   }
 }
+
+void ant::on_collision() {
+  if (_rand % 2) { _dir.dx *= -1; }
+  else           { _dir.dy *= -1; }
+  switch_mode(mode::scouting);
+}
+
+
 
 void ant::attack(gos::state::ant & enemy) noexcept {
   GOS__LOG_DEBUG("ant.attack", "enemy: " <<
@@ -79,8 +89,7 @@ void ant::update_position() noexcept {
   ++_nticks_not_fed;
   switch (_mode) {
     case ant::mode::eating:
-      _nticks_not_fed = 0;
-      switch_mode(mode::scouting);
+      eat();
       break;
     case ant::mode::scouting:
       if (_rand % 8 == 0) {
@@ -130,9 +139,9 @@ void ant::update_action() noexcept {
         "t:"   << enemy->team_id() << " " <<
         "id:"  << enemy->id() << " " <<
         "at (" << enemy->pos().x << "," << enemy->pos().y << ")");
-
     attack(*enemy);
-  } else {
+  }
+  if (_mode == mode::fighting && (enemy == nullptr || !enemy->is_alive())) {
     switch_mode(mode::scouting);
   }
 }
@@ -148,6 +157,25 @@ void ant::update_reaction() noexcept {
   }
 }
 
+void ant::eat() noexcept {
+  if (!is_alive()) { return; }
+  int consumed = 0;
+  gos::state::cell & pos_cell =_game_state->grid_state()[_pos];
+  if (pos_cell.type() == gos::state::cell_type::food) {
+    gos::state::cell_state      * c_state   = pos_cell.state();
+    gos::state::food_cell_state * food_cell =
+      reinterpret_cast<gos::state::food_cell_state *>(c_state);
+    consumed = food_cell->consume();
+    if (consumed > 0) {
+      _nticks_not_fed = 0;
+      _strength       = std::min(max_strength(), _strength + consumed);
+    }
+  }
+  if (consumed == 0 || _strength >= max_strength() / 2) {
+    switch_mode(mode::scouting);
+  }
+}
+
 void ant::move() noexcept {
   if (!is_alive()) { return; }
   position pos_next { _pos.x + _dir.dx,
@@ -156,17 +184,14 @@ void ant::move() noexcept {
     return;
   }
   if (_game_state->grid_state().allows_move_to(pos_next)) {
-    _blocked = false;
     _game_state->grid_state()[_pos]
                 .leave(*this, *_game_state);
     _game_state->grid_state()[pos_next]
                 .enter(*this, *_game_state);
     _pos = pos_next;
   } else {
-    _blocked = true;
-    // collision, move failed:
-    if (_rand % 2) { _dir.dx *= -1; }
-    else           { _dir.dy *= -1; }
+    switch_mode(mode::collision);
+    on_collision();
   }
 /*
   // Bresenham differential:
