@@ -192,6 +192,9 @@ class app_play_state : public app_state {
   }
 
   void render_ant(const gos::state::ant & ant) {
+    if (!ant.is_alive()) {
+      return;
+    }
     int ant_size = 
       std::max<int>(
         std::min<int>(
@@ -247,8 +250,9 @@ class app_play_state : public app_state {
       col.r, col.g, col.b, tcol_a);
 
     direction dir = gos::or2dir(ort);
-    int       len = _grid_spacing / 2;
-    position from { center_x, center_y };
+    int       off = (_grid_spacing / 6);
+    int       len = (_grid_spacing * 3) / 4;
+    position from { center_x + (dir.dx * off), center_y + (dir.dy * off) };
     position to   { center_x + (dir.dx * len), center_y + (dir.dy * len) };
 
     SDL_RenderDrawLine(

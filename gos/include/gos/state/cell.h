@@ -30,6 +30,7 @@ class cell_state {
  private:
   cell                  & _cell;
   bool                    _taken  = false;
+  gos::state::ant       * _ant    = nullptr;
   std::array<traces, 4>   _traces = {{ }};
 
  public:
@@ -54,6 +55,10 @@ class cell_state {
     return _traces[team_id];
   }
 
+  gos::state::ant * ant() {
+    return _ant;
+  }
+
   void add_trace(
     int              team_id,
     gos::orientation ort,
@@ -72,8 +77,8 @@ class resource_cell_state : public cell_state {
 
   virtual ~resource_cell_state() { }
 
-  virtual void on_enter(ant &, const gos::state::game_state &);
-  virtual void on_exit(ant &, const gos::state::game_state &);
+  virtual void on_enter(gos::state::ant &, const gos::state::game_state &);
+  virtual void on_exit(gos::state::ant &, const gos::state::game_state &);
 
   int amount_left() const noexcept {
     return _amount;
@@ -144,7 +149,7 @@ class food_cell_state : public resource_cell_state {
   : resource_cell_state(c, max_amount())
   { }
 
-  virtual void on_enter(ant &, const gos::state::game_state &);
+  virtual void on_enter(gos::state::ant &, const gos::state::game_state &);
 };
 
 /**
@@ -198,14 +203,16 @@ class cell {
   bool               is_taken()    const { return _state->is_taken();    }
   bool               is_obstacle() const { return _state->is_obstacle(); }
 
+  gos::state::ant  * ant()            { return _state->ant(); }
+
   cell_type          type()     const { return _type;        }
   cell_state       * state()          { return _state.get(); }
   const cell_state * state()    const { return _state.get(); }
 
-  void enter(ant & a, const gos::state::game_state & gs) {
+  void enter(gos::state::ant & a, const gos::state::game_state & gs) {
     _state->on_enter(a, gs);
   }
-  void leave(ant & a, const gos::state::game_state & gs) {
+  void leave(gos::state::ant & a, const gos::state::game_state & gs) {
     _state->on_exit(a, gs);
   }
 };

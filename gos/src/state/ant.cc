@@ -46,7 +46,37 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell)
   }
 }
 
+void ant::attack(gos::state::ant & enemy) noexcept {
+  GOS__LOG_DEBUG("ant.attack", "enemy: " <<
+                 "team:" << enemy.team().id() << " " <<
+                 "id:"   << enemy.id());
+  _mode = mode::fighting;
+  enemy.attacked_by(*this);
+}
+
+void ant::attacked_by(gos::state::ant & enemy) noexcept {
+  GOS__LOG_DEBUG("ant.attacked_by", "enemy: " <<
+                 "team:" << enemy.team().id() << " " <<
+                 "id:"   << enemy.id());
+  if (_strength <= enemy.strength()) {
+    if (_strength > 1) {
+      --_strength;
+    } else {
+      die();
+    }
+  }
+}
+
+void ant::die() noexcept {
+  _alive = false;
+  _game_state.grid_state()[_pos]
+             .leave(*this, _game_state);
+}
+
 void ant::update() noexcept {
+  if (!is_alive()) {
+    return;
+  }
   auto rc = _game_state.round_count();
   _rand   = gos::random();
   ++_nticks_not_fed;
@@ -68,6 +98,28 @@ void ant::update() noexcept {
   }
   if (_strength > 1 && (_nticks_not_fed % 100) == 0) {
     --_strength;
+  }
+  gos::state::ant * enemy = nullptr;
+  for (int y = -1; enemy == nullptr && y <= 1; ++y) {
+    for (int x = -1; enemy == nullptr && x <= 1; ++x) {
+      position adj_pos { _pos.x + x,
+                         _pos.y + y };
+      if (!_game_state.grid_state().contains_position(adj_pos)) {
+        continue;
+      }
+      enemy = _game_state.grid_state()[adj_pos].ant();
+    }
+  }
+  if (enemy != nullptr && enemy->team().id() != team().id()) {
+    GOS__LOG_DEBUG("ant.update", "ant: " <<
+                   "team:" << team().id() << " " <<
+                   "id:"   << id() << " " <<
+                   "attacks enemy at " <<
+                   enemy->pos().x << "," << enemy->pos().y);
+    attack(*enemy);
+    if (is_alive() && !enemy->is_alive()) {
+      _mode = mode::scouting;
+    }
   }
 }
 

@@ -11,17 +11,21 @@ void cell_state::on_enter(
   const gos::state::game_state & gs)
 {
   _taken = true;
+  _ant   = &a;
 }
 
 void cell_state::on_exit(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
+  if (a.is_alive()) {
+    add_trace(
+      a.team().id(),
+      dir2or(a.dir()),
+      gs.round_count() - 1);
+  }
   _taken = false;
-  add_trace(
-    a.team().id(),
-    dir2or(a.dir()),
-    gs.round_count() - 1);
+  _ant   = nullptr;
 }
 
 void resource_cell_state::on_enter(

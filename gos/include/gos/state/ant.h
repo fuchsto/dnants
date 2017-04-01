@@ -63,6 +63,7 @@ class ant {
     waiting  = 0, // do nothing
     blocked,      // collision, move failed
     scouting,     // move without following a pheromone trace
+    fighting,     // fighting enemy in adjacent cell
     tracing,      // follow the closes pheromone trace
     eating        // eat and gain strength
   };
@@ -86,6 +87,7 @@ class ant {
   mode         _mode           = ant::mode::scouting;
   int          _rand           = 0;
   bool         _blocked        = false;
+  bool         _alive          = true;
 
  public:
   static const int max_strength() { return 10; }
@@ -110,15 +112,29 @@ class ant {
   , _pos(pos)
   { }
 
-  bool is_blocked() const noexcept {
+  void attack(gos::state::ant & enemy) noexcept;
+
+  void attacked_by(gos::state::ant & enemy) noexcept;
+
+  void die() noexcept;
+
+  inline bool is_alive() const noexcept {
+    return _alive;
+  }
+
+  inline bool is_blocked() const noexcept {
     return _blocked;
   }
 
-  const direction & dir() const noexcept {
+  inline const position & pos() const noexcept {
+    return _pos;
+  }
+
+  inline const direction & dir() const noexcept {
     return _dir;
   }
 
-  gos::orientation orientation() const noexcept {
+  inline gos::orientation orientation() const noexcept {
     return gos::dir2or(_dir);
   }
 
@@ -126,27 +142,23 @@ class ant {
 
   void update() noexcept;
 
-  const ant_team & team() const noexcept {
+  inline const ant_team & team() const noexcept {
     return _team;
   }
 
-  int id() const noexcept {
+  inline int id() const noexcept {
     return _id;
   }
 
-  int strength() const noexcept {
+  inline int strength() const noexcept {
     return _strength;
   }
 
-  const position & pos() const noexcept {
-    return _pos;
-  }
-
-  void set_direction(direction && dir) noexcept {
+  inline void set_direction(direction && dir) noexcept {
     _dir = std::move(dir);
   }
 
-  void set_direction(const direction & dir) noexcept {
+  inline void set_direction(const direction & dir) noexcept {
     _dir = dir;
   }
 
