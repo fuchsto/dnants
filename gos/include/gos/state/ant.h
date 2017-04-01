@@ -16,6 +16,7 @@ namespace state {
 class ant;
 class game_state;
 class food_cell_state;
+class spawn_cell_state;
 
 struct ant_id {
   int team_id;
@@ -83,22 +84,23 @@ class ant {
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
-  ant_team   * _team;
+  ant_team   * _team            = nullptr;
   int          _id;
   // When an ant is in a cell next to ants of another team, it dies if its
   // strength is less than the cumulative strength of the enemy ants in
   // adjacent cells (von-Neumann neighborhood, diagonals are considered
   // neighbor cells).
-  int          _strength       = 5;
-  int          _attack_str     = 0;
+  int          _strength        = 5;
+  int          _attack_str      = 0;
   // If an ant carries food or material, its strength available for fights
   // is reduced by the carried weight.
-  int          _num_carrying   = 0;
-  int          _nticks_not_fed = 0;
+  int          _num_carrying    = 0;
+  int          _nticks_not_fed  = 0;
   position     _pos;
   direction    _dir;
-  mode         _mode           = ant::mode::scouting;
-  size_t       _rand           = 0;
+  size_t       _last_dir_change = 0;
+  mode         _mode            = ant::mode::scouting;
+  size_t       _rand            = 0;
 
  public:
   static const int max_strength() { return 10; }
@@ -127,6 +129,7 @@ class ant {
   ant & operator=(const ant & rhs) = delete;
   ant & operator=(ant && rhs)      = default;
 
+  void on_home_cell(gos::state::spawn_cell_state & home_cell);
   void on_food_cell(gos::state::food_cell_state & food_cell);
   void on_collision();
 
@@ -176,6 +179,10 @@ class ant {
     return _strength;
   }
 
+  inline int num_carrying() const noexcept {
+    return _num_carrying;
+  }
+
   inline int attacker_strength() const noexcept {
     return _attack_str;
   }
@@ -197,10 +204,14 @@ class ant {
   }
 
   inline void set_direction(direction && dir) noexcept {
+    if (_dir == dir) { return; }
+    _last_dir_change = game_state().round_count();
     _dir = std::move(dir);
   }
 
   inline void set_direction(const direction & dir) noexcept {
+    if (_dir == dir) { return; }
+    _last_dir_change = game_state().round_count();
     _dir = dir;
   }
 
@@ -211,7 +222,11 @@ class ant {
     if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
     if (ort_idx > 7) { ort_idx -= ort_idx;     }
     auto ort = int2or(ort_idx);
-    _dir = or2dir(ort);
+    set_direction(or2dir(ort));
+  }
+
+  inline int num_no_dir_change() const noexcept {
+    return this->game_state().round_count() - _last_dir_change;
   }
 
   inline void switch_mode(ant::mode m) noexcept {

@@ -37,9 +37,9 @@ gos::app_engine::app_settings process_args(int argc, char** argv)
   gos::app_engine::app_settings app_opts;
 
   app_opts.grid_extents   = { 30, 30 };
-  app_opts.rounds_per_sec = 10;
+  app_opts.rounds_per_sec =  3;
   app_opts.init_team_size = 12;
-  app_opts.num_teams      = 1;
+  app_opts.num_teams      =  1;
   app_opts.trace_rounds   = 20;
 
   const char* const short_opts = "g:w:h:t:n:s";

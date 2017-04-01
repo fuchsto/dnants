@@ -41,10 +41,20 @@ void ant_team::spawn_ants() {
 }
 
 
+void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) {
+  GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << _num_carrying);
+  _num_carrying = 0;
+  switch_mode(mode::scouting);
+}
 
 void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
-  if (_strength < max_strength() &&
-      food_cell.amount_left() > 0) {
+  if (food_cell.amount_left() <= 0) {
+    return;
+  }
+  if (_mode == mode::harvesting) {
+    return;
+  }
+  if (_strength < max_strength()) {
     switch_mode(mode::eating);
   } else {
     switch_mode(mode::harvesting);
@@ -52,9 +62,8 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
 }
 
 void ant::on_collision() {
-  if (_rand % 2) { _dir.dx *= -1; }
-  else           { _dir.dy *= -1; }
-  switch_mode(mode::scouting);
+  if (_rand % 2) { turn(-2); }
+  else           { turn(2);  }
 }
 
 
@@ -103,7 +112,7 @@ void ant::update_position() noexcept {
       move();
       break;
     case ant::mode::scouting:
-      if (_rand % 8 == 0) {
+      if (_rand % 4 == 0) {
         int dx = ((_rand + rc / 2) % 3) - 1;
         int dy = ((_rand + rc * 7) % 3) - 1;
         set_direction(direction { dx, dy });
@@ -119,7 +128,9 @@ void ant::update_position() noexcept {
 }
 
 void ant::update_action() noexcept {
-  if (!is_alive()) { return; }
+  if (!is_alive())       { return; }
+  // Cannot attack while carrying:
+  if (_num_carrying > 0) { return; }
   gos::state::ant_id enemy_id { -1, -1 };
   gos::state::ant *  enemy = nullptr;
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
@@ -134,10 +145,10 @@ void ant::update_action() noexcept {
 
       if (enemy_id.id != -1 &&
           enemy_id.team_id != team_id()) {
-      enemy = &(this->game_state().population_state()
-                                .teams()[enemy_id.team_id]
-                                .ants()[enemy_id.id]);
-      _dir = direction { x, y };
+        enemy = &(this->game_state().population_state()
+                                  .teams()[enemy_id.team_id]
+                                  .ants()[enemy_id.id]);
+        set_direction(direction { x, y });
         break;
       }
     }
@@ -203,8 +214,10 @@ void ant::trace_back() noexcept {
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
 
-  direction backtrace_dir { };
-  int max_trace_intensity = 0;
+  direction max_backtrace_dir { };
+  direction sec_max_backtrace_dir { };
+  int max_trace_intensity     = 0;
+  int sec_max_trace_intensity = 0;
   for (int y = -1; y <= 1; ++y) {
     for (int x = -1; x <= 1; ++x) {
       position adj_pos { _pos.x + x,
@@ -224,18 +237,24 @@ void ant::trace_back() noexcept {
       int in_trace_ort_idx          = or2int(in_trace_ort);
       int adj_cell_ort_idx          = or2int(adj_cell_ort);
       int in_trace_intensity        = adj_traces[in_trace_ort_idx];
+      // follow second highest intensity as highest intensity is
+      // would toggle back to last backtraced cell:
       if (in_trace_intensity > max_trace_intensity) {
-        max_trace_intensity = in_trace_intensity;
-        backtrace_dir = { x, y };
+        sec_max_trace_intensity = max_trace_intensity;
+        sec_max_backtrace_dir   = max_backtrace_dir;
+        max_trace_intensity     = in_trace_intensity;
+        max_backtrace_dir       = { x, y };
       }
     }
   }
-  if (backtrace_dir.dx != 0 && backtrace_dir.dy != 0) {
+  if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
     // trace found:
-    set_direction(backtrace_dir);
+    set_direction(sec_max_backtrace_dir);
   } else {
     // no trace found, just turn around:
-    turn(4);
+    if (num_no_dir_change() > 4) {
+      turn((this->game_state().round_count() % 4) - 2);
+    }
   }
 }
 
@@ -253,7 +272,6 @@ void ant::move() noexcept {
                     .enter(*this, this->game_state());
     _pos = pos_next;
   } else {
-    switch_mode(mode::collision);
     on_collision();
   }
 /*
@@ -276,7 +294,9 @@ std::ostream & operator<<(
      << "-t"   << a.team_id()  << " "
      << "mod:" << a.ant_mode() << " "
      << "str:" << a.strength() << " "
+     << "car:" << a.num_carrying() << " "
      << "dir:" << "(" << a.dir().dx << "," << a.dir().dy << ") "
+     << "ldc:" << a.num_no_dir_change() << " "
      << "att:" << a.attacker_strength() << " "
      << "}";
   return operator<<(os, ss.str());

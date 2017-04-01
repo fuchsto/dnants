@@ -49,6 +49,13 @@ struct position {
 struct direction {
   int dx;
   int dy;
+
+  bool operator==(const direction & rhs) const noexcept {
+    return dx == rhs.dx && dy == rhs.dy;
+  }
+  bool operator!=(const direction & rhs) const noexcept {
+    return dx != rhs.dx || dy != rhs.dy;
+  }
 };
 
 struct extents {
