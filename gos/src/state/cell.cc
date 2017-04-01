@@ -54,6 +54,14 @@ void food_cell_state::on_enter(
   a.on_food_cell(*this);
 }
 
+void spawn_cell_state::on_enter(
+  gos::state::ant              & a,
+  const gos::state::game_state & gs)
+{
+  resource_cell_state::on_enter(a, gs);
+  a.on_home_cell(*this);
+}
+
 std::ostream & operator<<(
   std::ostream           & os,
   const gos::state::cell & c)

@@ -26,6 +26,13 @@ class map_generator
   int          _num_food_regions  = 0;
   int          _num_barriers      = 0;
   int          _num_teams         = 0;
+  int          _team_size         = 0;
+
+  struct map {
+    gos::state::grid       * grid;
+    gos::state::population * population;
+  };
+
  public:
   map_generator()                 = delete;
 
@@ -53,10 +60,22 @@ class map_generator
     return *this;
   }
 
-  gos::state::grid       * make_grid();
-  gos::state::population * make_population(int team_size);
+  self_t & set_team_size(int team_size) {
+    _team_size = team_size;
+    return *this;
+  }
+
+  map generate() {
+    map gen_map;
+    gen_map.grid       = make_grid();
+    gen_map.population = make_population(gen_map.grid);
+    return gen_map;
+  }
 
  private:
+  gos::state::grid       * make_grid();
+  gos::state::population * make_population(gos::state::grid * grid_in);
+
   void add_region(
          gos::state::grid      * grid_in,
          gos::point              region_center,

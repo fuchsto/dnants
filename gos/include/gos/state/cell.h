@@ -100,6 +100,10 @@ class resource_cell_state : public cell_state {
     _amount -= consumed;
     return consumed;
   }
+
+  void drop(int amount) noexcept {
+    _amount += amount;
+  }
 };
 
 class barrier_cell_state : public cell_state {
@@ -113,15 +117,13 @@ class barrier_cell_state : public cell_state {
   }
 };
 
-class spawn_cell_state : public cell_state {
+class spawn_cell_state : public resource_cell_state {
  public:
   spawn_cell_state(cell & c)
-  : cell_state(c)
+  : resource_cell_state(c)
   { }
 
-  virtual bool is_obstacle() const noexcept {
-    return true;
-  }
+  virtual void on_enter(gos::state::ant &, const gos::state::game_state &);
 };
 
 class plain_cell_state : public resource_cell_state {
@@ -157,8 +159,7 @@ class cell {
   friend cell_state;
 
  public:
-  cell(
-    cell_type ct = cell_type::plain)
+  cell(cell_type ct = cell_type::plain)
   : _type(ct)
   {
     switch (ct) {

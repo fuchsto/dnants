@@ -136,7 +136,7 @@ gos::state::grid * map_generator::make_grid()
 }
 
 gos::state::population * map_generator::make_population(
-  int team_size)
+  gos::state::grid * grid_in)
 {
   GOS__LOG_DEBUG("map_generator", "make_population()");
   std::vector<ant_team> teams;
@@ -152,9 +152,12 @@ gos::state::population * map_generator::make_population(
                    "team "  << team_idx << " " <<
                    "spawn:" << spawn_point.x << "," << spawn_point.y);
     teams.emplace_back(ant_team(team_idx,
-                                team_size,
+                                _team_size,
                                 spawn_point,
                                 _game_state));
+    grid_in->set_cell_type(
+      spawn_point,
+      cell_type::spawn_point);
   }
   gos::state::population * popul = new gos::state::population(
                                          std::move(teams));

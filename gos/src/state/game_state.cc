@@ -21,16 +21,15 @@ game_state::game_state(
   map_gen.set_num_grass_regions(8)
          .set_num_food_regions(_nteams * 2)
          .set_num_barriers(3)
+         .set_team_size(app->settings().init_team_size)
          .set_num_teams(_nteams);
 
-  // back and front game state:
+  auto map = map_gen.generate();
+
   GOS__LOG_DEBUG("game_state", "map_gen.make_grid ...");
-  _grid_front    = map_gen.make_grid();
-//_grid_back     = new grid(*_grid_front);
+  _grid_front    = map.grid;
   GOS__LOG_DEBUG("game_state", "map_gen.make_population ...");
-  _popul_front   = map_gen.make_population(
-                     app->settings().init_team_size);
-//_popul_back    = new population(*_popul_front);
+  _popul_front   = map.population;
   GOS__LOG_DEBUG("game_state", "game_state >");
 }
 

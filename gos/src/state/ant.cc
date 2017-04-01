@@ -33,7 +33,13 @@ ant & ant_team::add_ant_at(const position & pos) {
 
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
-    if (!(_game_state->grid_state()[spawn_pos].is_taken())) {
+    auto & base_cell  = _game_state->grid_state()[spawn_pos];
+    auto   base_state = reinterpret_cast<spawn_cell_state *>(
+                          base_cell.state());
+    if (base_state->amount_left() > 0) {
+      _team_size += base_state->consume();
+    }
+    if (!(base_cell.is_taken())) {
       if (_ants.size() >= _team_size) { return; }
       add_ant_at(spawn_pos);
     }
@@ -43,6 +49,7 @@ void ant_team::spawn_ants() {
 
 void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) {
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << _num_carrying);
+  home_cell.drop(_num_carrying);
   _num_carrying = 0;
   switch_mode(mode::scouting);
 }
@@ -62,8 +69,8 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
 }
 
 void ant::on_collision() {
-  if (_rand % 2) { turn(-2); }
-  else           { turn(2);  }
+  if (_rand % 4 <= 1) { turn(-1); }
+  else                { turn(1);  }
 }
 
 
@@ -255,7 +262,9 @@ void ant::trace_back() noexcept {
   }
   if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
     // trace found:
-    set_direction(sec_max_backtrace_dir);
+    if (num_no_dir_change() > 4) {
+      set_direction(sec_max_backtrace_dir);
+    }
   } else {
     // no trace found, just turn around:
     if (num_no_dir_change() > 4) {
