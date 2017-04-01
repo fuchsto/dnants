@@ -290,6 +290,34 @@ class app_play_state : public app_state {
                      SDL_FLIP_NONE);
 
     SDL_DestroyTexture(texture);
+
+    if (ant.num_carrying() > 0) {
+      int size = 16;
+      SDL_Rect dst_rect;
+      dst_rect.x = center.x + ant.dir().dx * (_grid_spacing / 4);
+      dst_rect.y = center.y + ant.dir().dy * (_grid_spacing / 4);
+      dst_rect.w = size;
+      dst_rect.h = size;
+      SDL_SetRenderDrawBlendMode(
+        _app->win().renderer(),
+        SDL_BLENDMODE_BLEND);
+
+      SDL_Surface * surface = _sprites[(int)sprite_tag::sugah_2];
+      SDL_SetColorKey(
+        surface, SDL_TRUE,
+        SDL_MapRGB(surface->format, 255, 0, 255));
+      SDL_Texture * texture =
+        SDL_CreateTextureFromSurface(
+          _app->win().renderer(),
+          surface);
+
+      SDL_RenderCopy(_app->win().renderer(),
+                     texture,
+                     0,
+                     &dst_rect);
+
+      SDL_DestroyTexture(texture);
+    }
   }
 
   void render_trace_cell(

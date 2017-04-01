@@ -196,6 +196,9 @@ void ant::eat() noexcept {
 
 void ant::harvest() noexcept {
   if (!is_alive()) { return; }
+  if (_num_carrying >= strength() - 1) {
+    switch_mode(mode::tracing);
+  }
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
   if (pos_cell.type() == gos::state::cell_type::food) {
@@ -207,7 +210,7 @@ void ant::harvest() noexcept {
       _num_carrying += consumed;
     }
   }
-  if (consumed == 0 || _num_carrying == strength() - 1) {
+  if (consumed == 0 || _num_carrying >= strength() - 1) {
     switch_mode(mode::tracing);
   }
 }
