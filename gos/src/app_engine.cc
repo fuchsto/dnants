@@ -11,10 +11,16 @@
 namespace gos {
 
 app_engine::app_engine(
-  std::string title,
-  int         width,
-  int         height)
-: _window(*this, title, width, height, 0) {
+  std::string  title,
+  app_settings settings,
+  int          max_width,
+  int          max_height)
+: _settings(settings)
+, _window(
+    *this, title,
+    settings.grid_extents.w * (max_width / settings.grid_extents.w),
+    settings.grid_extents.h * (max_width / settings.grid_extents.w),
+    0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
   GOS__LOG_DEBUG("app_engine", "app_engine >");
 }

@@ -17,8 +17,8 @@ class game_state;
 class food_cell_state;
 
 struct ant_id {
-	int team_id;
-	int id;
+  int team_id;
+  int id;
 };
 
 class ant_team {
@@ -167,7 +167,7 @@ class ant {
   }
 
   inline const gos::state::game_state & game_state() const noexcept {
-	return *(_team->_game_state);
+    return *(_team->_game_state);
   }
 
   inline gos::state::game_state & game_state() noexcept {
@@ -179,7 +179,7 @@ class ant {
   }
 
   inline ant_team & team() noexcept {
-	return *_team;
+    return *_team;
   }
 
   inline int strength() const noexcept {

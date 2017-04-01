@@ -165,7 +165,7 @@ class food_cell_state : public resource_cell_state {
  */
 class cell {
   cell_type                     _type = cell_type::plain;
-  std::unique_ptr<cell_state>   _state;
+  std::shared_ptr<cell_state>   _state;
 
   friend cell_state;
 
@@ -176,26 +176,26 @@ class cell {
   {
     switch (ct) {
       case cell_type::grass:
-        _state = std::make_unique<grass_cell_state>(*this);
+        _state = std::make_shared<grass_cell_state>(*this);
         break;
       case cell_type::spawn_point:
-        _state = std::make_unique<spawn_cell_state>(*this);
+        _state = std::make_shared<spawn_cell_state>(*this);
         break;
       case cell_type::material:
-        _state = std::make_unique<plain_cell_state>(*this);
+        _state = std::make_shared<plain_cell_state>(*this);
         break;
       case cell_type::water:
-        _state = std::make_unique<water_cell_state>(*this);
+        _state = std::make_shared<water_cell_state>(*this);
         break;
       case cell_type::food:
-        _state = std::make_unique<food_cell_state>(*this);
+        _state = std::make_shared<food_cell_state>(*this);
         break;
       case cell_type::barrier:
-        _state = std::make_unique<barrier_cell_state>(*this);
+        _state = std::make_shared<barrier_cell_state>(*this);
         break;
       case cell_type::plain:
       default: // fall-through
-        _state = std::make_unique<plain_cell_state>(*this);
+        _state = std::make_shared<plain_cell_state>(*this);
         break;
     }
   }

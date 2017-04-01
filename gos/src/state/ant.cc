@@ -124,10 +124,10 @@ void ant::update_action() noexcept {
 
       if (enemy_id.id != -1 &&
           enemy_id.team_id != team_id()) {
-		  enemy = &(this->game_state().population_state()
-			                          .teams()[enemy_id.team_id]
-			                          .ants()[enemy_id.id]);
-		  _dir = direction { x, y };
+      enemy = &(this->game_state().population_state()
+                                .teams()[enemy_id.team_id]
+                                .ants()[enemy_id.id]);
+      _dir = direction { x, y };
         break;
       }
     }
@@ -178,10 +178,10 @@ void ant::move() noexcept {
     return;
   }
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
-	this->game_state().grid_state()[_pos]
-                .leave(*this, this->game_state());
-	this->game_state().grid_state()[pos_next]
-                .enter(*this, this->game_state());
+  this->game_state().grid_state()[_pos]
+                    .leave(*this, this->game_state());
+  this->game_state().grid_state()[pos_next]
+                    .enter(*this, this->game_state());
     _pos = pos_next;
   } else {
     switch_mode(mode::collision);

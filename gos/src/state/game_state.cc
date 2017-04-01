@@ -10,14 +10,8 @@ namespace state {
 
 game_state::game_state(
   app_engine * app)
-: game_state(app, 2)
-{ }
-
-game_state::game_state(
-  app_engine * app,
-  int          nteams)
 : _app(app)
-, _nteams(nteams)
+, _nteams(app->settings().num_teams)
 {
   GOS__LOG_DEBUG("game_state", "game_state()");
   _grid_extents  = app->settings().grid_extents;

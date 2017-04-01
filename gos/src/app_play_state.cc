@@ -4,6 +4,8 @@
 #include <gos/state/cell.h>
 #include <gos/state/game_state.h>
 
+#include <gos/view/svg_texture.h>
+
 #include <gos/util/logging.h>
 
 #include <cmath>

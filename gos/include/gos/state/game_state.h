@@ -24,7 +24,6 @@ class game_state {
 
  public:
   game_state(app_engine * app);
-  game_state(app_engine * app, int nteams);
   ~game_state();
 
   /// Blocks until back state is ready, then swaps front and back state

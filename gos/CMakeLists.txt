@@ -4,6 +4,13 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
 find_package(SDL2 REQUIRED)
 
+set(Boost_USE_STATIC_LIBS    ON)
+set(Boost_USE_MULTITHREADED  ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+
+find_package(Boost 1.58.0 REQUIRED
+             COMPONENTS filesystem regex)
+
 
 file(GLOB_RECURSE DNANTS_MAIN_SOURCES
      "src/*.c" "src/*.h" "src/*.cc" "src/*.cpp" )
@@ -18,9 +25,15 @@ set(DNANTS_MAIN_INCLUDE_DIRS
 set(DNANTS_MAIN_SOURCE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+message(STATUS "Boost include directories: "
+        ${Boost_INCLUDE_DIRS})
+message(STATUS "Boost libraries: "
+        ${Boost_LIBRARIES})
+
 include_directories(
   ${DNANTS_MAIN_INCLUDE_DIRS}
   ${SDL2_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS}
 )
 
 add_executable(
@@ -32,6 +45,7 @@ add_executable(
 target_link_libraries(
   ${DNANTS_MAIN_TARGET_NAME}
   ${SDL2_LIBRARY}
+  ${Boost_LIBRARIES}
 )
 
 set_target_properties(

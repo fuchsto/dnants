@@ -27,6 +27,7 @@ class app_play_state : public app_state {
   timestamp_t  _last_round_ms   = 0;
   int          _grid_spacing    = 5;
   extents      _grid_extents;
+  position     _marked_cell     { -1, -1 };
 
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
@@ -36,6 +37,7 @@ class app_play_state : public app_state {
                                   { 0x49, 0x48, 0x16, 0xff },
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
+  rgba         _highlight_color { 0xaf, 0x12, 0x12, 0xff };
   rgba         _blocked_color   { 0xff, 0x12, 0x12, 0xff };
   rgba         _taken_color     { 0x23, 0x45, 0x45, 0xff };
   rgba         _food_color      { 0xfa, 0xb7, 0x05, 0xff };
@@ -58,10 +60,25 @@ class app_play_state : public app_state {
         case SDL_QUIT:
             app->quit();
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            if (_paused &&
+                event.button.button == SDL_BUTTON_LEFT) {
+              position clicked_cell_pos { event.button.x / _grid_spacing,
+                                          event.button.y / _grid_spacing };
+              GOS__LOG_DEBUG("app_play_state.handle_events",
+                             "clicked grid " <<
+                             "(" << clicked_cell_pos.x <<
+                             "," << clicked_cell_pos.y << ")");
+              _marked_cell = clicked_cell_pos;
+            }
+            break;
         case SDL_KEYDOWN:
             if (event.key.keysym.sym == SDLK_ESCAPE) {
               // reset
               app->change_state(app_play_state::get());
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_Q) {
+              // quit
+              app->quit();
             } else if( event.key.keysym.scancode == SDL_SCANCODE_G) {
               // toggle grid
               app->settings().show_grid = !(app->settings().show_grid);
@@ -82,6 +99,9 @@ class app_play_state : public app_state {
             } else if( event.key.keysym.scancode == SDL_SCANCODE_P) {
               // pause
               _paused = !_paused;
+              if (!_paused) {
+                _marked_cell = { -1, -1 };
+              }
             }
             break;
         default:
@@ -95,10 +115,10 @@ class app_play_state : public app_state {
     auto rounds_per_sec = app->settings().rounds_per_sec;
     auto ms_per_round   = 1000 / rounds_per_sec;
     if (ms - _last_round_ms >= ms_per_round) {
-      GOS__LOG_DEBUG("app_play_state.update",
-                     "round: " << _game_state->round_count());
       _last_round_ms = ms;
       if (!_paused) {
+        GOS__LOG_DEBUG("app_play_state.update",
+                       "round: " << _game_state->round_count());
         _game_state->next();
       }
     }
@@ -120,6 +140,10 @@ class app_play_state : public app_state {
 
     if (app->settings().show_grid) {
       render_grid(app->win());
+    }
+
+    if (_marked_cell.x != -1 && _marked_cell.y != -1) {
+      render_highlight_cell(_marked_cell);
     }
 
     SDL_RenderPresent(
@@ -307,6 +331,15 @@ class app_play_state : public app_state {
   }
 
   void render_grid(gos::view::window & win);
+
+
+  void render_highlight_cell(const position & cell_pos) {
+    draw_cell_rectangle(
+      _app->win(),
+      cell_pos.x, cell_pos.y,
+      _grid_spacing,
+      _highlight_color);
+  }
 
   void draw_cell_circle(
     gos::view::window & win,

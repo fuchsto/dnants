@@ -3,6 +3,8 @@
 
 #include <gos/view/window.h>
 
+// #include <gos/dna/rule_types.h>
+
 #include <vector>
 #include <string>
 
@@ -30,6 +32,7 @@ class app_engine
     int     rounds_per_sec;
     int     trace_rounds;
     int     init_team_size;
+    int     num_teams;
     bool    show_grid;
     bool    show_traces;
   };
@@ -41,15 +44,17 @@ class app_engine
                   5,          // rps
                   30,         // trace rounds
                   50,         // initial team size
+                  2,          // number of teams
                   true,       // show grid
                   true        // show traces
                };
 
  public:
   app_engine(
-    std::string title,
-    int         width,
-    int         height);
+    std::string  title,
+    app_settings settings,
+    int          width,
+    int          height);
 
   ~app_engine();
 
