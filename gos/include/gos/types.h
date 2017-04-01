@@ -138,6 +138,22 @@ static constexpr direction or2dir(
   };
 }
 
+static double or2deg(
+  const orientation & ort)
+{
+  switch(ort) {
+    case orientation::north:     return   0.0;
+    case orientation::northeast: return  45.0;
+    case orientation::east:      return  90.0;
+    case orientation::southeast: return 135.0;
+    case orientation::south:     return 180.0;
+    case orientation::southwest: return 225.0;
+    case orientation::west:      return 270.0;
+    case orientation::northwest: return 315.0;
+    default: return 0.0;
+  };
+}
+
 } // namespace gos
 
 #endif // GOS__TYPES_H__INCLUDED

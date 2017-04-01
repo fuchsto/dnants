@@ -228,6 +228,50 @@ class app_play_state : public app_state {
           - 2,
         _grid_spacing / 5);
 
+    const rgba & col = _team_colors[ant.team().id()];
+
+    int size   = 32;
+    int cell_x = ant.pos().x;
+    int cell_y = ant.pos().y;
+    SDL_Point center { (cell_x * _grid_spacing),
+                       (cell_y * _grid_spacing) };
+    SDL_Rect dst_rect;
+    dst_rect.x = center.x + (_grid_spacing - size) / 2;
+    dst_rect.y = center.y + (_grid_spacing - size) / 2;
+    dst_rect.w = 32;
+    dst_rect.h = 32;
+
+    SDL_SetRenderDrawBlendMode(
+      _app->win().renderer(),
+      SDL_BLENDMODE_BLEND);
+
+    SDL_Surface * surface = SDL_LoadBMP("bug32x32.bmp");
+    SDL_SetColorKey(
+      surface, SDL_TRUE,
+      SDL_MapRGB(surface->format, 255, 0, 255));
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(
+        _app->win().renderer(),
+        surface);
+    SDL_SetTextureColorMod(
+      texture, col.r, col.g, col.b);
+
+    SDL_RenderCopyEx(_app->win().renderer(),
+                     texture,
+                     0,
+                     &dst_rect,
+                     gos::or2deg(ant.orientation()),
+                     0,
+                     SDL_FLIP_NONE);
+    /*
+    int ant_size = 
+      std::max<int>(
+        std::min<int>(
+          ((ant.strength() * _grid_spacing) /
+           gos::state::ant::max_strength()),
+          _grid_spacing)
+          - 2,
+        _grid_spacing / 5);
     draw_cell_circle(
       _app->win(),
       ant.pos().x, ant.pos().y,
@@ -253,6 +297,7 @@ class app_play_state : public app_state {
         _blocked_color
       );
     }
+    */
   }
 
   void render_trace_cell(

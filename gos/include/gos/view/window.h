@@ -48,7 +48,7 @@ class window {
     if (SDL_CreateWindowAndRenderer(
           width,
           height,
-          0, // SDL_WINDOW_RESIZABLE,
+          SDL_WINDOW_SHOWN, // | SDL_RENDERER_ACCELERATED,
           &_window,
           &_renderer) != 0) {
       SDL_LogError(
