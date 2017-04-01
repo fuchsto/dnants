@@ -19,12 +19,18 @@ enum cell_type : int {
   food
 };
 
+
 class cell;
 
 class cell_state {
-  cell               & _cell;
-  bool                 _taken  = false;
-  std::array<int, 4>   _traces = { };
+
+ public:
+  typedef std::array<int, 8> traces;
+
+ private:
+  cell                  & _cell;
+  bool                    _taken  = false;
+  std::array<traces, 4>   _traces = {{ }};
 
  public:
   cell_state(cell & c)
@@ -44,12 +50,15 @@ class cell_state {
     return _taken;
   }
 
-  int get_trace(int team_id) const noexcept {
+  const traces & get_traces(int team_id) const noexcept {
     return _traces[team_id];
   }
 
-  void add_trace(int team_id, int round_count) noexcept {
-    _traces[team_id] = round_count;
+  void add_trace(
+    int              team_id,
+    gos::orientation ort,
+    int              round_count) noexcept {
+    _traces[team_id][or2int(ort)] = round_count;
   }
 };
 

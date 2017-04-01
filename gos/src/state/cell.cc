@@ -7,11 +7,10 @@ namespace gos {
 namespace state {
 
 void cell_state::on_enter(
-  gos::state::ant               & a,
+  gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
   _taken = true;
-  add_trace(a.team().id(), gs.round_count());
 }
 
 void cell_state::on_exit(
@@ -19,6 +18,10 @@ void cell_state::on_exit(
   const gos::state::game_state & gs)
 {
   _taken = false;
+  add_trace(
+    a.team().id(),
+    dir2or(a.dir()),
+    gs.round_count() - 1);
 }
 
 void resource_cell_state::on_enter(

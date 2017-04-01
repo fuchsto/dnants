@@ -12,7 +12,8 @@
 namespace gos {
 
 class app_play_state : public app_state {
-  using game_state = gos::state::game_state;
+  using game_state  = gos::state::game_state;
+  using cell_traces = gos::state::cell_state::traces;
 
  protected:
   app_play_state() { }
@@ -151,15 +152,19 @@ class app_play_state : public app_state {
         }
         if (_app->settings().show_traces) {
           for (const auto & team : popul.teams()) {
-            int team_id   = team.id();
-            int trace_rc  = grid_cell.state()->get_trace(team_id);
-            int trace_age = _game_state->round_count() - trace_rc;
-            int trace_val = n_trace - trace_age;
-            if (trace_rc > 0 && trace_val > 0) {
-              render_trace_cell(
-                cell_x, cell_y,
-                trace_val,
-                _team_colors[team_id]);
+            int team_id          = team.id();
+            const auto & traces  = grid_cell.state()->get_traces(team_id);
+            for (int oidx = 0; oidx < 8; ++oidx) {
+              int trace_rc    = traces[oidx];
+              orientation ort = gos::int2or(oidx);
+              int trace_age   = _game_state->round_count() - trace_rc;
+              int trace_val   = n_trace - trace_age;
+              if (trace_rc > 0 && trace_val > 0) {
+                render_trace_cell(
+                  cell_x, cell_y,
+                  trace_val, ort,
+                  _team_colors[team_id]);
+              }
             }
           }
         }
@@ -227,16 +232,30 @@ class app_play_state : public app_state {
     int          cell_x,
     int          cell_y,
     int          trace_value,
-    const rgba & col) {
-    rgba trace_col = col;
+    orientation  ort,
+    const rgba & col)
+  {
     int max_trace_rounds = _app->settings().trace_rounds;
-    trace_col.a = static_cast<Uint8>(
-                    (trace_value * 256) / max_trace_rounds
-                  ) / 2;
-    draw_cell_fill_rectangle(
-      _app->win(),
-      cell_x, cell_y, _grid_spacing / 2,
-      trace_col);
+    int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
+    int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
+
+    Uint8 tcol_a = static_cast<Uint8>(
+                     (trace_value * 256) / max_trace_rounds
+                   ) / 2;
+    SDL_SetRenderDrawColor(
+      _app->win().renderer(),
+      col.r, col.g, col.b, tcol_a);
+
+    direction dir = gos::or2dir(ort);
+    int       len = _grid_spacing / 2;
+    position from { center_x, center_y };
+    position to   { center_x + (dir.dx * len), center_y + (dir.dy * len) };
+
+    SDL_RenderDrawLine(
+      _app->win().renderer(),
+      from.x, from.y,
+      to.x,   to.y
+    );
   }
 
   void render_grass_cell(int cell_x, int cell_y) {
