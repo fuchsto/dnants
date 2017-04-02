@@ -55,7 +55,7 @@ void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
   switch_mode(mode::scouting);
 }
 
-void ant::on_food_cell(gos::state::food_cell_state & food_cell) noexcept {
+void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
   // Client code
   if (_mode == mode::harvesting) {
     return;

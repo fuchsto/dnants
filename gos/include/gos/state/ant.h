@@ -15,6 +15,8 @@ namespace state {
 
 class ant;
 class game_state;
+
+class resource_cell_state;
 class food_cell_state;
 class spawn_cell_state;
 
@@ -126,7 +128,7 @@ class ant {
   ant & operator=(ant && rhs)      = default;
 
   void on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept;
-  void on_food_cell(gos::state::food_cell_state & food_cell) noexcept;
+  void on_food_cell(gos::state::resource_cell_state & food_cell) noexcept;
   void on_enemy(gos::state::ant & enemy)    noexcept;
   void on_attacked(gos::state::ant & enemy) noexcept;
   void on_collision() noexcept;

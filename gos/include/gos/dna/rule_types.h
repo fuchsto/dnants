@@ -16,11 +16,55 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 
+#include <iostream>
+
+
 namespace gos {
 namespace dna {
 
-struct dna_context {
-  std::vector<std::string> _state_tags;
+struct state_command {
+};
+
+struct state_event_handler {
+  std::vector<state_command>       _commands;
+};
+
+struct state_definition {
+  std::string                      _state_id;
+  std::vector<state_command>       _commands;
+  std::vector<state_event_handler> _evt_handlers;
+
+  state_definition(const std::string & state_id)
+  : _state_id(state_id)
+  { }
+
+  const std::string & id() const {
+    return _state_id;
+  }
+};
+
+struct state_definitions {
+  std::vector<state_definition> _states;
+
+  state_definitions() { }
+
+	void add_state_def(const std::string & state_id) {
+    _states.push_back(
+      state_definition(state_id));
+	}
+
+  bool has_state(const std::string & state_id) const {
+    return std::find_if(_states.begin(), _states.end(),
+                        [&](const state_definition & s) {
+                            return s.id() == state_id; })
+           != _states.end();
+  }
+
+  state_definition & operator[](const std::string & state_id) {
+    return *std::find_if(_states.begin(), _states.end(),
+                         [&](const state_definition & s) {
+                             return s.id() == state_id; });
+  }
 };
 
 
@@ -59,9 +103,9 @@ struct state_grammar
     program = +(state_definition); 
                        
     state_definition
-      = (lit("state") >> lit(":")
-         >> identifier
-         >> rules_block);
+      = ( (lit("state") >> lit(":") >> identifier)
+          [ std::cout << "state tag: " << qi::_1 << "\n" ]
+        ) >> rules_block;
 
     state_identifier
       = lit("@") >> string_literal;
@@ -71,7 +115,8 @@ struct state_grammar
 
     action
       = ( lit("move") | lit("turn") | lit("set_dir") |
-          lit("eat")  | lit("take") | lit("backtrace") );
+          lit("eat")  | lit("take") | lit("backtrace") ) >> lit("!")
+        [ std::cout << "action: " << qi::_1 << "\n" ];
 
     event
       = lit("food")     | lit("collision") | lit("enemy") |
@@ -100,19 +145,12 @@ struct state_grammar
 
     // on(event) or action! or switch(@state)
     command_clause
-      = on_event_block | action_clause | state_switch_clause;
+      = on_event_block | action_expression | state_switch_clause;
 
-    action_clause
-      = action_noparams_clause | action_param_clause;
-
-    // move!
-    action_noparams_clause
-      = action >> lit("!");
-
-    // turn!(3)
-    action_param_clause
+    // move! or turn!(3)
+    action_expression
       // should be expression_term instead of value
-      = action >> lit("!") >> lit("(") >> int_value >> lit(")");
+      = action >> -(lit("(") >> int_value >> lit(")"));
 
     conditional_block
       = if_clause | if_else_clause | every_clause;
@@ -163,7 +201,7 @@ struct state_grammar
       on_event_clause, rules_block, rule_expression,
 			if_clause, else_clause, if_else_clause, every_clause,
       conditional_block, condition_clause, command_clause, compare_op,
-      action_clause, action_noparams_clause, action_param_clause,
+      action_expression, 
       state_switch_clause,
       int_value, 
       number, op, identifier, string_literal;
