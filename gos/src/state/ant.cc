@@ -47,14 +47,15 @@ void ant_team::spawn_ants() {
 }
 
 
-void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) {
+
+void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << _num_carrying);
   home_cell.drop(_num_carrying);
   _num_carrying = 0;
   switch_mode(mode::scouting);
 }
 
-void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
+void ant::on_food_cell(gos::state::food_cell_state & food_cell) noexcept {
   if (food_cell.amount_left() <= 0) {
     return;
   }
@@ -68,7 +69,30 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell) {
   }
 }
 
-void ant::on_collision() {
+void ant::on_enemy(
+  gos::state::ant & enemy) noexcept {
+  if (strength() > 3) {
+    attack(enemy);
+  } else {
+    // too weak, run away
+    turn(4);
+    if (_mode == mode::fighting) {
+      switch_mode(mode::scouting);
+    }
+  }
+  if (_mode == mode::fighting && !enemy.is_alive()) {
+    switch_mode(mode::scouting);
+  }
+}
+
+void ant::on_attacked(gos::state::ant & enemy) noexcept {
+  GOS__LOG_DEBUG("ant.on_attacked", "enemy: " <<
+                 "t:"  << enemy.team_id() << " " <<
+                 "id:" << enemy.id());
+  _attack_str += enemy.strength();
+}
+
+void ant::on_collision() noexcept {
   if (_rand % 4 <= 1) { turn(-1); }
   else                { turn(1);  }
 }
@@ -79,18 +103,11 @@ void ant::attack(gos::state::ant & enemy) noexcept {
   GOS__LOG_DEBUG("ant.attack", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
                  "id:" << enemy.id());
-  switch_mode(mode::fighting);
-  enemy.attacked_by(*this);
-}
-
-void ant::attacked_by(gos::state::ant & enemy) noexcept {
-  GOS__LOG_DEBUG("ant.attacked_by", "enemy: " <<
-                 "t:"  << enemy.team_id() << " " <<
-                 "id:" << enemy.id());
-  _attack_str += enemy.strength();
-  if (_num_carrying == 0) {
-    switch_mode(mode::fighting);
+  if (num_carrying() > 0) {
+    return;
   }
+  switch_mode(mode::fighting);
+  enemy.on_attacked(*this);
 }
 
 void ant::die() noexcept {
@@ -121,18 +138,16 @@ void ant::update_position() noexcept {
       move();
       break;
     case ant::mode::scouting:
-      if (_rand % 4 == 0) {
-      // int dx = ((_rand + rc / 2) % 3) - 1;
-      // int dy = ((_rand + rc * 7) % 3) - 1;
-      // set_direction(direction { dx, dy });
-        turn(((_rand + rc * 7) % 5) - 2);
+      if (num_no_dir_change() > 4) {
+        turn(((_rand + rc * 7) % 3) - 1);
       }
       move();
       break;
     default:
       break;
   }
-  if (_strength > 1 && ((_nticks_not_fed + 1) % 100) == 0) {
+  if (_strength > max_strength() / 2 &&
+      ((_nticks_not_fed + 1) % 100) == 0) {
     --_strength;
   }
 }
@@ -140,9 +155,7 @@ void ant::update_position() noexcept {
 void ant::update_action() noexcept {
   if (!is_alive())       { return; }
   // Cannot attack while carrying:
-  if (_num_carrying > 0) { return; }
-  gos::state::ant_id enemy_id { -1, -1 };
-  gos::state::ant *  enemy = nullptr;
+  gos::state::ant_id enemy_id  { -1, -1 };
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
     for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
       position adj_pos { _pos.x + x,
@@ -152,22 +165,17 @@ void ant::update_action() noexcept {
         continue;
       }
       enemy_id = this->game_state().grid_state()[adj_pos].ant();
-
       if (enemy_id.id != -1 &&
           enemy_id.team_id != team_id()) {
-        enemy = &(this->game_state().population_state()
-                                  .teams()[enemy_id.team_id]
-                                  .ants()[enemy_id.id]);
-        set_direction(direction { x, y });
-        break;
+        return on_enemy(this->game_state().population_state()
+                                          .teams()[enemy_id.team_id]
+                                          .ants()[enemy_id.id]);
       }
     }
   }
-  if (enemy != nullptr) {
-    attack(*enemy);
-  }
-  if (_mode == mode::fighting && (enemy == nullptr || !enemy->is_alive())) {
-    switch_mode(mode::scouting);
+  // No enemy in range
+  if (_mode == ant::mode::fighting) {
+    switch_mode(ant::mode::scouting);
   }
 }
 
@@ -178,6 +186,13 @@ void ant::update_reaction() noexcept {
       --_strength;
     } else {
       die();
+    }
+    if (_num_carrying > 0) {
+      gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+      auto pos_cell_state = reinterpret_cast<resource_cell_state *>(
+                              pos_cell.state());
+      pos_cell_state->drop(_num_carrying);
+      _num_carrying = 0;
     }
   }
 }
@@ -262,7 +277,7 @@ void ant::trace_back() noexcept {
   }
   if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
     // trace found:
-    if (num_no_dir_change() > 4) {
+    if (true || num_no_dir_change() > 4) {
       set_direction(sec_max_backtrace_dir);
     }
   } else {

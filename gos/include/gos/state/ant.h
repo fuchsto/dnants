@@ -129,17 +129,15 @@ class ant {
   ant & operator=(const ant & rhs) = delete;
   ant & operator=(ant && rhs)      = default;
 
-  void on_home_cell(gos::state::spawn_cell_state & home_cell);
-  void on_food_cell(gos::state::food_cell_state & food_cell);
-  void on_collision();
+  void on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept;
+  void on_food_cell(gos::state::food_cell_state & food_cell) noexcept;
+  void on_enemy(gos::state::ant & enemy)    noexcept;
+  void on_attacked(gos::state::ant & enemy) noexcept;
+  void on_collision() noexcept;
 
   void update_position() noexcept;
   void update_action()   noexcept;
   void update_reaction() noexcept;
-
-  void attack(gos::state::ant & enemy) noexcept;
-
-  void attacked_by(gos::state::ant & enemy) noexcept;
 
   void die() noexcept;
 
@@ -230,16 +228,19 @@ class ant {
   }
 
   inline void switch_mode(ant::mode m) noexcept {
-    if (_mode != ant::mode::dead) {
+    if (_mode != ant::mode::dead &&
+        (_num_carrying == 0 || m != ant::mode::fighting)) {
       _mode = m;
     }
   }
 
  private:
-  void eat()        noexcept;
-  void harvest()    noexcept;
-  void trace_back() noexcept;
-  void move()       noexcept;
+  // actions:
+  void attack(ant &) noexcept;
+  void eat()         noexcept;
+  void harvest()     noexcept;
+  void trace_back()  noexcept;
+  void move()        noexcept;
 
 };
 

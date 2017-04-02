@@ -181,6 +181,8 @@ class app_play_state : public app_state {
           //render_grass_cell(cell_x, cell_y);
             break;
           case gos::state::cell_type::food:
+            // fall-trough
+          case gos::state::cell_type::plain:
             render_food_cell(cell_x, cell_y);
             break;
           case gos::state::cell_type::barrier:
