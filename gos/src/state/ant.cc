@@ -340,7 +340,7 @@ std::ostream & operator<<(
      << "car:" << a.num_carrying() << " "
      << "dir:" << "(" << a.dir().dx << "," << a.dir().dy << ") "
      << "ldc:" << a.num_no_dir_change() << " "
-     << "att:" << a.attacker_strength() << " "
+     << "att:" << a.damage() << " "
      << "}";
   return operator<<(os, ss.str());
 }

@@ -25,7 +25,6 @@ void app_play_state::initialize(app_engine * app) {
   _grid_spacing  = app->win().view_extents().w / _grid_extents.w;
   _game_state    = new gos::state::game_state(_app);
 
-
   _sprites[(int)sprite_tag::rock]    = SDL_LoadBMP("rock_16.bmp");
   _sprites[(int)sprite_tag::sugah_1] = SDL_LoadBMP("sugah-1_16.bmp");
   _sprites[(int)sprite_tag::sugah_2] = SDL_LoadBMP("sugah-2_16.bmp");

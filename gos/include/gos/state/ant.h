@@ -94,13 +94,13 @@ class ant {
   };
 
   enum action : int {
-    idle       = 0,
-    action_move,
-    action_backtrace,
-    action_eat,
-    action_harvest,
-    action_attack,
-    action_turn
+    do_idle    = 0,
+    do_move,
+    do_backtrace,
+    do_eat,
+    do_harvest,
+    do_attack,
+    do_turn
   };
 
   // Ants can detect pheromone traces and distinguish friendly (own team)
@@ -176,6 +176,10 @@ class ant {
     return _dir;
   }
 
+  inline const event evt() const noexcept {
+    return _event;
+  }
+
   inline gos::orientation orientation() const noexcept {
     return gos::dir2or(_dir);
   }
@@ -204,7 +208,7 @@ class ant {
     return _num_carrying;
   }
 
-  inline int attacker_strength() const noexcept {
+  inline int damage() const noexcept {
     return _attack_str;
   }
 

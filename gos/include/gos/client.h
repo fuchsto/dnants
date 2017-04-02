@@ -11,8 +11,8 @@ namespace gos {
 class client {
 
  public:
-   client()
-   { }
+   client() {
+   }
 
    void update_state(gos::state::client_state & state);
 };
