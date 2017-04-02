@@ -111,8 +111,7 @@ struct state_grammar
     program = +(state_definition); 
                        
     state_definition
-      = STATE << state_identifier
-              << rules_clause;
+      = lit(STATE) << lit(COLON) << identifier << rules_clause;
 
     state_identifier
       = AT << identifier;
@@ -132,37 +131,59 @@ struct state_grammar
     on_event_rules_clause
       = on_event_clause >> rules_clause; 
 
+    // on(event)
     on_event_clause
-      = lit(ON) >> lit(COLON) >> event;
+      = lit(ON) >> lit(LPAREN) >> event >> lit(RPAREN);
 
+    // { +expression }
     rules_clause
       = lit(LBRACE) >> +(rule_expression) >> lit(RBRACE);
 
+    // if (...) { } or command
     rule_expression
       = +(conditional_block | command_clause);
 
+    // switch(@state_id)
     state_switch_clause
-      = lit(SWITCH) << (state_identifier | lit(PREV));
+      = lit(SWITCH) << LPAREN << (state_identifier | lit(PREV)) << RPAREN;
 
+    // on(event) or action! or switch(@state)
     command_clause
       = on_event_rules_clause | action_clause | state_switch_clause;
+
+    action_clause
+      = action_noparams_clause | action_param_clause;
+
+    // move!
+    action_noparams_clause
+      = action << lit(EXCL);
+
+    // turn!(3)
+    action_param_clause
+      // should be expression_term instead of value
+      = action << lit(EXCL) << LPAREN << value << RPAREN;
 
     conditional_block
       = if_clause | if_else_clause;
 
+    // identifier <= 123
     condition_clause
+      // should be expression_term instead of value
       = identifier >> compare_op >> value;
 
     compare_op
       = lit(LE) | lit(LT) | lit(GE) | lit(GT) | lit(EQUAL) | lit(NE);
 
+    // if (...) { ... }
     if_clause
       = lit(IF) >> lit(LPAREN) >> condition_clause >> lit(RPAREN)
                 >> rules_clause;
 
+    // else { ... }
     else_clause
       = lit(ELSE) >> rules_clause;
 
+    // if (...) { ... } else { ... }
     if_else_clause
       = if_clause >> else_clause;
 
@@ -178,7 +199,8 @@ struct state_grammar
       on_event_clause, rules_clause, rule_expression,
       conditional_block, if_clause, else_clause, if_else_clause,
       condition_clause, command_clause, compare_op,
-      action_clause, state_switch_clause,
+      action_clause, action_noparams_clause, action_param_clause,
+      state_switch_clause,
       value, 
       number, op, identifier, string_literal;
 
