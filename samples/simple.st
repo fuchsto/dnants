@@ -1,6 +1,6 @@
 
-state:scouting {
-  every(8) { turn!((random % 2) - 1) }
+state : scouting {
+  every(8) { turn!(-1) }
   move!
   on(food) {
     if (strength < 3) {
@@ -15,13 +15,13 @@ state:scouting {
   }
 }
 
-state:harvesting {
+state : harvesting {
   take!
   turn!(4)
   switch(@backtracing)
 }
 
-state:backtracing {
+state : backtracing {
   move!
   on(home) {
     drop!

@@ -1,39 +1,57 @@
 
 #include <gos/dna/rule_types.h>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 
-int main()
+
+int main(int argc, const char * argv[])
 {
-  std::cout << "state configuration test parser\n";
+  std::cout << "State definitions test parser\n";
 
-  using boost::spirit::ascii::space;
+  using boost::spirit::qi::space;
+  using boost::spirit::qi::blank;
   using boost::spirit::utree;
   typedef std::string::const_iterator iterator_type;
   typedef gos::dna::state_grammar<iterator_type> state_grammar;
 
   state_grammar sg;
 
-  std::string str;
-  while (std::getline(std::cin, str)) {
-    if (str.empty()) { break; }
+  if (argc < 2) {
+    std::cerr << "no file given\n";
+    return -1;
+  }
 
-    std::string::const_iterator iter = str.begin();
-    std::string::const_iterator end  = str.end();
-    utree ut;
-    bool r = phrase_parse(iter, end, sg, space, ut);
+  std::ifstream ifs(argv[1]);
+  std::stringstream ss;
+  ss << ifs.rdbuf();
 
-    if (r && iter == end) {
-      std::cout << "-------------------------\n"
-                << "Parsing succeeded: " << '\n'
-                << ut << "\n"
-                << "-------------------------\n";
-    } else {
-      std::string rest(iter, end);
-      std::cout << "-------------------------\n"
-                << "Parsing failed\n"
-                << "stopped at: \": " << rest << "\"\n"
-                << "-------------------------\n";
-    }
+  std::string input = ss.str();
+
+  std::replace(input.begin(), input.end(), '\n', ' ');
+
+  std::cout << "-------------------------\n"
+            << "Parsing input: " << '\n'
+            << input << '\n';
+
+  std::string::const_iterator iter = input.begin();
+  std::string::const_iterator end  = input.end();
+  utree ut;
+  bool r = phrase_parse(iter, end, sg, space, ut);
+
+  if (r && iter == end) {
+    std::cout << "-------------------------\n"
+              << "Parsing succeeded: " << '\n'
+              << ut << "\n"
+              << "-------------------------\n";
+  } else {
+    std::string rest(iter, end);
+    std::cout << "-------------------------\n"
+              << "Parsing failed\n"
+              << "stopped at: \": " << rest << "\"\n"
+              << "-------------------------\n";
   }
   return 0;
 }

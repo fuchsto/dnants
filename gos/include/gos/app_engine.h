@@ -3,8 +3,6 @@
 
 #include <gos/view/window.h>
 
-#include <gos/dna/rule_types.h>
-
 #include <vector>
 #include <string>
 

@@ -1,6 +1,8 @@
 #ifndef GOS__DNA__RULE_TYPES_H__INCLUDED
 #define GOS__DNA__RULE_TYPES_H__INCLUDED
 
+#define BOOST_SPIRIT_DEBUG
+
 #include <string>
 
 #include <boost/spirit/include/lex_lexertl.hpp>
@@ -13,7 +15,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
-
 
 namespace gos {
 namespace dna {
@@ -31,70 +32,15 @@ template <typename Iterator>
 struct state_grammar
 : boost::spirit::qi::grammar<
     Iterator,
-    boost::spirit::ascii::space_type,
+    boost::spirit::qi::space_type,
     boost::spirit::utree()>
 {
-  // state:
-  constexpr static const char * STATE     = "state";
-  constexpr static const char * SWITCH    = "switch";
-  constexpr static const char * PREV      = "prev";
-  // flow control:
-  constexpr static const char * IF        = "if";
-  constexpr static const char * ELSE      = "else";
-  constexpr static const char * EVERY     = "every";
-  constexpr static const char * NOT       = "not";
-  // stack values:
-  constexpr static const char * STORE     = "store";
-  constexpr static const char * LOAD      = "load";
-  constexpr static const char * COUNT     = "count";
-  // functions:
-  constexpr static const char * RANDOM    = "random";
-  // events:
-  constexpr static const char * ON        = "on";
-  constexpr static const char * FOOD      = "food";
-  constexpr static const char * ENEMY     = "enemy";
-  constexpr static const char * COLLISION = "collision";
-  constexpr static const char * HOME      = "home";
-  constexpr static const char * ATTACKED  = "attacked";
-  // attributes:
-  constexpr static const char * STRENGTH  = "strength";
-  constexpr static const char * CARRYING  = "num_carrying";
-  constexpr static const char * DAMAGE    = "damage";
-  constexpr static const char * DIRECTION = "direction";
-  // actions:
-  constexpr static const char * MOVE      = "move";
-  constexpr static const char * SET_DIR   = "set_dir";
-  constexpr static const char * TURN      = "turn";
-  constexpr static const char * EAT       = "eat";
-  constexpr static const char * TAKE      = "take";
-  constexpr static const char * DROP      = "drop";
-  constexpr static const char * BACKTRACE = "backtrace";
-
-  constexpr static const char   AT         = '@';
-  constexpr static const char   EXCL       = '!';
-  constexpr static const char   STAR       = '*';
-  constexpr static const char   COMMA      = ',';
-  constexpr static const char   LPAREN     = '(';
-  constexpr static const char   RPAREN     = ')'; 
-  constexpr static const char   LBRACE     = '{';
-  constexpr static const char   RBRACE     = '}'; 
-  constexpr static const char   SEMICOLON  = ';';
-  constexpr static const char   COLON      = ':';
-  constexpr static const char * LAND       = "&&";
-  constexpr static const char * LOR        = "||";
-  constexpr static const char   DOT        = '.';        
-  constexpr static const char   ASSIGN     = '=';
-  constexpr static const char   LT         = '<';
-  constexpr static const char   GT         = '>';
-  constexpr static const char * LE         = "<=";
-  constexpr static const char * GE         = ">=";
-  constexpr static const char * EQUAL      = "==";
-  constexpr static const char * NE         = "!=";    
-
   state_grammar() : state_grammar::base_type(program)
   {
     using namespace qi::labels;
     using qi::eol;
+    using qi::eoi;
+    using qi::alpha;
     using qi::graph;
     using qi::lit;
     using qi::lexeme;
@@ -102,164 +48,126 @@ struct state_grammar
     using ascii::char_;
 
     identifier
-      = +graph;
+      = +alpha;
 
     string_literal
-      = lit('"') >> +~char_('"') >> '"';
+      = lit('"') >> +~char_('"') >> lit('"');
 
+    int_value
+      = +int_;
 
     program = +(state_definition); 
                        
     state_definition
-      = lit(STATE) << lit(COLON) << identifier << rules_clause;
+      = (lit("state") >> lit(":")
+         >> identifier
+         >> rules_block);
 
     state_identifier
-      = AT << identifier;
+      = lit("@") >> string_literal;
 
     attribute
-      = lit(STRENGTH) | lit(CARRYING) | lit(DIRECTION) | lit(DAMAGE);
+      = lit("strength") | lit("carrying") | lit("dir") | lit("damage");
 
     action
-      = ( lit(MOVE) | lit(TURN) | lit(SET_DIR) |
-          lit(EAT) | lit(TAKE) | lit(BACKTRACE) )
-        >> lit(EXCL);
+      = ( lit("move") | lit("turn") | lit("set_dir") |
+          lit("eat")  | lit("take") | lit("backtrace") );
 
     event
-      = lit(FOOD) | lit(COLLISION) | lit(ENEMY) |
-        lit(ATTACKED) | lit(HOME);
+      = lit("food")     | lit("collision") | lit("enemy") |
+        lit("attacked") | lit("home");
             
-    on_event_rules_clause
-      = on_event_clause >> rules_clause; 
+    on_event_block
+      = on_event_clause >> rules_block; 
 
     // on(event)
     on_event_clause
-      = lit(ON) >> lit(LPAREN) >> event >> lit(RPAREN);
+      = lit("on") >> lit("(") >> event >> lit(")");
 
     // { +expression }
-    rules_clause
-      = lit(LBRACE) >> +(rule_expression) >> lit(RBRACE);
+    rules_block
+      = lit("{") >> +(rule_expression) >> lit("}");
 
     // if (...) { } or command
     rule_expression
-      = +(conditional_block | command_clause);
+      = conditional_block | command_clause;
 
     // switch(@state_id)
     state_switch_clause
-      = lit(SWITCH) << LPAREN << (state_identifier | lit(PREV)) << RPAREN;
+      = lit("switch") >> lit("(")
+                      >> (state_identifier | lit("prev"))
+                      >> lit(")");
 
     // on(event) or action! or switch(@state)
     command_clause
-      = on_event_rules_clause | action_clause | state_switch_clause;
+      = on_event_block | action_clause | state_switch_clause;
 
     action_clause
       = action_noparams_clause | action_param_clause;
 
     // move!
     action_noparams_clause
-      = action << lit(EXCL);
+      = action >> lit("!");
 
     // turn!(3)
     action_param_clause
       // should be expression_term instead of value
-      = action << lit(EXCL) << LPAREN << value << RPAREN;
+      = action >> lit("!") >> lit("(") >> int_value >> lit(")");
 
     conditional_block
-      = if_clause | if_else_clause;
+      = if_clause | if_else_clause | every_clause;
+
+		every_clause
+			= lit("every") >> lit("(") >> int_value >> lit(")")
+                     >> rules_block;
 
     // identifier <= 123
     condition_clause
       // should be expression_term instead of value
-      = identifier >> compare_op >> value;
+      = identifier >> compare_op >> int_value;
 
     compare_op
-      = lit(LE) | lit(LT) | lit(GE) | lit(GT) | lit(EQUAL) | lit(NE);
+      = (lit("<=") | lit("<") | lit(">=") | lit(">") |
+         lit("==") | lit("!="));
 
     // if (...) { ... }
     if_clause
-      = lit(IF) >> lit(LPAREN) >> condition_clause >> lit(RPAREN)
-                >> rules_clause;
+      = lit("if") >> lit("(") >> condition_clause >> lit(")")
+                  >> rules_block;
 
     // else { ... }
     else_clause
-      = lit(ELSE) >> rules_clause;
+      = lit("else") >> rules_block;
 
     // if (...) { ... } else { ... }
     if_else_clause
       = if_clause >> else_clause;
 
+		BOOST_SPIRIT_DEBUG_NODE(program);
+		BOOST_SPIRIT_DEBUG_NODE(state_definition);
+		BOOST_SPIRIT_DEBUG_NODE(state_identifier);
+		BOOST_SPIRIT_DEBUG_NODE(identifier);
+		BOOST_SPIRIT_DEBUG_NODE(action);
+		BOOST_SPIRIT_DEBUG_NODE(rule_expression);
+		BOOST_SPIRIT_DEBUG_NODE(rules_block);
+		BOOST_SPIRIT_DEBUG_NODE(command_clause);
   } // state_grammar()
   
   boost::spirit::qi::rule<
     Iterator,
-    ascii::space_type,
+    qi::space_type,
     spirit::utree()>
       program,
       state_definition, state_identifier,
-      attribute, action, event, on_event_rules_clause,
-      on_event_clause, rules_clause, rule_expression,
-      conditional_block, if_clause, else_clause, if_else_clause,
-      condition_clause, command_clause, compare_op,
+      attribute, action, event, on_event_block,
+      on_event_clause, rules_block, rule_expression,
+			if_clause, else_clause, if_else_clause, every_clause,
+      conditional_block, condition_clause, command_clause, compare_op,
       action_clause, action_noparams_clause, action_param_clause,
       state_switch_clause,
-      value, 
+      int_value, 
       number, op, identifier, string_literal;
-
-#if 0
-  preprocessor() : preprocessor::base_type(body)
-  {
-    using namespace qi::labels;
-    using qi::eol;
-    using qi::graph;
-    using qi::lit;
-    using qi::lexeme;
-    using qi::int_;
-    using ascii::char_;
-
-    vartype = +graph;
-    varname = +(graph - char_("[;"));
-    vardim  = '[' >> int_  >> "]";
-
-    state_tag =
-        "state" >> lit(':') >> // +~char_(')') >> ')' >>
-        eol;
-
-    field =
-        vartype >>
-        varname >>
-        -vardim >>
-        ';' >> 
-        eol;
-
-    body =
-        strucname  >>
-        '(' >> eol >>
-        *field >>
-        ')' >> -eol;
-
-    BOOST_SPIRIT_DEBUG_NODES((body)(field)(statetag))
-  }
-
-  qi::rule<Iterator, struct_body(),  Skipper> body;
-  qi::rule<Iterator, struct_field(), Skipper> field;
-  qi::rule<Iterator, std::string(),  Skipper> strucname;
-  qi::rule<Iterator, int(),          Skipper> vardim;
-  // lexemes
-  qi::rule<Iterator, std::string()> vartype, varname;
-#endif
 };
-
-#if 0
-template<typename Iterator, typename Skipper>
-bool parse(
-  Iterator      & first,
-  Iterator        end,
-  Skipper const & skipper,
-  struct_body   & mystruct)
-{
-  preprocessor<Iterator, Skipper> g;
-  return qi::phrase_parse(first, end, g, skipper, mystruct);
-}
-#endif
 
 
 #if 0
@@ -290,28 +198,6 @@ struct state_tokens : lex::lexer<Lexer>
         |   any   [++ref(c)]
         ;
   }
-};
-#endif
-
-#if 0
-enum class settable_tag : int {
-  direction = 0,
-  mode
-};
-
-class setter {
-
-};
-
-class state_rule {
-  std::string _state_tag;
-
- public:
-  state_rule(const std::string & state_tag)
-  : _state_tag(g)
-  { }
-
-  void add_setter(settable_tag);
 };
 #endif
 
