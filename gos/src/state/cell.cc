@@ -51,7 +51,9 @@ void food_cell_state::on_enter(
   const gos::state::game_state & gs)
 {
   resource_cell_state::on_enter(a, gs);
-  a.on_food_cell(*this);
+  if (amount_left() > 0) {
+    a.on_food_cell(*this);
+  }
 }
 
 void spawn_cell_state::on_enter(

@@ -107,13 +107,6 @@ class ant {
 
  public:
   ant() = delete;
-  ant(ant_team  & team,
-      int         id,
-      position && pos)
-  : _team(&team)
-  , _id(id)
-  , _pos(std::move(pos))
-  { }
 
   ant(ant_team       & team,
       int              id,
@@ -121,7 +114,10 @@ class ant {
   : _team(&team)
   , _id(id)
   , _pos(pos)
-  { }
+  {
+    set_direction({ (( id + 7) % 3) - 1,
+                    (( id + 5) % 3) - 1 });
+  }
 
   ant(const ant & other) = delete;
   ant(ant && other)      = default;

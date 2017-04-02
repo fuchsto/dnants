@@ -16,7 +16,7 @@ namespace gos {
 namespace state {
 
 void ant_team::update() {
-  if (_game_state->round_count() % 20) {
+  if (_game_state->round_count() % 20 == 0) {
     spawn_ants();
   }
 }
@@ -56,9 +56,7 @@ void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
 }
 
 void ant::on_food_cell(gos::state::food_cell_state & food_cell) noexcept {
-  if (food_cell.amount_left() <= 0) {
-    return;
-  }
+  // Client code
   if (_mode == mode::harvesting) {
     return;
   }
@@ -71,6 +69,7 @@ void ant::on_food_cell(gos::state::food_cell_state & food_cell) noexcept {
 
 void ant::on_enemy(
   gos::state::ant & enemy) noexcept {
+  // Client code
   if (strength() > 3) {
     attack(enemy);
   } else {
@@ -86,6 +85,7 @@ void ant::on_enemy(
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {
+  // Client code
   GOS__LOG_DEBUG("ant.on_attacked", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
                  "id:" << enemy.id());
@@ -93,7 +93,8 @@ void ant::on_attacked(gos::state::ant & enemy) noexcept {
 }
 
 void ant::on_collision() noexcept {
-  if (_rand % 4 <= 1) { turn(-1); }
+  // Client code
+  if (_rand % 6 <= 2) { turn(-1); }
   else                { turn(1);  }
 }
 
@@ -277,7 +278,7 @@ void ant::trace_back() noexcept {
   }
   if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
     // trace found:
-    if (true || num_no_dir_change() > 4) {
+    if (num_no_dir_change() > 1) {
       set_direction(sec_max_backtrace_dir);
     }
   } else {
