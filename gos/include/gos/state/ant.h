@@ -15,6 +15,7 @@ namespace state {
 
 class ant;
 class game_state;
+class cell;
 
 class resource_cell_state;
 class food_cell_state;
@@ -75,7 +76,7 @@ class ant {
  public:
   enum mode : int {
     waiting    = 0, // do nothing
-    collision,      // collision, move failed
+    detour,         // collision, move failed
     scouting,       // move without following a pheromone trace
     fighting,       // fighting enemy in adjacent cell
     tracing,        // follow the closes pheromone trace
@@ -83,6 +84,25 @@ class ant {
     harvesting,     // eat and gain strength
     dead            // ant has died
   };
+
+  enum event : int {
+    none       = 0,
+    food,
+    enemy,
+    collision,
+    attacked
+  };
+
+  enum action : int {
+    idle       = 0,
+    action_move,
+    action_backtrace,
+    action_eat,
+    action_harvest,
+    action_attack,
+    action_turn
+  };
+
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
@@ -101,8 +121,9 @@ class ant {
   position     _pos;
   direction    _dir;
   size_t       _last_dir_change = 0;
-  mode         _mode            = ant::mode::scouting;
   size_t       _rand            = 0;
+  mode         _mode            = ant::mode::scouting;
+  event        _event           = ant::event::none;
 
  public:
   static const int max_strength() { return 10; }
@@ -144,7 +165,7 @@ class ant {
   }
 
   inline bool is_blocked() const noexcept {
-    return _mode == mode::collision;
+    return _mode == mode::detour;
   }
 
   inline const position & pos() const noexcept {
@@ -166,6 +187,10 @@ class ant {
   inline int team_id() const noexcept {
     return _team->id();
   }
+
+  const gos::state::cell & cell() const noexcept;
+
+  gos::state::cell & cell() noexcept;
 
   inline ant::mode ant_mode() const noexcept {
     return _mode;

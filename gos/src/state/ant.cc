@@ -56,6 +56,7 @@ void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
 }
 
 void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
+  _event = ant::event::food;
   // Client code
   if (_mode == mode::harvesting) {
     return;
@@ -69,6 +70,7 @@ void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
 
 void ant::on_enemy(
   gos::state::ant & enemy) noexcept {
+  _event = ant::event::enemy;
   // Client code
   if (strength() > 3) {
     attack(enemy);
@@ -85,6 +87,7 @@ void ant::on_enemy(
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {
+  _event = ant::event::attacked;
   // Client code
   GOS__LOG_DEBUG("ant.on_attacked", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
@@ -93,6 +96,7 @@ void ant::on_attacked(gos::state::ant & enemy) noexcept {
 }
 
 void ant::on_collision() noexcept {
+  _event = ant::event::collision;
   // Client code
   if (_rand % 6 <= 2) { turn(-1); }
   else                { turn(1);  }
@@ -283,8 +287,8 @@ void ant::trace_back() noexcept {
     }
   } else {
     // no trace found, just turn around:
-    if (num_no_dir_change() > 4) {
-      turn((this->game_state().round_count() % 4) - 2);
+    if (num_no_dir_change() > 8) {
+      turn((this->game_state().round_count() % 2) - 1);
     }
   }
 }
@@ -314,6 +318,14 @@ void ant::move() noexcept {
   else        { d += dn; ++_pos.y; }
   ++_pos.x;
 */
+}
+
+gos::state::cell & ant::cell() noexcept {
+  return this->game_state().grid_state()[_pos];
+}
+
+const gos::state::cell & ant::cell() const noexcept {
+  return this->game_state().grid_state()[_pos];
 }
 
 std::ostream & operator<<(
