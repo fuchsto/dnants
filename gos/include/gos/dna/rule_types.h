@@ -121,8 +121,9 @@ struct state_grammar
       = lit(STRENGTH) | lit(CARRYING) | lit(DIRECTION) | lit(DAMAGE);
 
     action
-      = lit(MOVE) | lit(TURN) | lit(SET_DIR) |
-        lit(EAT) | lit(TAKE) | lit(BACKTRACE);
+      = ( lit(MOVE) | lit(TURN) | lit(SET_DIR) |
+          lit(EAT) | lit(TAKE) | lit(BACKTRACE) )
+        >> lit(EXCL);
 
     event
       = lit(FOOD) | lit(COLLISION) | lit(ENEMY) |
@@ -132,7 +133,7 @@ struct state_grammar
       = on_event_clause >> rules_clause; 
 
     on_event_clause
-      = lit(ON) >> event;
+      = lit(ON) >> lit(COLON) >> event;
 
     rules_clause
       = lit(LBRACE) >> +(rule_expression) >> lit(RBRACE);
@@ -179,7 +180,6 @@ struct state_grammar
       condition_clause, command_clause, compare_op,
       action_clause, state_switch_clause,
       value, 
-   // value_list, string_list, number_list,
       number, op, identifier, string_literal;
 
 #if 0
