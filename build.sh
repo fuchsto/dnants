@@ -15,5 +15,5 @@ rm -Rf $BUILD_DIR/*
   .. && \
   make VERBOSE=1) \
   && (cp $BUILD_DIR/compile_commands.json .) \
-  && (cp $BUILD_DIR/res/*.bmp .)
+  && (cp ./res/*.bmp $BUILD_DIR/)
 

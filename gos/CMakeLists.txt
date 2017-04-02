@@ -4,7 +4,7 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
 find_package(SDL2     REQUIRED)
 find_package(Pybind11 REQUIRED)
-# find_package(Python   REQUIRED)
+find_package(Python   REQUIRED)
 
 set(Boost_USE_STATIC_LIBS    ON)
 set(Boost_USE_MULTITHREADED  ON)

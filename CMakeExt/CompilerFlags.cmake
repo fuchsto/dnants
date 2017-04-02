@@ -25,7 +25,7 @@ execute_process(COMMAND python3.5-config --ldflags
                 OUTPUT_VARIABLE PYTHON_LDFLAGS
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (PYTHON_FLAGS "${PYTHON_CFLAGS} ${PYTHON_LDFLAGS}")
+# set (PYTHON_FLAGS "${PYTHON_CFLAGS} ${PYTHON_LDFLAGS}")
 
 set (CXX_OMP_FLAG ${OpenMP_CXX_FLAGS})
 set (CC_OMP_FLAG  ${OpenMP_CC_FLAGS})
