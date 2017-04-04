@@ -2,6 +2,7 @@
 #define GOS__STATE__GRID_H__INCLUDED
 
 #include <gos/state/cell.h>
+
 #include <gos/util/logging.h>
 #include <gos/types.h>
 

@@ -8,8 +8,6 @@
 #include <gos/util/timestamp.h>
 #include <gos/util/random.h>
 
-#include <gos/app_play_state.h>
-
 #include <cmath>
 #include <cstdlib>
 

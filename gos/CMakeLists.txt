@@ -1,56 +1,34 @@
-project(project_dnants_main CXX)
+project(project_dnants_libgos CXX)
 
 include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
-find_package(SDL2     REQUIRED)
-find_package(Pybind11 REQUIRED)
-find_package(Python   REQUIRED)
 
-set(Boost_USE_STATIC_LIBS    ON)
-set(Boost_USE_MULTITHREADED  ON)
-set(Boost_USE_STATIC_RUNTIME ON)
-
-find_package(Boost 1.58.0 REQUIRED
-             COMPONENTS filesystem regex)
+set(DNANTS_LIBGOS_TARGET_NAME gos)
 
 
-file(GLOB_RECURSE DNANTS_MAIN_SOURCES
+file(GLOB_RECURSE DNANTS_LIBGOS_SOURCES
      "src/*.c" "src/*.h" "src/*.cc" "src/*.cpp" )
-file(GLOB_RECURSE DNANTS_MAIN_HEADERS
+file(GLOB_RECURSE DNANTS_LIBGOS_HEADERS
      "include/*.h")
 
-set(DNANTS_MAIN_TARGET_NAME dnants)
-
-set(DNANTS_MAIN_INCLUDE_DIRS
+set(DNANTS_LIBGOS_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-set(DNANTS_MAIN_SOURCE_DIRS
+set(DNANTS_LIBGOS_SOURCE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-message(STATUS "Boost include directories: "
-        ${Boost_INCLUDE_DIRS})
-message(STATUS "Boost libraries: "
-        ${Boost_LIBRARIES})
-
 include_directories(
-  ${DNANTS_MAIN_INCLUDE_DIRS}
-  ${SDL2_INCLUDE_DIR}
-  ${Boost_INCLUDE_DIRS}
-  ${PYBIND11_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
+  ${DNANTS_LIBGOS_INCLUDE_DIRS}
 )
 
-add_executable(
-  ${DNANTS_MAIN_TARGET_NAME}
-  ${DNANTS_MAIN_HEADERS}
-  ${DNANTS_MAIN_SOURCES}
+add_library(
+  ${DNANTS_LIBGOS_TARGET_NAME}
+  SHARED
+  ${DNANTS_LIBGOS_HEADERS}
+  ${DNANTS_LIBGOS_SOURCES}
 )
 
 target_link_libraries(
-  ${DNANTS_MAIN_TARGET_NAME}
-  ${SDL2_LIBRARY}
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARY}
+  ${DNANTS_LIBGOS_TARGET_NAME}
 )
 
 set_target_properties(
@@ -68,5 +46,5 @@ set_target_properties(
 )
 
 install(
-  TARGETS ${DNANTS_MAIN_TARGET_NAME}
-  DESTINATION bin/)
+  TARGETS ${DNANTS_LIBGOS_TARGET_NAME}
+  DESTINATION lib/)

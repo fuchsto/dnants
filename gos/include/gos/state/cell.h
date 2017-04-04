@@ -3,6 +3,7 @@
 
 #include <gos/state/ant.h>
 
+#include <array>
 #include <memory>
 #include <iostream>
 
