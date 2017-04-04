@@ -106,17 +106,29 @@ void ant::die() noexcept {
 void ant::update_position() noexcept {
   if (!is_alive()) { return; }
   // Apply cell change from last round:
-  _state.tick_count = this->game_state().round_count();
-  _state.rand       = gos::random();
-  _state.damage     = 0;
+  _state.tick_count       = this->game_state().round_count();
+  _state.rand             = gos::random();
+  _state.damage           = 0;
+  _state.events.enemy     = false;
+  _state.events.food      = false;
+  _state.events.collision = false;
+  _state.events.attacked  = false;
+
   ++_state.nticks_not_fed;
   if (_state.strength > max_strength() / 2 &&
       ((_state.nticks_not_fed + 1) % 100) == 0) {
     --_state.strength;
   }
+
   if (_state.action == ant_state::ant_action::do_move) {
     // Updates position and triggers grid cell events:
     move();
+  }
+  else if (_state.action == ant_state::ant_action::do_eat) {
+    eat();
+  }
+  else if (_state.action == ant_state::ant_action::do_harvest) {
+    harvest();
   }
 }
 
@@ -186,8 +198,9 @@ void ant::eat() noexcept {
 
 void ant::harvest() noexcept {
   if (!is_alive()) { return; }
-  if (_state.num_carrying >= strength() - 1) {
-    switch_mode(ant_state::ant_mode::tracing);
+  if (_state.num_carrying >= strength()) {
+    // carry capacity reached
+    return;
   }
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
@@ -289,19 +302,80 @@ const gos::state::cell & ant::cell() const noexcept {
 }
 
 std::ostream & operator<<(
+  std::ostream                          & os,
+  const gos::state::ant_state::ant_mode & m)
+{
+  std::ostringstream ss;
+  ss << "mode(";
+  switch (m) {
+    case ant_state::ant_mode::waiting:
+         ss << "waiting";
+         break;
+    case ant_state::ant_mode::scouting:
+         ss << "scouting";
+         break;
+    case ant_state::ant_mode::detour:
+         ss << "detour";
+         break;
+    case ant_state::ant_mode::eating:
+         ss << "eating";
+         break;
+    case ant_state::ant_mode::harvesting:
+         ss << "harvesting";
+         break;
+    case ant_state::ant_mode::fighting:
+         ss << "fighting";
+         break;
+    case ant_state::ant_mode::tracing:
+         ss << "tracing";
+         break;
+    case ant_state::ant_mode::dead:
+         ss << "dead";
+         break;
+    default:
+         ss << "???";
+         break;
+  }
+  ss << ")";
+  return operator<<(os, ss.str());
+}
+
+std::ostream & operator<<(
+  std::ostream                              & os,
+  const gos::state::ant_state::state_events & e)
+{
+  std::ostringstream ss;
+  ss << "events { ";
+  if (e.enemy)     { ss << "enemy ";     }
+  if (e.food)      { ss << "food ";      }
+  if (e.collision) { ss << "collision "; }
+  if (e.attacked)  { ss << "attacked ";  }
+  ss << "}";
+  return operator<<(os, ss.str());
+}
+
+std::ostream & operator<<(
   std::ostream          & os,
   const gos::state::ant & a)
 {
   std::ostringstream ss;
-  ss << "ant { " << a.id()
-     << "-t"   << a.team_id()      << " "
-     << "mod:" << a.mode()         << " "
-     << "str:" << a.strength()     << " "
-     << "car:" << a.num_carrying() << " "
-     << "dir:" << "(" << a.dir().dx << "," << a.dir().dy << ") "
-     << "ldc:" << a.num_no_dir_change() << " "
-     << "att:" << a.damage() << " "
-     << "}";
+  ss << "ant { "
+     << " id:"   << a.id() 
+                 << ".t" << a.team_id() << " "
+     << a.mode()
+     << " "
+     << a.state().events
+     << " str:"  << a.strength()
+     << " dir:"  << "(" 
+                 << a.dir().dx << ","
+                 << a.dir().dy
+                 << ")"
+     << " car:"  << a.num_carrying()
+     << " dmg:"  << a.damage()
+     << " ldc:"  << a.state().last_dir_change
+     << " tic:"  << a.state().tick_count
+     << " rnd:"  << a.state().rand
+     << " }";
   return operator<<(os, ss.str());
 }
 

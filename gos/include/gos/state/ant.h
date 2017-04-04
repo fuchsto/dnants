@@ -234,6 +234,14 @@ class ant {
 };
 
 std::ostream & operator<<(
+  std::ostream                          & os,
+  const gos::state::ant_state::ant_mode & m);
+
+std::ostream & operator<<(
+  std::ostream                              & os,
+  const gos::state::ant_state::state_events & e);
+
+std::ostream & operator<<(
   std::ostream          & os,
   const gos::state::ant & a);
 

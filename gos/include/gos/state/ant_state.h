@@ -69,6 +69,9 @@ struct ant_state {
     }
   }
 
+  inline void set_action(ant_action a) noexcept {
+  }
+
   inline void set_dir(direction d) noexcept {
     if (dir == d) { return; }
     last_dir_change = tick_count;
@@ -77,7 +80,7 @@ struct ant_state {
 
   inline void set_turn(int turn_dir) noexcept {
     // for example, turn_dir +4 or -4 is reverse direction:
-    int ort_idx = or2int(orientation());
+    int ort_idx = or2int(gos::dir2or(dir));
     ort_idx += turn_dir;
     if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
     if (ort_idx > 7) { ort_idx -= ort_idx;     }
