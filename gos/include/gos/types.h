@@ -1,7 +1,6 @@
 #ifndef GOS__TYPES_H__INCLUDED
 #define GOS__TYPES_H__INCLUDED
 
-#include <SDL.h>
 #include <array>
 
 
@@ -64,10 +63,10 @@ struct extents {
 };
 
 struct rgba {
-  Uint8 r;
-  Uint8 g;
-  Uint8 b;
-  Uint8 a;
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+  unsigned char a;
 };
 
 static orientation int2or(

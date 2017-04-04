@@ -6,8 +6,6 @@
 #include <vector>
 #include <string>
 
-#include <SDL.h>
-
 
 namespace gos {
 
@@ -19,9 +17,9 @@ class app_engine
   std::vector<app_state *>   _states;
   gos::view::window          _window;
   bool                       _is_running      = false;
-  Uint32                     _frame_time      = 0;
-  Uint32                     _last_frame_time = 0;
-  Uint32                     _delta_time      = 0;
+  uint32_t                   _frame_time      = 0;
+  uint32_t                   _last_frame_time = 0;
+  uint32_t                   _delta_time      = 0;
 
  public:
   struct app_settings {

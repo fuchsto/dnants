@@ -54,4 +54,5 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/CompilerFlags.cmake)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(gos)
+add_subdirectory(pygos)
 
