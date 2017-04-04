@@ -1,5 +1,7 @@
 
 #include <gos/state/ant.h>
+
+#include <gos/state/ant_state.h>
 #include <gos/state/game_state.h>
 #include <gos/state/grid.h>
 #include <gos/state/cell.h>
@@ -49,56 +51,56 @@ void ant_team::spawn_ants() {
 
 
 void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
-  GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << _num_carrying);
-  home_cell.drop(_num_carrying);
-  _num_carrying = 0;
-  switch_mode(mode::scouting);
+  GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << num_carrying());
+  home_cell.drop(num_carrying());
+  _state.num_carrying = 0;
+  switch_mode(ant_state::ant_mode::scouting);
 }
 
 void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
-  _event = ant::event::food;
+  _state.event = ant_state::ant_event::food;
   // Client code
-  if (_mode == mode::harvesting) {
+  if (mode() == ant_state::ant_mode::harvesting) {
     return;
   }
-  if (_strength < max_strength()) {
-    switch_mode(mode::eating);
+  if (strength() < max_strength()) {
+    switch_mode(ant_state::ant_mode::eating);
   } else {
-    switch_mode(mode::harvesting);
+    switch_mode(ant_state::ant_mode::harvesting);
   }
 }
 
 void ant::on_enemy(
   gos::state::ant & enemy) noexcept {
-  _event = ant::event::enemy;
+  _state.event = ant_state::ant_event::enemy;
   // Client code
   if (strength() > 3) {
     attack(enemy);
   } else {
     // too weak, run away
     turn(4);
-    if (_mode == mode::fighting) {
-      switch_mode(mode::scouting);
+    if (mode() == ant_state::ant_mode::fighting) {
+      switch_mode(ant_state::ant_mode::scouting);
     }
   }
-  if (_mode == mode::fighting && !enemy.is_alive()) {
-    switch_mode(mode::scouting);
+  if (mode() == ant_state::ant_mode::fighting && !enemy.is_alive()) {
+    switch_mode(ant_state::ant_mode::scouting);
   }
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {
-  _event = ant::event::attacked;
+  _state.event = ant_state::ant_event::attacked;
   // Client code
   GOS__LOG_DEBUG("ant.on_attacked", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
                  "id:" << enemy.id());
-  _attack_str += enemy.strength();
+  _state.damage += enemy.strength();
 }
 
 void ant::on_collision() noexcept {
-  _event = ant::event::collision;
+  _state.event = ant_state::ant_event::collision;
   // Client code
-  if (_rand % 6 <= 2) { turn(-1); }
+  if (rand() % 6 <= 2) { turn(-1); }
   else                { turn(1);  }
 }
 
@@ -111,7 +113,7 @@ void ant::attack(gos::state::ant & enemy) noexcept {
   if (num_carrying() > 0) {
     return;
   }
-  switch_mode(mode::fighting);
+  switch_mode(ant_state::ant_mode::fighting);
   enemy.on_attacked(*this);
 }
 
@@ -120,40 +122,40 @@ void ant::die() noexcept {
                  "t:"   << team_id() << " " <<
                  "id:"  << id() << " " <<
                  "at (" << pos().x << "," << pos().y << ")");
-  _mode = mode::dead;
-  this->game_state().grid_state()[_pos]
+  _state.mode = ant_state::ant_mode::dead;
+  this->game_state().grid_state()[_state.pos]
                     .leave(*this, this->game_state());
 }
 
 void ant::update_position() noexcept {
   if (!is_alive()) { return; }
-  auto rc     = this->game_state().round_count();
-  _rand       = gos::random();
-  _attack_str = 0;
-  ++_nticks_not_fed;
-  switch (_mode) {
-    case ant::mode::eating:
+  auto rc       = this->game_state().round_count();
+  _state.rand   = gos::random();
+  _state.damage = 0;
+  ++_state.nticks_not_fed;
+  switch (_state.mode) {
+    case ant_state::ant_mode::eating:
       eat();
       break;
-    case ant::mode::harvesting:
+    case ant_state::ant_mode::harvesting:
       harvest();
       break;
-    case ant::mode::tracing:
+    case ant_state::ant_mode::tracing:
       trace_back();
       move();
       break;
-    case ant::mode::scouting:
+    case ant_state::ant_mode::scouting:
       if (num_no_dir_change() > 4) {
-        turn(((_rand + rc * 7) % 3) - 1);
+        turn(((_state.rand + rc * 7) % 3) - 1);
       }
       move();
       break;
     default:
       break;
   }
-  if (_strength > max_strength() / 2 &&
-      ((_nticks_not_fed + 1) % 100) == 0) {
-    --_strength;
+  if (_state.strength > max_strength() / 2 &&
+      ((_state.nticks_not_fed + 1) % 100) == 0) {
+    --_state.strength;
   }
 }
 
@@ -163,8 +165,8 @@ void ant::update_action() noexcept {
   gos::state::ant_id enemy_id  { -1, -1 };
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
     for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
-      position adj_pos { _pos.x + x,
-                         _pos.y + y };
+      position adj_pos { pos().x + x,
+                         pos().y + y };
       if ((x == 0 && y == 0) ||
           !this->game_state().grid_state().contains_position(adj_pos)) {
         continue;
@@ -179,25 +181,25 @@ void ant::update_action() noexcept {
     }
   }
   // No enemy in range
-  if (_mode == ant::mode::fighting) {
-    switch_mode(ant::mode::scouting);
+  if (_state.mode == ant_state::ant_mode::fighting) {
+    switch_mode(ant_state::ant_mode::scouting);
   }
 }
 
 void ant::update_reaction() noexcept {
   if (!is_alive()) { return; }
-  if (_strength <= _attack_str) {
-    if (_strength > 1) {
-      --_strength;
+  if (strength() <= damage()) {
+    if (strength() > 1) {
+      --_state.strength;
     } else {
       die();
     }
-    if (_num_carrying > 0) {
-      gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+    if (num_carrying() > 0) {
+      gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
       auto pos_cell_state = reinterpret_cast<resource_cell_state *>(
                               pos_cell.state());
-      pos_cell_state->drop(_num_carrying);
-      _num_carrying = 0;
+      pos_cell_state->drop(num_carrying());
+      _state.num_carrying = 0;
     }
   }
 }
@@ -205,47 +207,48 @@ void ant::update_reaction() noexcept {
 void ant::eat() noexcept {
   if (!is_alive()) { return; }
   int consumed = 0;
-  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+  gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
   if (pos_cell.type() == gos::state::cell_type::food) {
     gos::state::cell_state      * c_state   = pos_cell.state();
     gos::state::food_cell_state * food_cell =
       reinterpret_cast<gos::state::food_cell_state *>(c_state);
     consumed = food_cell->consume();
     if (consumed > 0) {
-      _nticks_not_fed = 0;
-      _strength       = std::min(max_strength(), _strength + consumed);
+      _state.nticks_not_fed = 0;
+      _state.strength       = std::min(max_strength(),
+                                       strength() + consumed);
     }
   }
-  if (consumed == 0 || _strength >= max_strength() / 2) {
-    switch_mode(mode::scouting);
+  if (consumed == 0 || strength() >= max_strength() / 2) {
+    switch_mode(ant_state::ant_mode::scouting);
   }
 }
 
 void ant::harvest() noexcept {
   if (!is_alive()) { return; }
-  if (_num_carrying >= strength() - 1) {
-    switch_mode(mode::tracing);
+  if (_state.num_carrying >= strength() - 1) {
+    switch_mode(ant_state::ant_mode::tracing);
   }
   int consumed = 0;
-  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+  gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
   if (pos_cell.type() == gos::state::cell_type::food) {
     gos::state::cell_state      * c_state   = pos_cell.state();
     gos::state::food_cell_state * food_cell =
       reinterpret_cast<gos::state::food_cell_state *>(c_state);
     consumed = food_cell->consume();
     if (consumed > 0) {
-      _num_carrying += consumed;
+      _state.num_carrying += consumed;
     }
   }
-  if (consumed == 0 || _num_carrying >= strength() - 1) {
-    switch_mode(mode::tracing);
+  if (consumed == 0 || num_carrying() >= strength() - 1) {
+    switch_mode(ant_state::ant_mode::tracing);
   }
 }
 
 void ant::trace_back() noexcept {
   if (!is_alive()) { return; }
   int consumed = 0;
-  gos::state::cell & pos_cell = this->game_state().grid_state()[_pos];
+  gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
 
   direction max_backtrace_dir { };
   direction sec_max_backtrace_dir { };
@@ -253,8 +256,8 @@ void ant::trace_back() noexcept {
   int sec_max_trace_intensity = 0;
   for (int y = -1; y <= 1; ++y) {
     for (int x = -1; x <= 1; ++x) {
-      position adj_pos { _pos.x + x,
-                         _pos.y + y };
+      position adj_pos { pos().x + x,
+                         pos().y + y };
       if ((x == 0 && y == 0) ||
           !this->game_state().grid_state().contains_position(adj_pos)) {
         continue;
@@ -295,17 +298,17 @@ void ant::trace_back() noexcept {
 
 void ant::move() noexcept {
   if (!is_alive()) { return; }
-  position pos_next { _pos.x + _dir.dx,
-                      _pos.y + _dir.dy };
-  if (pos_next == _pos) {
+  position pos_next { pos().x + dir().dx,
+                      pos().y + dir().dy };
+  if (pos_next == pos()) {
     return;
   }
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
-  this->game_state().grid_state()[_pos]
+  this->game_state().grid_state()[_state.pos]
                     .leave(*this, this->game_state());
   this->game_state().grid_state()[pos_next]
-                    .enter(*this, this->game_state());
-    _pos = pos_next;
+                    .cell::enter(*this, this->game_state());
+    set_pos(pos_next);
   } else {
     on_collision();
   }
@@ -321,11 +324,11 @@ void ant::move() noexcept {
 }
 
 gos::state::cell & ant::cell() noexcept {
-  return this->game_state().grid_state()[_pos];
+  return this->game_state().grid_state()[pos()];
 }
 
 const gos::state::cell & ant::cell() const noexcept {
-  return this->game_state().grid_state()[_pos];
+  return this->game_state().grid_state()[pos()];
 }
 
 std::ostream & operator<<(
@@ -334,9 +337,9 @@ std::ostream & operator<<(
 {
   std::ostringstream ss;
   ss << "ant { " << a.id()
-     << "-t"   << a.team_id()  << " "
-     << "mod:" << a.ant_mode() << " "
-     << "str:" << a.strength() << " "
+     << "-t"   << a.team_id()      << " "
+     << "mod:" << a.mode()         << " "
+     << "str:" << a.strength()     << " "
      << "car:" << a.num_carrying() << " "
      << "dir:" << "(" << a.dir().dx << "," << a.dir().dy << ") "
      << "ldc:" << a.num_no_dir_change() << " "

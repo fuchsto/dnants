@@ -1,6 +1,7 @@
 #ifndef GOS__STATE__ANT_H__INCLUDED
 #define GOS__STATE__ANT_H__INCLUDED
 
+#include <gos/state/ant_state.h>
 #include <gos/state/game_state.h>
 
 #include <gos/types.h>
@@ -21,11 +22,6 @@ class cell;
 class resource_cell_state;
 class food_cell_state;
 class spawn_cell_state;
-
-struct ant_id {
-  int team_id;
-  int id;
-};
 
 class ant_team {
   using game_state = gos::state::game_state;
@@ -74,57 +70,13 @@ class ant_team {
 
 
 class ant {
- public:
-  enum mode : int {
-    waiting    = 0, // do nothing
-    detour,         // collision, move failed
-    scouting,       // move without following a pheromone trace
-    fighting,       // fighting enemy in adjacent cell
-    tracing,        // follow the closes pheromone trace
-    eating,         // eat and gain strength
-    harvesting,     // eat and gain strength
-    dead            // ant has died
-  };
-
-  enum event : int {
-    none       = 0,
-    food,
-    enemy,
-    collision,
-    attacked
-  };
-
-  enum action : int {
-    do_idle    = 0,
-    do_move,
-    do_backtrace,
-    do_eat,
-    do_harvest,
-    do_attack,
-    do_turn
-  };
+  using gos::state::ant_state;
 
   // Ants can detect pheromone traces and distinguish friendly (own team)
   // from enemy pheromones.
  private:
-  ant_team   * _team            = nullptr;
-  int          _id;
-  // When an ant is in a cell next to ants of another team, it dies if its
-  // strength is less than the cumulative strength of the enemy ants in
-  // adjacent cells (von-Neumann neighborhood, diagonals are considered
-  // neighbor cells).
-  int          _strength        = 5;
-  int          _attack_str      = 0;
-  // If an ant carries food or material, its strength available for fights
-  // is reduced by the carried weight.
-  int          _num_carrying    = 0;
-  int          _nticks_not_fed  = 0;
-  position     _pos;
-  direction    _dir;
-  size_t       _last_dir_change = 0;
-  size_t       _rand            = 0;
-  mode         _mode            = ant::mode::scouting;
-  event        _event           = ant::event::none;
+  ant_team   * _team  = nullptr;
+  ant_state    _state;
 
  public:
   static const int max_strength() { return 10; }
@@ -136,9 +88,10 @@ class ant {
       int              id,
       const position & pos)
   : _team(&team)
-  , _id(id)
-  , _pos(pos)
   {
+    _state.id       = id;
+    _state.pos      = pos;
+    _state.strength = 5;
     set_direction({ (( id + 7) % 3) - 1,
                     (( id + 5) % 3) - 1 });
   }
@@ -149,6 +102,12 @@ class ant {
   ant & operator=(const ant & rhs) = delete;
   ant & operator=(ant && rhs)      = default;
 
+ private:
+  inline void set_pos(const position & p) noexcept {
+    _state.pos = p;
+  }
+
+ public:
   void on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept;
   void on_food_cell(gos::state::resource_cell_state & food_cell) noexcept;
   void on_enemy(gos::state::ant & enemy)    noexcept;
@@ -162,31 +121,35 @@ class ant {
   void die() noexcept;
 
   inline bool is_alive() const noexcept {
-    return _mode != mode::dead;
+    return mode() != ant_state::ant_mode::dead;
   }
 
   inline bool is_blocked() const noexcept {
-    return _mode == mode::detour;
+    return mode() == ant_state::ant_mode::detour;
+  }
+
+  inline size_t rand() const noexcept {
+    return _state.rand;
   }
 
   inline const position & pos() const noexcept {
-    return _pos;
+    return _state.pos;
   }
 
   inline const direction & dir() const noexcept {
-    return _dir;
-  }
-
-  inline const event evt() const noexcept {
-    return _event;
+    return _state.dir;
   }
 
   inline gos::orientation orientation() const noexcept {
-    return gos::dir2or(_dir);
+    return gos::dir2or(_state.dir);
+  }
+
+  inline const ant_stat::ant_event evt() const noexcept {
+    return _state.event;
   }
 
   inline int id() const noexcept {
-    return _id;
+    return _state.id;
   }
 
   inline int team_id() const noexcept {
@@ -197,22 +160,56 @@ class ant {
 
   gos::state::cell & cell() noexcept;
 
-  inline ant::mode ant_mode() const noexcept {
-    return _mode;
+  inline ant_stat::ant_mode mode() const noexcept {
+    return _state.mode;
   }
 
   inline int strength() const noexcept {
-    return _strength;
+    return _state.strength;
   }
 
   inline int num_carrying() const noexcept {
-    return _num_carrying;
+    return _state.num_carrying;
   }
 
   inline int damage() const noexcept {
-    return _attack_str;
+    return _state.damage;
   }
 
+  inline void set_direction(direction && d) noexcept {
+    if (_state.dir == d) { return; }
+    _state.last_dir_change = game_state().round_count();
+    _state.dir = std::move(d);
+  }
+
+  inline void set_direction(const direction & d) noexcept {
+    if (_dir == d) { return; }
+    _state.last_dir_change = game_state().round_count();
+    _state.dir = d;
+  }
+
+  inline void turn(int turn_dir) noexcept {
+    // for example, turn_dir +4 or -4 is reverse direction:
+    int ort_idx = or2int(this->orientation());
+    ort_idx += turn_dir;
+    if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
+    if (ort_idx > 7) { ort_idx -= ort_idx;     }
+    auto ort = int2or(ort_idx);
+    set_direction(or2dir(ort));
+  }
+
+  inline int num_no_dir_change() const noexcept {
+    return this->game_state().round_count() - _state.last_dir_change;
+  }
+
+  inline void switch_mode(ant_state::ant_mode m) noexcept {
+    if (is_alive() &&
+        (num_carrying() == 0 || m != ant_state::ant_mode::fighting)) {
+      _state.mode = m;
+    }
+  }
+
+ private:
   inline const gos::state::game_state & game_state() const noexcept {
     return *(_team->_game_state);
   }
@@ -227,39 +224,6 @@ class ant {
 
   inline ant_team & team() noexcept {
     return *_team;
-  }
-
-  inline void set_direction(direction && dir) noexcept {
-    if (_dir == dir) { return; }
-    _last_dir_change = game_state().round_count();
-    _dir = std::move(dir);
-  }
-
-  inline void set_direction(const direction & dir) noexcept {
-    if (_dir == dir) { return; }
-    _last_dir_change = game_state().round_count();
-    _dir = dir;
-  }
-
-  inline void turn(int turn_dir) noexcept {
-    // for example, turn_dir +4 or -4 is reverse direction:
-    int ort_idx = or2int(this->orientation());
-    ort_idx += turn_dir;
-    if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
-    if (ort_idx > 7) { ort_idx -= ort_idx;     }
-    auto ort = int2or(ort_idx);
-    set_direction(or2dir(ort));
-  }
-
-  inline int num_no_dir_change() const noexcept {
-    return this->game_state().round_count() - _last_dir_change;
-  }
-
-  inline void switch_mode(ant::mode m) noexcept {
-    if (_mode != ant::mode::dead &&
-        (_num_carrying == 0 || m != ant::mode::fighting)) {
-      _mode = m;
-    }
   }
 
  private:
