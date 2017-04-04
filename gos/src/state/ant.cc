@@ -8,6 +8,8 @@
 #include <gos/state/population.h>
 
 #include <gos/types.h>
+#include <gos/default_rules.h>
+
 #include <gos/util/random.h>
 
 #include <iostream>
@@ -58,39 +60,16 @@ void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
 }
 
 void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
-  _state.event = ant_state::ant_event::food;
-  // Client code
-  if (mode() == ant_state::ant_mode::harvesting) {
-    return;
-  }
-  if (strength() < max_strength()) {
-    switch_mode(ant_state::ant_mode::eating);
-  } else {
-    switch_mode(ant_state::ant_mode::harvesting);
-  }
+  _state.events.food = true;
 }
 
 void ant::on_enemy(
   gos::state::ant & enemy) noexcept {
-  _state.event = ant_state::ant_event::enemy;
-  // Client code
-  if (strength() > 3) {
-    attack(enemy);
-  } else {
-    // too weak, run away
-    turn(4);
-    if (mode() == ant_state::ant_mode::fighting) {
-      switch_mode(ant_state::ant_mode::scouting);
-    }
-  }
-  if (mode() == ant_state::ant_mode::fighting && !enemy.is_alive()) {
-    switch_mode(ant_state::ant_mode::scouting);
-  }
+  _state.events.enemy = true;
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {
-  _state.event = ant_state::ant_event::attacked;
-  // Client code
+  _state.events.attacked = true;
   GOS__LOG_DEBUG("ant.on_attacked", "enemy: " <<
                  "t:"  << enemy.team_id() << " " <<
                  "id:" << enemy.id());
@@ -98,10 +77,7 @@ void ant::on_attacked(gos::state::ant & enemy) noexcept {
 }
 
 void ant::on_collision() noexcept {
-  _state.event = ant_state::ant_event::collision;
-  // Client code
-  if (rand() % 6 <= 2) { turn(-1); }
-  else                { turn(1);  }
+  _state.events.collision = true;
 }
 
 
@@ -129,39 +105,23 @@ void ant::die() noexcept {
 
 void ant::update_position() noexcept {
   if (!is_alive()) { return; }
-  auto rc       = this->game_state().round_count();
-  _state.rand   = gos::random();
-  _state.damage = 0;
+  // Apply position changes from last round:
+  _state.tick_count = this->game_state().round_count();
+  _state.rand       = gos::random();
+  _state.damage     = 0;
   ++_state.nticks_not_fed;
-  switch (_state.mode) {
-    case ant_state::ant_mode::eating:
-      eat();
-      break;
-    case ant_state::ant_mode::harvesting:
-      harvest();
-      break;
-    case ant_state::ant_mode::tracing:
-      trace_back();
-      move();
-      break;
-    case ant_state::ant_mode::scouting:
-      if (num_no_dir_change() > 4) {
-        turn(((_state.rand + rc * 7) % 3) - 1);
-      }
-      move();
-      break;
-    default:
-      break;
-  }
   if (_state.strength > max_strength() / 2 &&
       ((_state.nticks_not_fed + 1) % 100) == 0) {
     --_state.strength;
   }
+  if (_state.action == ant_state::ant_action::do_move) {
+    move();
+  }
 }
 
 void ant::update_action() noexcept {
-  if (!is_alive())       { return; }
-  // Cannot attack while carrying:
+  if (!is_alive()) { return; }
+  // Apply actions from current round:
   gos::state::ant_id enemy_id  { -1, -1 };
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
     for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
@@ -181,13 +141,13 @@ void ant::update_action() noexcept {
     }
   }
   // No enemy in range
-  if (_state.mode == ant_state::ant_mode::fighting) {
-    switch_mode(ant_state::ant_mode::scouting);
-  }
+  _state.events.enemy = false;
+  _state.enemy_dir    = { 0, 0 };
 }
 
 void ant::update_reaction() noexcept {
   if (!is_alive()) { return; }
+  // Apply results of actions from current round:
   if (strength() <= damage()) {
     if (strength() > 1) {
       --_state.strength;
@@ -219,9 +179,6 @@ void ant::eat() noexcept {
                                        strength() + consumed);
     }
   }
-  if (consumed == 0 || strength() >= max_strength() / 2) {
-    switch_mode(ant_state::ant_mode::scouting);
-  }
 }
 
 void ant::harvest() noexcept {
@@ -239,9 +196,6 @@ void ant::harvest() noexcept {
     if (consumed > 0) {
       _state.num_carrying += consumed;
     }
-  }
-  if (consumed == 0 || num_carrying() >= strength() - 1) {
-    switch_mode(ant_state::ant_mode::tracing);
   }
 }
 

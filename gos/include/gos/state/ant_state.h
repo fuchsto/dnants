@@ -25,14 +25,6 @@ struct ant_state {
     dead            // ant has died
   };
 
-  enum ant_event : int {
-    none       = 0,
-    food,
-    enemy,
-    collision,
-    attacked
-  };
-
   enum ant_action : int {
     do_idle    = 0,
     do_move,
@@ -44,11 +36,18 @@ struct ant_state {
     do_turn
   };
 
+  struct state_events {
+    bool collision = false;
+    bool attacked  = false;
+    bool food      = false;
+    bool enemy     = false;
+  };
+
   // Read-only:
   int          id;
   int          team_id;
   position     pos;
-  direction    dir;
+  direction    dir             { 0, 0 };
   size_t       rand            = 0;
   size_t       last_dir_change = 0;
   int          strength        = 0;
@@ -56,7 +55,8 @@ struct ant_state {
   int          num_carrying    = 0;
   int          nticks_not_fed  = 0;
   int          tick_count      = 0;
-  ant_event    event           = ant_event::none;
+  state_events events;
+  direction    enemy_dir       { 0, 0 };
   ant_action   action          = ant_action::do_idle;
   ant_mode     mode            = ant_mode::scouting;
 
@@ -89,6 +89,7 @@ struct ant_state {
   inline void move()       noexcept {
                              action = ant_action::do_move; }
   inline void attack()     noexcept {
+                             if (num_carrying > 0) { return; }
                              action = ant_action::do_attack; }
   inline void eat()        noexcept {
                              action = ant_action::do_eat; }

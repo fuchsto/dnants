@@ -90,7 +90,7 @@ class ant {
     _state.pos      = pos;
     _state.strength = 5;
     set_dir({ (( id + 7) % 3) - 1,
-                    (( id + 5) % 3) - 1 });
+              (( id + 5) % 3) - 1 });
   }
 
   ant(const ant & other) = delete;
@@ -105,6 +105,10 @@ class ant {
   }
 
  public:
+  const ant_state & state() const noexcept {
+    return _state;
+  }
+
   void on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept;
   void on_food_cell(gos::state::resource_cell_state & food_cell) noexcept;
   void on_enemy(gos::state::ant & enemy)    noexcept;
@@ -139,10 +143,6 @@ class ant {
 
   inline gos::orientation orientation() const noexcept {
     return gos::dir2or(_state.dir);
-  }
-
-  inline const ant_state::ant_event evt() const noexcept {
-    return _state.event;
   }
 
   inline int id() const noexcept {

@@ -24,14 +24,19 @@ PYBIND11_PLUGIN(pygos)
 
     // Read-only --------------------------------------------------------
     //
+    // Attributes
     .def_readonly("id",           &ant_state::id)
     .def_readonly("team_id",      &ant_state::team_id)
     .def_readonly("mode",         &ant_state::mode)
     .def_readonly("strength",     &ant_state::strength)
     .def_readonly("num_carrying", &ant_state::num_carrying)
     .def_readonly("damage",       &ant_state::damage)
-    .def_readonly("event",        &ant_state::event)
     .def_readonly("dir",          &ant_state::dir)
+    // Events
+    .def_readonly("collision",    &ant_state::collision)
+    .def_readonly("attacked",     &ant_state::attacked)
+    .def_readonly("enemy",        &ant_state::enemy)
+    .def_readonly("food",         &ant_state::food)
 
     // Modifiers --------------------------------------------------------
     //
@@ -54,10 +59,6 @@ PYBIND11_PLUGIN(pygos)
            (void                 (ant_state::*)(void))
                                  &ant_state::move,
            "move action")
-    .def("attack",
-           (void                 (ant_state::*)(void))
-                                 &ant_state::attack,
-           "attack action")
     .def("attack",
            (void                 (ant_state::*)(void))
                                  &ant_state::attack,
@@ -89,14 +90,6 @@ PYBIND11_PLUGIN(pygos)
     .value("eating",       gos::state::ant_state::ant_mode::eating)
     .value("harvesting",   gos::state::ant_state::ant_mode::harvesting)
     .value("dead",         gos::state::ant_state::ant_mode::dead)
-    ;
-
-  py::enum_<gos::state::ant_state::ant_event>(ant_state_py, "ant_event")
-    .value("none",         gos::state::ant_state::ant_event::none)
-    .value("food",         gos::state::ant_state::ant_event::food)
-    .value("enemy",        gos::state::ant_state::ant_event::enemy)
-    .value("collision",    gos::state::ant_state::ant_event::collision)
-    .value("attacked",     gos::state::ant_state::ant_event::attacked)
     ;
 
   py::enum_<gos::state::ant_state::ant_action>(ant_state_py, "ant_action")
