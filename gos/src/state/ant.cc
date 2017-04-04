@@ -20,7 +20,7 @@ namespace gos {
 namespace state {
 
 void ant_team::update() {
-  if (_game_state->round_count() % 20 == 0) {
+  if (_game_state->round_count() % 20 == 1) {
     spawn_ants();
   }
 }
@@ -123,18 +123,32 @@ void ant::update_position() noexcept {
   if (_state.action == ant_state::ant_action::do_move) {
     // Updates position and triggers grid cell events:
     move();
+  } else if (_state.action == ant_state::ant_action::do_backtrace) {
+    trace_back();
+    move();
   }
-  else if (_state.action == ant_state::ant_action::do_eat) {
-    eat();
-  }
-  else if (_state.action == ant_state::ant_action::do_harvest) {
-    harvest();
+
+  const auto & current_cell = cell();
+  if (current_cell.type() == cell_type::plain ||
+      current_cell.type() == cell_type::food) {
+    const resource_cell_state * current_cell_state =
+      reinterpret_cast<const resource_cell_state *>(current_cell.state());
+    if (current_cell_state->amount_left() > 0) {
+      _state.events.food = true;
+    }
   }
 }
 
 void ant::update_action() noexcept {
   if (!is_alive()) { return; }
   // Apply actions from current round:
+  if (_state.action == ant_state::ant_action::do_eat) {
+    eat();
+  }
+  else if (_state.action == ant_state::ant_action::do_harvest) {
+    harvest();
+  }
+  // Scan for enemies:
   gos::state::ant_id enemy_id  { -1, -1 };
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
     for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {

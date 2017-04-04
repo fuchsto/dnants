@@ -43,20 +43,48 @@ gos::state::ant_state update_ant(
       if (current.events.enemy) {
         next.set_dir(current.enemy_dir);
         next.attack();
-      } else {
+      } else if (current.events.food) {
         if (current.strength >= 7) {
           next.harvest();
           next.set_mode(ant_state::ant_mode::harvesting);
         } else {
           next.eat();
         }
+      } else {
+        if (current.num_carrying > 0) {
+          next.set_mode(ant_state::ant_mode::tracing);
+          next.backtrace();
+        } else {
+          next.set_mode(ant_state::ant_mode::scouting);
+          next.move();
+        }
       }
       break;
     case ant_state::ant_mode::harvesting:
-      next.harvest();
+      if (current.events.food) {
+        if (current.num_carrying < current.strength) {
+          next.harvest();
+        } else {
+          next.set_mode(ant_state::ant_mode::tracing);
+          next.backtrace();
+        }
+      } else {
+        if (current.num_carrying > 0) {
+          next.set_mode(ant_state::ant_mode::tracing);
+          next.backtrace();
+        } else {
+          next.set_mode(ant_state::ant_mode::scouting);
+          next.move();
+        }
+      }
       break;
     case ant_state::ant_mode::tracing:
-      next.backtrace();
+      if (current.num_carrying > 0) {
+        next.backtrace();
+      } else {
+        next.set_mode(ant_state::ant_mode::scouting);
+        next.move();
+      }
       break;
     default:
       break;
