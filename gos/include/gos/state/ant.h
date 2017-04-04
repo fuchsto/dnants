@@ -70,10 +70,6 @@ class ant_team {
 
 
 class ant {
-  using gos::state::ant_state;
-
-  // Ants can detect pheromone traces and distinguish friendly (own team)
-  // from enemy pheromones.
  private:
   ant_team   * _team  = nullptr;
   ant_state    _state;
@@ -90,9 +86,10 @@ class ant {
   : _team(&team)
   {
     _state.id       = id;
+    _state.team_id  = team.id();
     _state.pos      = pos;
     _state.strength = 5;
-    set_direction({ (( id + 7) % 3) - 1,
+    set_dir({ (( id + 7) % 3) - 1,
                     (( id + 5) % 3) - 1 });
   }
 
@@ -144,7 +141,7 @@ class ant {
     return gos::dir2or(_state.dir);
   }
 
-  inline const ant_stat::ant_event evt() const noexcept {
+  inline const ant_state::ant_event evt() const noexcept {
     return _state.event;
   }
 
@@ -160,7 +157,7 @@ class ant {
 
   gos::state::cell & cell() noexcept;
 
-  inline ant_stat::ant_mode mode() const noexcept {
+  inline ant_state::ant_mode mode() const noexcept {
     return _state.mode;
   }
 
@@ -176,14 +173,14 @@ class ant {
     return _state.damage;
   }
 
-  inline void set_direction(direction && d) noexcept {
+  inline void set_dir(direction && d) noexcept {
     if (_state.dir == d) { return; }
     _state.last_dir_change = game_state().round_count();
     _state.dir = std::move(d);
   }
 
-  inline void set_direction(const direction & d) noexcept {
-    if (_dir == d) { return; }
+  inline void set_dir(const direction & d) noexcept {
+    if (dir() == d) { return; }
     _state.last_dir_change = game_state().round_count();
     _state.dir = d;
   }
@@ -195,7 +192,7 @@ class ant {
     if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
     if (ort_idx > 7) { ort_idx -= ort_idx;     }
     auto ort = int2or(ort_idx);
-    set_direction(or2dir(ort));
+    set_dir(or2dir(ort));
   }
 
   inline int num_no_dir_change() const noexcept {

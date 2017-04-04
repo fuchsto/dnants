@@ -25,7 +25,7 @@ void cell_state::on_exit(
   _taken = false;
   if (a.is_alive()) {
     add_trace(
-      a.team().id(),
+      a.team_id(),
       dir2or(a.dir()),
       gs.round_count() - 1);
   }

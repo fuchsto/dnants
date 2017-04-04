@@ -254,7 +254,7 @@ class app_play_state : public app_state {
                            ant.max_strength()) / 25
                         ) + 1;
 
-    const rgba & col = _team_colors[ant.team().id()];
+    const rgba & col = _team_colors[ant.team_id()];
 
     int size   = 16;
     int cell_x = ant.pos().x;

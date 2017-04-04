@@ -286,7 +286,7 @@ void ant::trace_back() noexcept {
   if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
     // trace found:
     if (num_no_dir_change() > 1) {
-      set_direction(sec_max_backtrace_dir);
+      set_dir(sec_max_backtrace_dir);
     }
   } else {
     // no trace found, just turn around:
@@ -304,10 +304,10 @@ void ant::move() noexcept {
     return;
   }
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
-  this->game_state().grid_state()[_state.pos]
-                    .leave(*this, this->game_state());
-  this->game_state().grid_state()[pos_next]
-                    .cell::enter(*this, this->game_state());
+    this->game_state().grid_state()[_state.pos]
+                      .leave(*this, this->game_state());
+    this->game_state().grid_state()[pos_next]
+                      .cell::enter(*this, this->game_state());
     set_pos(pos_next);
   } else {
     on_collision();

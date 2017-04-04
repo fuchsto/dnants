@@ -34,7 +34,7 @@ struct ant_state {
   };
 
   enum ant_action : int {
-    idle       = 0,
+    do_idle    = 0,
     do_move,
     do_backtrace,
     do_eat,
@@ -46,34 +46,58 @@ struct ant_state {
 
   // Read-only:
   int          id;
+  int          team_id;
   position     pos;
+  direction    dir;
   size_t       rand            = 0;
   size_t       last_dir_change = 0;
   int          strength        = 0;
   int          damage          = 0;
   int          num_carrying    = 0;
   int          nticks_not_fed  = 0;
+  int          tick_count      = 0;
   ant_event    event           = ant_event::none;
-  ant_action   action          = ant_action::idle;
-
-  // Read-write:
-  direction    dir;
+  ant_action   action          = ant_action::do_idle;
   ant_mode     mode            = ant_mode::scouting;
 
-  // actions:
-  inline void attack(direction d) noexcept {
-                                    dir    = d;
-                                    action = ant_action::do_attack; }
-  inline void eat()               noexcept {
-                                    action = ant_action::do_eat; }
-  inline void harvest()           noexcept {
-                                    action = ant_action::do_harvest; }
-  inline void drop()              noexcept {
-                                    action = ant_action::do_drop; }
-  inline void trace_back()        noexcept {
-                                    action = ant_action::do_backtrace; }
-  inline void move()              noexcept {
-                                    action = ant_action::do_move; }
+  // Commands:
+  inline void set_mode(ant_mode m) noexcept {
+    if (mode != ant_mode::dead &&
+        // fighting while carrying is not allowed:
+        (num_carrying == 0 || m != ant_mode::fighting)) {
+      mode = m;
+    }
+  }
+
+  inline void set_dir(direction d) noexcept {
+    if (dir == d) { return; }
+    last_dir_change = tick_count;
+    dir             = d;
+  }
+
+  inline void set_turn(int turn_dir) noexcept {
+    // for example, turn_dir +4 or -4 is reverse direction:
+    int ort_idx = or2int(orientation());
+    ort_idx += turn_dir;
+    if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }
+    if (ort_idx > 7) { ort_idx -= ort_idx;     }
+    auto ort = int2or(ort_idx);
+    set_dir(or2dir(ort));
+  }
+
+  // Actions:
+  inline void move()       noexcept {
+                             action = ant_action::do_move; }
+  inline void attack()     noexcept {
+                             action = ant_action::do_attack; }
+  inline void eat()        noexcept {
+                             action = ant_action::do_eat; }
+  inline void harvest()    noexcept {
+                             action = ant_action::do_harvest; }
+  inline void drop()       noexcept {
+                             action = ant_action::do_drop; }
+  inline void backtrace()  noexcept {
+                             action = ant_action::do_backtrace; }
 };
 
 } // namespace state
