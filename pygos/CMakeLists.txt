@@ -6,7 +6,10 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 find_package(Pybind11 REQUIRED)
 find_package(Python   REQUIRED)
 
-# add_subdirectory(project_dnants_libgos)
+set(CMAKE_CXX_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG}   ${PYTHON_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} ${PYTHON_FLAGS}")
 
 # -- Target --------------------------------------------
 
@@ -48,17 +51,23 @@ target_link_libraries(
   ${PYTHON_LIBRARY}
 )
 
+# Target filename is 'pygos.so', not 'libpygos.so'
+SET_TARGET_PROPERTIES(
+  ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
+  PREFIX ""
+)
+
 set_target_properties(
-  ${exampletarget} PROPERTIES
+  ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
   COMPILE_FLAGS
   "${VARIANT_ADDITIONAL_COMPILE_FLAGS} -Wno-unused"
 )
 set_target_properties(
-  ${exampletarget} PROPERTIES
+  ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
   CXX_STANDARD 11
 )
 set_target_properties(
-  ${exampletarget} PROPERTIES
+  ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
   CXX_STANDARD_REQUIRED 11
 )
 

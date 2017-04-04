@@ -15,9 +15,9 @@ using namespace gos::state;
 
 
 
-PYBIND11_PLUGIN(gos_client)
+PYBIND11_PLUGIN(pygos)
 {
-  py::module m("gos_client", "GOS client");
+  py::module m("pygos", "GOS client");
 
   py::class_<gos::state::ant> ant_py(m, "ant");
   ant_py

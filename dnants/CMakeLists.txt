@@ -78,10 +78,9 @@ set_target_properties(
 
 install(
   TARGETS ${DNANTS_MAIN_TARGET_NAME}
-  DESTINATION bin/)
-
+  DESTINATION bin)
 
 install(
-  FILES ${DNANTS_MAIN_RESOURCES}
-  DESTINATION bin/)
+  DIRECTORY res/
+  DESTINATION bin)
 
