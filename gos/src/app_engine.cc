@@ -11,10 +11,10 @@
 namespace gos {
 
 app_engine::app_engine(
-  std::string  title,
-  app_settings settings,
-  int          max_width,
-  int          max_height)
+  std::string          title,
+  const app_settings & settings,
+  int                  max_width,
+  int                  max_height)
 : _settings(settings)
 , _window(
     *this, title,

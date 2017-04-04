@@ -1,6 +1,7 @@
 #ifndef GOS__APP_ENGINE_H__INCLUDED
 #define GOS__APP_ENGINE_H__INCLUDED
 
+#include <gos/types.h>
 #include <gos/view/window.h>
 
 #include <vector>
@@ -21,36 +22,24 @@ class app_engine
   uint32_t                   _last_frame_time = 0;
   uint32_t                   _delta_time      = 0;
 
- public:
-  struct app_settings {
-    extents grid_extents;
-    int     frames_per_sec;
-    int     rounds_per_sec;
-    int     trace_rounds;
-    int     init_team_size;
-    int     num_teams;
-    bool    show_grid;
-    bool    show_traces;
-  };
-
  private:
-  app_settings _settings {
-                  { 30, 30 }, // grid extents
-                  30,         // fps
-                  5,          // rps
-                  30,         // trace rounds
-                  50,         // initial team size
-                  2,          // number of teams
-                  true,       // show grid
-                  true        // show traces
-               };
+  gos::app_settings _settings {
+                       { 30, 30 }, // grid extents
+                       30,         // fps
+                       5,          // rps
+                       30,         // trace rounds
+                       50,         // initial team size
+                       2,          // number of teams
+                       true,       // show grid
+                       true        // show traces
+                    };
 
  public:
   app_engine(
-    std::string  title,
-    app_settings settings,
-    int          width,
-    int          height);
+    std::string               title,
+    const gos::app_settings & settings,
+    int                       width,
+    int                       height);
 
   ~app_engine();
 

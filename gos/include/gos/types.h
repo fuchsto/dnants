@@ -69,6 +69,18 @@ struct rgba {
   unsigned char a;
 };
 
+struct app_settings {
+  extents grid_extents;
+  int     frames_per_sec;
+  int     rounds_per_sec;
+  int     trace_rounds;
+  int     init_team_size;
+  int     num_teams;
+  bool    show_grid;
+  bool    show_traces;
+};
+
+
 static orientation int2or(
   int o_idx)
 {

@@ -9,19 +9,19 @@ namespace gos {
 namespace state {
 
 game_state::game_state(
-  app_engine * app)
-: _app(app)
-, _nteams(app->settings().num_teams)
+  const app_settings & app_settings)
+: _app_settings(app_settings)
+, _nteams(_app_settings.num_teams)
 {
   GOS__LOG_DEBUG("game_state", "game_state()");
-  _grid_extents  = app->settings().grid_extents;
+  _grid_extents = _app_settings.grid_extents;
 
   GOS__LOG_DEBUG("game_state", "map_gen ...");
   map_generator map_gen(*this, _grid_extents);
   map_gen.set_num_grass_regions(8)
          .set_num_food_regions(_nteams * 2)
          .set_num_barriers(3)
-         .set_team_size(app->settings().init_team_size)
+         .set_team_size(_app_settings.init_team_size)
          .set_num_teams(_nteams);
 
   auto map = map_gen.generate();
