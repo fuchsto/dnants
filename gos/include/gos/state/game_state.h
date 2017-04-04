@@ -1,9 +1,10 @@
 #ifndef GOS__STATE__GAME_STATE_H__INCLUDED
 #define GOS__STATE__GAME_STATE_H__INCLUDED
 
-#include <gos/app_engine.h>
-#include <gos/types.h>
+// #include <gos/state/grid.h>
+// #include <gos/state/population.h>
 
+#include <gos/types.h>
 
 
 namespace gos {

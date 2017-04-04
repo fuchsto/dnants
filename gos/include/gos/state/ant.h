@@ -1,8 +1,10 @@
 #ifndef GOS__STATE__ANT_H__INCLUDED
 #define GOS__STATE__ANT_H__INCLUDED
 
-#include <gos/types.h>
 #include <gos/state/game_state.h>
+
+#include <gos/types.h>
+
 #include <gos/util/timestamp.h>
 
 #include <vector>

@@ -1,6 +1,6 @@
 project(project_dnants)
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.11)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeExt)
 
@@ -40,7 +40,7 @@ set(CMAKE_COLOR_MAKEFILE   ON)
 if (INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
 else()
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/opt/")
+  set(CMAKE_INSTALL_PREFIX "./install/")
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -51,8 +51,14 @@ endif()
 include(${CMAKE_SOURCE_DIR}/CMakeExt/CompilerFlags.cmake)
 
 ## Build results output directories:
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Base library
 add_subdirectory(gos)
+
+# Python binding shared library
 add_subdirectory(pygos)
+
+# Main application executable
+add_subdirectory(dnants)
 

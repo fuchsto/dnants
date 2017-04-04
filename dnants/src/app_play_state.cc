@@ -4,7 +4,6 @@
 
 #include <gos/state/cell.h>
 #include <gos/state/game_state.h>
-
 #include <gos/util/logging.h>
 
 #include <cmath>
@@ -22,7 +21,7 @@ void app_play_state::initialize(app_engine * app) {
   _app           = app;
   _grid_extents  = app->settings().grid_extents;
   _grid_spacing  = app->win().view_extents().w / _grid_extents.w;
-  _game_state    = new gos::state::game_state(_app);
+  _game_state    = new gos::state::game_state(_app->settings());
 
   _sprites[(int)sprite_tag::rock]    = SDL_LoadBMP("rock_16.bmp");
   _sprites[(int)sprite_tag::sugah_1] = SDL_LoadBMP("sugah-1_16.bmp");

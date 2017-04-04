@@ -3,11 +3,15 @@
 
 #include <SDL.h>
 
-#include <gos/state/game_state.h>
-#include <gos/state/ant.h>
-#include <gos/types.h>
-
 #include <gos/app_state.h>
+
+#include <gos/state/ant.h>
+#include <gos/state/cell.h>
+#include <gos/state/grid.h>
+#include <gos/state/population.h>
+#include <gos/state/game_state.h>
+
+#include <gos/types.h>
 
 
 namespace gos {

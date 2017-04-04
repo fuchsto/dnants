@@ -2,8 +2,6 @@
 #include <gos/client.h>
 #include <gos/state/client_state.h>
 
-#include <pybind11/pybind11.h>
-
 #include <ctime>
 #include <iostream>
 #include <string>

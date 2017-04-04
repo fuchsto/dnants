@@ -2,8 +2,15 @@ project(project_dnants_pygos CXX)
 
 include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
+# -- Dependencies --------------------------------------
 find_package(Pybind11 REQUIRED)
 find_package(Python   REQUIRED)
+
+# add_subdirectory(project_dnants_libgos)
+
+# -- Target --------------------------------------------
+
+set(DNANTS_PYGOS_TARGET_NAME pygos)
 
 
 file(GLOB_RECURSE DNANTS_PYGOS_SOURCES
@@ -14,8 +21,6 @@ file(GLOB_RECURSE DNANTS_PYGOS_HEADERS
 set(DNANTS_GOS_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/gos/include)
 
-
-set(DNANTS_PYGOS_TARGET_NAME pygos)
 
 set(DNANTS_PYGOS_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -39,8 +44,7 @@ add_library(
 
 target_link_libraries(
   ${DNANTS_PYGOS_TARGET_NAME}
-  ${GOS_LIBRARY}
-  ${SDL2_LIBRARY}
+  gos
   ${PYTHON_LIBRARY}
 )
 
@@ -61,3 +65,7 @@ set_target_properties(
 install(
   TARGETS ${DNANTS_PYGOS_TARGET_NAME}
   DESTINATION lib/)
+install(
+  DIRECTORY include/
+  DESTINATION include)
+

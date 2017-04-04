@@ -3,8 +3,6 @@
 
 #include <gos/state/client_state.h>
 
-#include <pybind11/pybind11.h>
-
 
 namespace gos {
 

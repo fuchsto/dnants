@@ -1,8 +1,9 @@
 #ifndef GOS__APP_ENGINE_H__INCLUDED
 #define GOS__APP_ENGINE_H__INCLUDED
 
-#include <gos/types.h>
 #include <gos/view/window.h>
+
+#include <gos/types.h>
 
 #include <vector>
 #include <string>

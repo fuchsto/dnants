@@ -9,11 +9,11 @@ rm -Rf $BUILD_DIR/*
 
 (cd $BUILD_DIR && \
   cmake -DCMAKE_BUILD_TYPE=Debug \
-        -DINSTALL_PREFIX=$HOME/opt/gos/ \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR/install/ \
         \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   .. && \
   make VERBOSE=1) \
   && (cp $BUILD_DIR/compile_commands.json .) \
-  && (cp ./res/*.bmp $BUILD_DIR/)
+  && (cp ./dnants/res/*.bmp $BUILD_DIR/)
 

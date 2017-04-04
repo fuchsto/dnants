@@ -1,4 +1,6 @@
 
+#include <pygos/py_plugin.h>
+
 #include <gos/state/ant.h>
 #include <gos/state/client_state.h>
 

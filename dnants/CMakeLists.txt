@@ -2,10 +2,10 @@ project(project_dnants_main CXX)
 
 include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
+# -- Dependencies --------------------------------------
+find_package(SDL2 REQUIRED)
 
-set(DNANTS_MAIN_TARGET_NAME dnants)
-
-find_package(SDL2     REQUIRED)
+# add_subdirectory(project_dnants_libgos)
 
 # set(Boost_USE_STATIC_LIBS    ON)
 # set(Boost_USE_MULTITHREADED  ON)
@@ -13,25 +13,37 @@ find_package(SDL2     REQUIRED)
 #
 # find_package(Boost 1.58.0 REQUIRED
 #              COMPONENTS filesystem regex)
+#
+# message(STATUS "Boost include directories: "
+#         ${Boost_INCLUDE_DIRS})
+# message(STATUS "Boost libraries: "
+#         ${Boost_LIBRARIES})
+
+# -- Target --------------------------------------------
+
+set(DNANTS_MAIN_TARGET_NAME dnants)
+
 
 
 file(GLOB_RECURSE DNANTS_MAIN_SOURCES
      "src/*.c" "src/*.h" "src/*.cc" "src/*.cpp" )
 file(GLOB_RECURSE DNANTS_MAIN_HEADERS
      "include/*.h")
+file(GLOB_RECURSE DNANTS_MAIN_RESOURCES
+     "res/*.")
+
+set(DNANTS_GOS_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/gos/include)
+
 
 set(DNANTS_MAIN_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(DNANTS_MAIN_SOURCE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# message(STATUS "Boost include directories: "
-#         ${Boost_INCLUDE_DIRS})
-# message(STATUS "Boost libraries: "
-#         ${Boost_LIBRARIES})
-
 include_directories(
   ${DNANTS_MAIN_INCLUDE_DIRS}
+  ${DNANTS_GOS_INCLUDE_DIRS}
   ${DNANTS_LIBGOS_INCLUDE_DIRS}
   ${SDL2_INCLUDE_DIR}
 # ${Boost_INCLUDE_DIRS}
@@ -45,7 +57,7 @@ add_executable(
 
 target_link_libraries(
   ${DNANTS_MAIN_TARGET_NAME}
-  ${LIBGOS_LIBRARY}
+  gos
   ${SDL2_LIBRARY}
 # ${Boost_LIBRARIES}
 )
@@ -67,3 +79,9 @@ set_target_properties(
 install(
   TARGETS ${DNANTS_MAIN_TARGET_NAME}
   DESTINATION bin/)
+
+
+install(
+  FILES ${DNANTS_MAIN_RESOURCES}
+  DESTINATION bin/)
+

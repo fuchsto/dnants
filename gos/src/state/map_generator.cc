@@ -1,5 +1,6 @@
 
 #include <gos/state/map_generator.h>
+#include <gos/state/population.h>
 #include <gos/state/game_state.h>
 #include <gos/state/cell.h>
 #include <gos/types.h>

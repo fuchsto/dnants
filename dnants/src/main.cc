@@ -2,6 +2,8 @@
 #include <gos/app_engine.h>
 #include <gos/app_play_state.h>
 
+#include <gos/types.h>
+
 #include <cstdlib>
 #include <getopt.h>
 
@@ -10,7 +12,7 @@ using gos::app_engine;
 using gos::app_play_state;
 using gos::view::window;
 
-gos::app_engine::app_settings process_args(int argc, char** argv);
+gos::app_settings process_args(int argc, char** argv);
 
 int main(int argc, char * argv[])
 {
@@ -32,9 +34,9 @@ int main(int argc, char * argv[])
   return EXIT_SUCCESS;
 }
 
-gos::app_engine::app_settings process_args(int argc, char** argv)
+gos::app_settings process_args(int argc, char** argv)
 {
-  gos::app_engine::app_settings app_opts;
+  gos::app_settings app_opts;
 
   app_opts.grid_extents   = { 30, 30 };
   app_opts.rounds_per_sec =  3;
