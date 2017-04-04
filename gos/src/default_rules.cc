@@ -22,11 +22,11 @@ gos::state::ant_state update_ant(
   switch (current.mode) {
     case ant_state::ant_mode::scouting:
       if (current.events.collision) {
-        if (next.rand() % 6 <= 2) { next.set_turn(-1); }
-        else                      { next.set_turn(1);  }
-      } else if (current.num_no_dir_change() > 4) {
+        if (next.rand % 6 <= 2) { next.set_turn(-1); }
+        else                    { next.set_turn(1);  }
+      } else if (current.tick_count - current.last_dir_change > 4) {
         next.set_turn(
-          ((next.rand() + next.round_count() * 7) % 3) - 1);
+          ((next.rand + next.tick_count * 7) % 3) - 1);
       }
       next.move();
       break;

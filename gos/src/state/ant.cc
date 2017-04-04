@@ -105,7 +105,7 @@ void ant::die() noexcept {
 
 void ant::update_position() noexcept {
   if (!is_alive()) { return; }
-  // Apply position changes from last round:
+  // Apply cell change from last round:
   _state.tick_count = this->game_state().round_count();
   _state.rand       = gos::random();
   _state.damage     = 0;
@@ -115,6 +115,7 @@ void ant::update_position() noexcept {
     --_state.strength;
   }
   if (_state.action == ant_state::ant_action::do_move) {
+    // Updates position and triggers grid cell events:
     move();
   }
 }
@@ -162,6 +163,8 @@ void ant::update_reaction() noexcept {
       _state.num_carrying = 0;
     }
   }
+  // Request next state:
+  _state = gos::update_ant(_state);
 }
 
 void ant::eat() noexcept {

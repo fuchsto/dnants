@@ -18,9 +18,11 @@ PYBIND11_PLUGIN(pygos)
 {
   py::module m("pygos", "GOS client");
 
-  py::class_<gos::state::ant_state> ant_state_py(m, "ant_state");
+  py::class_<ant_state> ant_state_py(m, "ant_state");
   ant_state_py
-  //.def(py::init<gos::state::ant_team &, int, const gos::position &>())
+    // Constructor
+    //
+    .def(py::init<>())
 
     // Read-only --------------------------------------------------------
     //
@@ -33,10 +35,7 @@ PYBIND11_PLUGIN(pygos)
     .def_readonly("damage",       &ant_state::damage)
     .def_readonly("dir",          &ant_state::dir)
     // Events
-    .def_readonly("collision",    &ant_state::collision)
-    .def_readonly("attacked",     &ant_state::attacked)
-    .def_readonly("enemy",        &ant_state::enemy)
-    .def_readonly("food",         &ant_state::food)
+    .def_readonly("events",       &ant_state::events)
 
     // Modifiers --------------------------------------------------------
     //
@@ -81,26 +80,35 @@ PYBIND11_PLUGIN(pygos)
            "backtrace action")
     ;
 
-  py::enum_<gos::state::ant_state::ant_mode>(ant_state_py, "ant_mode")
-    .value("waiting",      gos::state::ant_state::ant_mode::waiting)
-    .value("detour",       gos::state::ant_state::ant_mode::detour)
-    .value("scouting",     gos::state::ant_state::ant_mode::scouting)
-    .value("fighting",     gos::state::ant_state::ant_mode::fighting)
-    .value("tracing",      gos::state::ant_state::ant_mode::tracing)
-    .value("eating",       gos::state::ant_state::ant_mode::eating)
-    .value("harvesting",   gos::state::ant_state::ant_mode::harvesting)
-    .value("dead",         gos::state::ant_state::ant_mode::dead)
+  py::class_<ant_state::state_events>(ant_state_py, "state_events")
+    .def_readonly("collision",   &ant_state::state_events::collision)
+    .def_readonly("attacked",    &ant_state::state_events::attacked)
+    .def_readonly("enemy",       &ant_state::state_events::enemy)
+    .def_readonly("food",        &ant_state::state_events::food)
     ;
 
-  py::enum_<gos::state::ant_state::ant_action>(ant_state_py, "ant_action")
-    .value("do_idle",      gos::state::ant_state::ant_action::do_idle)
-    .value("do_move",      gos::state::ant_state::ant_action::do_move)
-    .value("do_backtrace", gos::state::ant_state::ant_action::do_backtrace)
-    .value("do_eat",       gos::state::ant_state::ant_action::do_eat)
-    .value("do_harvest",   gos::state::ant_state::ant_action::do_harvest)
-    .value("do_drop",      gos::state::ant_state::ant_action::do_drop)
-    .value("do_attack",    gos::state::ant_state::ant_action::do_attack)
-    .value("do_turn",      gos::state::ant_state::ant_action::do_turn)
+  py::enum_<ant_state::ant_mode>(ant_state_py, "ant_mode")
+    .value("waiting",      ant_state::ant_mode::waiting)
+    .value("detour",       ant_state::ant_mode::detour)
+    .value("scouting",     ant_state::ant_mode::scouting)
+    .value("fighting",     ant_state::ant_mode::fighting)
+    .value("tracing",      ant_state::ant_mode::tracing)
+    .value("eating",       ant_state::ant_mode::eating)
+    .value("harvesting",   ant_state::ant_mode::harvesting)
+    .value("dead",         ant_state::ant_mode::dead)
+    .export_values()
+    ;
+
+  py::enum_<ant_state::ant_action>(ant_state_py, "ant_action")
+    .value("do_idle",      ant_state::ant_action::do_idle)
+    .value("do_move",      ant_state::ant_action::do_move)
+    .value("do_backtrace", ant_state::ant_action::do_backtrace)
+    .value("do_eat",       ant_state::ant_action::do_eat)
+    .value("do_harvest",   ant_state::ant_action::do_harvest)
+    .value("do_drop",      ant_state::ant_action::do_drop)
+    .value("do_attack",    ant_state::ant_action::do_attack)
+    .value("do_turn",      ant_state::ant_action::do_turn)
+    .export_values()
     ;
 
   return m.ptr();
