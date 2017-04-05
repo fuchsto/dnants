@@ -11,9 +11,13 @@
 
 namespace gos {
 
+namespace state {
+  class grid;
+}
+
 class client {
-  std::string      _module_file;
-  pybind11::module _module;
+  std::string              _module_file;
+  pybind11::module         _module;
 
  public:
   client()                               = delete;
@@ -25,10 +29,12 @@ class client {
   client(int team_id);
 
   gos::state::ant_state callback(
-    const gos::state::ant_state & current) const;
+    const gos::state::ant_state & current,
+    const gos::state::grid      & grid_state) const;
 
   gos::state::ant_state default_callback(
-    const gos::state::ant_state & current) const;
+    const gos::state::ant_state & current,
+    const gos::state::grid      & grid_state) const;
 };
 
 } // namespace gos

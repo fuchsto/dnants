@@ -82,6 +82,35 @@ class grid {
 
 };
 
+class neighbor_grid {
+  typedef neighbor_grid self_t;
+
+  const grid & _grid;
+  position     _pos;
+  cell_state   _nil_cell;
+
+ public:
+  neighbor_grid()                               = delete;
+  neighbor_grid(const self_t & other)           = default;
+  neighbor_grid(self_t && other)                = default;
+  neighbor_grid & operator=(const self_t & rhs) = default;
+  neighbor_grid & operator=(self_t && rhs)      = default;
+  neighbor_grid(const grid & g, const position & pos)
+  : _grid(g)
+  , _pos(pos)
+  , _nil_cell(cell_type::barrier)
+  { }
+
+  inline const cell_state & state_at(int x, int y) const {
+    position neighbor_pos { _pos.x + std::max(-1, std::min(x, 1)),
+                            _pos.y + std::max(-1, std::min(y, 1)) };
+    return ( _grid.contains_position(neighbor_pos)
+             ? _grid[neighbor_pos].state()
+             : _nil_cell );
+  }
+};
+
+
 } // namespace state
 } // namespace gos
 

@@ -2,6 +2,9 @@
 #include <gos/client.h>
 
 #include <gos/state/ant_state.h>
+#include <gos/state/cell_state.h>
+#include <gos/state/grid.h>
+
 #include <gos/util/logging.h>
 #include <gos/types.h>
 
@@ -94,6 +97,12 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            (void                 (ant_state::*)(void))
                                  &ant_state::backtrace,
            "backtrace action")
+    // Neighbor cell access:
+    //
+  //.def("neighbor",
+  //     [](int dx, dy) -> const cell_state & {
+  //       return          
+  //     })
     ;
 
   py::class_<ant_state::state_events>(ant_state_py, "state_events")
@@ -125,6 +134,51 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .value("do_turn",      ant_action::do_turn)
     .export_values()
     ;
+
+  py::class_<neighbor_grid> neighbor_grid_py(m, "neighbor_grid");
+  neighbor_grid_py
+    .def("at",
+           (const cell_state & (neighbor_grid::*)(int,int))
+                               &neighbor_grid::state_at,
+           "access cell at grid coordinates")
+    ;
+
+  py::class_<cell_state> cell_state_py(m, "cell_state");
+  cell_state_py
+    // Attributes  ------------------------------------------------------
+    //
+    // Read-only
+    .def_readonly("id",              &ant_state::id)
+    //
+    .def("is_taken",
+           (bool                       (cell_state::*)(void))
+                                       &cell_state::is_taken,
+           "whether the cell is occupied by an ant")
+    .def("ant",
+           (ant_id                     (cell_state::*)(void))
+                                       &cell_state::ant,
+           "identifier of ant in cell")
+    .def("team_traces",
+           (const cell_state::traces & (cell_state::*)(int))
+                                       &cell_state::team_traces,
+           "trace directions of specified team")
+    .def("num_food",
+           (int                        (cell_state::*)(void))
+                                       &cell_state::num_food,
+           "amount of food in the cell")
+    .def("take_food",
+           (int                        (cell_state::*)(void))
+                                       &cell_state::take_food,
+           "harvest one food unit from the cell")
+    .def("drop_food",
+           (void                       (cell_state::*)(int))
+                                       &cell_state::drop_food,
+           "drop food in the cell")
+    .def("type",
+           (cell_type                  (cell_state::*)(void))
+                                       &cell_state::type,
+           "type of the cell")
+    ;
 }
 
 namespace gos {
@@ -142,14 +196,16 @@ client::client(int team_id)
 }
 
 gos::state::ant_state client::callback(
-  const gos::state::ant_state & current) const
+  const gos::state::ant_state & current,
+  const gos::state::grid      & grid_state) const
 {
   auto locals = py::dict(
                   "current"_a=current,
+                  "grid_state"_a=neighbor_grid(grid_state, current.pos),
                   **_module.attr("__dict__"));
 
   return py::eval<py::eval_expr>(
-           R"(update_state(current))", py::globals(), locals
+           R"(update_state(current,grid_state))", py::globals(), locals
          ).cast<const gos::state::ant_state &>();
 //py::eval<py::eval_statements>(R"(
 //    next = update_state(current))", py::globals(), locals
@@ -158,7 +214,8 @@ gos::state::ant_state client::callback(
 }
 
 gos::state::ant_state client::default_callback(
-  const gos::state::ant_state & current) const
+  const gos::state::ant_state & current,
+  const gos::state::grid      & grid_state) const
 {
   using gos::state::ant_state;
 

@@ -56,9 +56,6 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/CompilerFlags.cmake)
 # Base library
 add_subdirectory(gos)
 
-# Python binding shared library
-# add_subdirectory(pygos)
-
 # Main application executable
 add_subdirectory(dnants)
 

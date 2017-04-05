@@ -212,7 +212,9 @@ void ant::update_reaction() noexcept {
     }
   }
   // Request next state:
-  _state = this->team().client().callback(_state);
+  _state = this->team().client().callback(
+             _state,
+             this->game_state().grid_state());
 }
 
 void ant::eat() noexcept {
