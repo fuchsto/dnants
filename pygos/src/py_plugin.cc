@@ -4,6 +4,7 @@
 #include <gos/state/ant_state.h>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/embedded.h>
 
 
 
@@ -14,9 +15,16 @@ using namespace gos::state;
 
 
 
-PYBIND11_PLUGIN(pygos)
+// PYBIND11_PLUGIN(pygos)
+PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 {
-  py::module m("pygos", "GOS client");
+  // py::module m("pygos", "GOS client");
+
+  py::class_<direction> direction_py(m, "direction");
+  direction_py
+    .def_readwrite("dx", &direction::dx)
+    .def_readwrite("dy", &direction::dy)
+    ;
 
   py::class_<ant_state> ant_state_py(m, "ant_state");
   ant_state_py
@@ -110,7 +118,7 @@ PYBIND11_PLUGIN(pygos)
     .export_values()
     ;
 
-  return m.ptr();
+  // return m.ptr();
 }
 
 #if 0

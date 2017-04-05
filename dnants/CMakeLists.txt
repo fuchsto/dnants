@@ -3,9 +3,14 @@ project(project_dnants_main CXX)
 include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
 # -- Dependencies --------------------------------------
-find_package(SDL2 REQUIRED)
+find_package(SDL2     REQUIRED)
+find_package(Pybind11 REQUIRED)
+find_package(Python   REQUIRED)
 
-# add_subdirectory(project_dnants_libgos)
+set(CMAKE_CXX_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG}   ${PYTHON_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} ${PYTHON_FLAGS}")
 
 # set(Boost_USE_STATIC_LIBS    ON)
 # set(Boost_USE_MULTITHREADED  ON)
@@ -59,6 +64,7 @@ target_link_libraries(
   ${DNANTS_MAIN_TARGET_NAME}
   gos
   ${SDL2_LIBRARY}
+  ${PYTHON_LIBRARY}
 # ${Boost_LIBRARIES}
 )
 

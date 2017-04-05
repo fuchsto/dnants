@@ -11,6 +11,7 @@
 #include <gos/default_rules.h>
 
 #include <gos/util/random.h>
+#include <gos/util/logging.h>
 
 #include <iostream>
 #include <sstream>
@@ -216,7 +217,7 @@ void ant::update_reaction() noexcept {
     }
   }
   // Request next state:
-  _state = gos::update_ant(_state);
+  _state = gos::py_update_ant(_state);
 }
 
 void ant::eat() noexcept {
