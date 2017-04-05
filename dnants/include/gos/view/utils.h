@@ -7,6 +7,8 @@
 namespace gos {
 namespace view {
 
+#if 0
+
 static Uint32 next_time;
 
 static Uint32 timeLeft(void) {
@@ -21,6 +23,8 @@ cap_framerate(int tick_interval = 20) {
   SDL_Delay(timeLeft());
   next_time += tick_interval;
 }
+
+#endif
 
 } // namespace view
 } // namespace gos

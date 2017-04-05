@@ -23,9 +23,19 @@ file(GLOB_RECURSE DNANTS_LIBGOS_SOURCES
 file(GLOB_RECURSE DNANTS_LIBGOS_HEADERS
      "include/*.h")
 
+# Test
+file(GLOB_RECURSE DNANTS_PYGOS_SOURCES
+     "../pygos/src/*.c" "../pygos/src/*.h" "../pygos/src/*.cc" "../pygos/src/*.cpp" )
+file(GLOB_RECURSE DNANTS_PYGOS_HEADERS
+     "../pygos/include/*.h")
+
+set(DNANTS_PYGOS_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/pygos/include)
+
+
 add_library(
   ${DNANTS_LIBGOS_TARGET_NAME}
-  SHARED
+# SHARED
   ${DNANTS_LIBGOS_HEADERS}
   ${DNANTS_LIBGOS_SOURCES}
 )

@@ -13,6 +13,6 @@ rm -Rf $BUILD_DIR/*
         \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   .. && \
-  make VERBOSE=1 install) \
+  make install) \
   && (cp $BUILD_DIR/compile_commands.json .)
 

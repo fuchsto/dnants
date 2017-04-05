@@ -3,19 +3,32 @@
 #include <gos/app_play_state.h>
 
 #include <gos/types.h>
+#include <gos/state/ant_state.h>
+#include <gos/util/logging.h>
 
 #include <cstdlib>
 #include <getopt.h>
+
+#include <pybind11/embedded.h>
+
 
 
 using gos::app_engine;
 using gos::app_play_state;
 using gos::view::window;
 
+using namespace gos;
+using namespace gos::state;
+
+namespace py = pybind11;
+
+
 gos::app_settings process_args(int argc, char** argv);
 
 int main(int argc, char * argv[])
 {
+  py::scoped_interpreter guard { };
+
   auto app_options = process_args(argc, argv);
 
   app_engine app(

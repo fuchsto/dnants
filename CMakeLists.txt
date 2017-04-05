@@ -33,7 +33,7 @@ option(ENABLE_LOGGING
        "Specify whether logging should be enabled" off)
 
 set(CMAKE_RULE_MESSAGES    ON)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
 ## Install path
@@ -57,7 +57,7 @@ include(${CMAKE_SOURCE_DIR}/CMakeExt/CompilerFlags.cmake)
 add_subdirectory(gos)
 
 # Python binding shared library
-add_subdirectory(pygos)
+# add_subdirectory(pygos)
 
 # Main application executable
 add_subdirectory(dnants)

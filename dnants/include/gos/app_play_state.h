@@ -241,14 +241,6 @@ class app_play_state : public app_state {
     if (!ant.is_alive()) {
       return;
     }
-    int ant_size = 
-      std::max<int>(
-        std::min<int>(
-          ((ant.strength() * _grid_spacing) /
-           gos::state::ant::max_strength()),
-          _grid_spacing)
-          - 2,
-        _grid_spacing / 5);
 
     int strength_qurt = (((ant.strength() * 100) /
                            ant.max_strength()) / 25

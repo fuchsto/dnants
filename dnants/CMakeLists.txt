@@ -51,7 +51,9 @@ include_directories(
   ${DNANTS_GOS_INCLUDE_DIRS}
   ${DNANTS_LIBGOS_INCLUDE_DIRS}
   ${SDL2_INCLUDE_DIR}
-# ${Boost_INCLUDE_DIRS}
+  # Test
+  ${PYBIND11_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIRS}
 )
 
 add_executable(
@@ -62,10 +64,11 @@ add_executable(
 
 target_link_libraries(
   ${DNANTS_MAIN_TARGET_NAME}
+# pygos
   gos
   ${SDL2_LIBRARY}
+# Test
   ${PYTHON_LIBRARY}
-# ${Boost_LIBRARIES}
 )
 
 set_target_properties(

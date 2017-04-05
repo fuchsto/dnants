@@ -2,6 +2,7 @@
 #include <pygos/py_plugin.h>
 
 #include <gos/state/ant_state.h>
+#include <gos/util/logging.h>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embedded.h>
@@ -9,6 +10,8 @@
 
 
 namespace py = pybind11;
+
+using namespace pybind11::literals;
 
 using namespace gos;
 using namespace gos::state;
@@ -120,6 +123,42 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 
   // return m.ptr();
 }
+
+namespace gos {
+
+gos::state::ant_state client_callback(
+  const gos::state::ant_state & current)
+{
+  GOS__LOG_DEBUG("client_callback", "()");
+  
+  GOS__LOG_DEBUG("client_callback", "load client ...");
+  auto module = py::module::import("client");
+
+  return current;
+#if 0
+  GOS__LOG_DEBUG("client_callback", "set locals ...");
+  auto locals = py::dict(
+                  "current"_a=current,
+                  "next"_a=current,
+                  **module.attr("__dict__"));
+
+  GOS__LOG_DEBUG("client_callback", "eval ...");
+
+  py::eval<py::eval_statements>(R"(
+      next = update_state(current))", py::globals(), locals
+  );
+
+  GOS__LOG_DEBUG("client_callback", "->");
+
+  // auto         py_state  = module.attr("Client")(current);
+  // const auto & cpp_state = py_state.cast<const gos::state::ant_state &>();
+  // return cpp_state;
+
+  return locals["next"].cast<gos::state::ant_state>();
+#endif
+}
+
+} // namespace gos
 
 #if 0
 py::object import(
