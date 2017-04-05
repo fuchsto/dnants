@@ -135,6 +135,9 @@ client::client(int team_id)
   ss << "client_" << team_id;
 
   _module_file = ss.str();
+
+  GOS__LOG_DEBUG("client", "loading client module " << _module_file);
+
   _module      = py::module::import(_module_file.c_str());
 }
 
@@ -145,11 +148,13 @@ gos::state::ant_state client::callback(
                   "current"_a=current,
                   **_module.attr("__dict__"));
 
-  py::eval<py::eval_statements>(R"(
-      next = update_state(current))", py::globals(), locals
-  );
-
-  return locals["next"].cast<const gos::state::ant_state &>();
+  return py::eval<py::eval_expr>(
+           R"(update_state(current))", py::globals(), locals
+         ).cast<const gos::state::ant_state &>();
+//py::eval<py::eval_statements>(R"(
+//    next = update_state(current))", py::globals(), locals
+//);
+//return locals["next"].cast<const gos::state::ant_state &>();
 }
 
 gos::state::ant_state client::default_callback(

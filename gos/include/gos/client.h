@@ -16,6 +16,12 @@ class client {
   pybind11::module _module;
 
  public:
+  client()                               = delete;
+  client(const client & other)           = delete;
+  client & operator=(const client & rhs) = delete;
+  client(client && other)                = default;
+  client & operator=(client && rhs)      = default;
+
   client(int team_id);
 
   gos::state::ant_state callback(

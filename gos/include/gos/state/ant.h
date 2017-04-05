@@ -31,7 +31,7 @@ class ant_team {
 
   int                     _team_id;
   size_t                  _team_size;
-  const gos::client       _client;
+  gos::client             _client;
   game_state            * _game_state;
   std::vector<ant>        _ants;
   std::vector<position>   _spawn_points;

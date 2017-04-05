@@ -53,6 +53,7 @@ gos::app_settings process_args(int argc, char** argv)
 
   app_opts.grid_extents   = { 30, 30 };
   app_opts.rounds_per_sec =  3;
+  app_opts.frames_per_sec = 30;
   app_opts.init_team_size = 12;
   app_opts.num_teams      =  1;
   app_opts.trace_rounds   = 20;
