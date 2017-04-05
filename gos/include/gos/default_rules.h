@@ -6,7 +6,10 @@
 
 namespace gos {
 
-gos::state::ant_state update_ant(const gos::state::ant_state & current);
+gos::state::ant_state py_update_ant(
+                        const gos::state::ant_state & current);
+gos::state::ant_state update_ant(
+                        const gos::state::ant_state & current);
 
 } // namespace gos
 

@@ -200,10 +200,8 @@ class ant {
   }
 
   inline void switch_mode(ant_state::ant_mode m) noexcept {
-    if (is_alive() &&
-        (num_carrying() == 0 || m != ant_state::ant_mode::fighting)) {
-      _state.mode = m;
-    }
+    if (!is_alive()) { return; }
+    _state.mode = m;
   }
 
  private:
@@ -225,17 +223,21 @@ class ant {
 
  private:
   // actions:
-  void attack(ant &) noexcept;
-  void eat()         noexcept;
-  void harvest()     noexcept;
-  void trace_back()  noexcept;
-  void move()        noexcept;
+  void attack()     noexcept;
+  void eat()        noexcept;
+  void harvest()    noexcept;
+  void backtrace()  noexcept;
+  void move()       noexcept;
 
 };
 
 std::ostream & operator<<(
   std::ostream                          & os,
   const gos::state::ant_state::ant_mode & m);
+
+std::ostream & operator<<(
+  std::ostream                            & os,
+  const gos::state::ant_state::ant_action & a);
 
 std::ostream & operator<<(
   std::ostream                              & os,

@@ -2,6 +2,15 @@ project(project_dnants_libgos CXX)
 
 include(${CMAKE_SOURCE_DIR}/CMakeExt/InstallFiles.cmake)
 
+# -- Dependencies --------------------------------------
+find_package(Pybind11 REQUIRED)
+find_package(Python   REQUIRED)
+
+set(CMAKE_CXX_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG}   ${PYTHON_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} ${PYTHON_FLAGS}")
+
 # -- Target --------------------------------------------
 
 set(GOS_LIBRARY gos)
@@ -36,16 +45,19 @@ target_include_directories(
   $<INSTALL_INTERFACE:include>
   PRIVATE
   ${DNANTS_LIBGOS_SOURCE_DIRS}
+  ${PYBIND11_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIRS}
 )
 
 target_link_libraries(
   ${DNANTS_LIBGOS_TARGET_NAME}
+  ${PYTHON_LIBRARY}
 )
 
 set_target_properties(
   ${DNANTS_LIBGOS_TARGET_NAME}
   PROPERTIES
-  COMPILE_FLAGS "${VARIANT_ADDITIONAL_COMPILE_FLAGS} -Wno-unused"
+  COMPILE_FLAGS "-Wno-unused"
 )
 set_target_properties(
   ${DNANTS_LIBGOS_TARGET_NAME}

@@ -52,11 +52,10 @@ target_link_libraries(
 )
 
 # Target filename is 'pygos.so', not 'libpygos.so'
-SET_TARGET_PROPERTIES(
+set_target_properties(
   ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
   PREFIX ""
 )
-
 set_target_properties(
   ${DNANTS_PYGOS_TARGET_NAME} PROPERTIES
   COMPILE_FLAGS

@@ -82,14 +82,36 @@ void ant::on_collision() noexcept {
 
 
 
-void ant::attack(gos::state::ant & enemy) noexcept {
-  GOS__LOG_DEBUG("ant.attack", "enemy: " <<
-                 "t:"  << enemy.team_id() << " " <<
-                 "id:" << enemy.id());
+void ant::attack() noexcept {
   if (num_carrying() > 0) {
+    GOS__LOG_DEBUG("ant.attack", "failed: cannot attack while carrying");
     return;
   }
-  switch_mode(ant_state::ant_mode::fighting);
+  if (dir().dx == 0 && dir().dy == 0) {
+    GOS__LOG_DEBUG("ant.attack", "failed: no direction for attack");
+    return;
+  }
+  position enemy_pos { pos().x + dir().dx,
+                       pos().y + dir().dy };
+  if (!this->game_state().grid_state().contains_position(enemy_pos)) {
+    GOS__LOG_DEBUG("ant.attack",
+                   "failed: invalid enemy position " <<
+                   "(" << enemy_pos.x << "," << enemy_pos.y << ")");
+    return;
+  }
+  ant_id enemy_id = this->game_state().grid_state()[enemy_pos].ant();
+  if (enemy_id.id == -1 || enemy_id.team_id == -1 ||
+      enemy_id.team_id == team_id()) {
+    GOS__LOG_DEBUG("ant.attack", "failed: invalid enemy id " <<
+                   "id:" << enemy_id.id << " team:" << enemy_id.team_id);
+    return;
+  }
+  gos::state::ant & enemy = this->game_state().population_state()
+                                              .teams()[enemy_id.team_id]
+                                              .ants()[enemy_id.id];
+  GOS__LOG_DEBUG("ant.attack",
+                 "ant "   << id() << ".t" << team_id() << " attacks "
+                 "enemy " << enemy_id.id << ".t" << enemy_id.team_id);
   enemy.on_attacked(*this);
 }
 
@@ -124,7 +146,7 @@ void ant::update_position() noexcept {
     // Updates position and triggers grid cell events:
     move();
   } else if (_state.action == ant_state::ant_action::do_backtrace) {
-    trace_back();
+    backtrace();
     move();
   }
 
@@ -148,6 +170,9 @@ void ant::update_action() noexcept {
   else if (_state.action == ant_state::ant_action::do_harvest) {
     harvest();
   }
+  else if (_state.action == ant_state::ant_action::do_attack) {
+    attack();
+  }
   // Scan for enemies:
   gos::state::ant_id enemy_id  { -1, -1 };
   for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
@@ -161,6 +186,7 @@ void ant::update_action() noexcept {
       enemy_id = this->game_state().grid_state()[adj_pos].ant();
       if (enemy_id.id != -1 &&
           enemy_id.team_id != team_id()) {
+        _state.enemy_dir = { x, y };
         return on_enemy(this->game_state().population_state()
                                           .teams()[enemy_id.team_id]
                                           .ants()[enemy_id.id]);
@@ -229,7 +255,7 @@ void ant::harvest() noexcept {
   }
 }
 
-void ant::trace_back() noexcept {
+void ant::backtrace() noexcept {
   if (!is_alive()) { return; }
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
@@ -296,15 +322,6 @@ void ant::move() noexcept {
   } else {
     on_collision();
   }
-/*
-  // Bresenham differential:
-  int d  = 2 * _dir.dy - _dir.dx;
-  int d0 = 2 * _dir.dy;
-  int dn = 2 * (_dir.dy - _dir.dx);
-  if (d <= 0) { d += d0; }
-  else        { d += dn; ++_pos.y; }
-  ++_pos.x;
-*/
 }
 
 gos::state::cell & ant::cell() noexcept {
@@ -322,33 +339,34 @@ std::ostream & operator<<(
   std::ostringstream ss;
   ss << "mode(";
   switch (m) {
-    case ant_state::ant_mode::waiting:
-         ss << "waiting";
-         break;
-    case ant_state::ant_mode::scouting:
-         ss << "scouting";
-         break;
-    case ant_state::ant_mode::detour:
-         ss << "detour";
-         break;
-    case ant_state::ant_mode::eating:
-         ss << "eating";
-         break;
-    case ant_state::ant_mode::harvesting:
-         ss << "harvesting";
-         break;
-    case ant_state::ant_mode::fighting:
-         ss << "fighting";
-         break;
-    case ant_state::ant_mode::tracing:
-         ss << "tracing";
-         break;
-    case ant_state::ant_mode::dead:
-         ss << "dead";
-         break;
-    default:
-         ss << "???";
-         break;
+    case ant_state::ant_mode::waiting:    ss << "waiting";     break;
+    case ant_state::ant_mode::scouting:   ss << "scouting";    break;
+    case ant_state::ant_mode::detour:     ss << "detour";      break;
+    case ant_state::ant_mode::eating:     ss << "eating";      break;
+    case ant_state::ant_mode::harvesting: ss << "harvesting";  break;
+    case ant_state::ant_mode::tracing:    ss << "tracing";     break;
+    case ant_state::ant_mode::dead:       ss << "dead";        break;
+    default: ss << "???"; break;
+  }
+  ss << ")";
+  return operator<<(os, ss.str());
+}
+
+std::ostream & operator<<(
+  std::ostream                            & os,
+  const gos::state::ant_state::ant_action & a)
+{
+  std::ostringstream ss;
+  ss << "action(";
+  switch (a) {
+    case ant_state::ant_action::do_idle:      ss << "idle";      break;
+    case ant_state::ant_action::do_eat:       ss << "eat";       break;
+    case ant_state::ant_action::do_drop:      ss << "drop";      break;
+    case ant_state::ant_action::do_move:      ss << "move";      break;
+    case ant_state::ant_action::do_attack:    ss << "attack";    break;
+    case ant_state::ant_action::do_harvest:   ss << "harvest";   break;
+    case ant_state::ant_action::do_backtrace: ss << "backtrace"; break;
+    default: ss << "???"; break;
   }
   ss << ")";
   return operator<<(os, ss.str());
@@ -376,10 +394,16 @@ std::ostream & operator<<(
   ss << "ant { "
      << " id:"   << a.id() 
                  << ".t" << a.team_id() << " "
-     << a.mode()
-     << " "
-     << a.state().events
-     << " str:"  << a.strength()
+     << a.mode() << " "
+     << a.state().action << " "
+     << a.state().events;
+  if (a.state().events.enemy) {
+     ss << " edir:"  << "(" 
+                     << a.state().enemy_dir.dx << ","
+                     << a.state().enemy_dir.dy
+                     << ")";
+  }
+  ss << " str:"  << a.strength()
      << " dir:"  << "(" 
                  << a.dir().dx << ","
                  << a.dir().dy

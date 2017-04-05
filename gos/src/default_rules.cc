@@ -4,12 +4,29 @@
 #include <gos/state/ant_state.h>
 #include <gos/types.h>
 
+#include <pybind11/eval.h>
+
 
 namespace gos {
 
-gos::state::ant_state on_enemy(
-  gos::state::ant_state & state)
+namespace py = pybind11;
+
+gos::state::ant_state py_update_ant(
+  const gos::state::ant_state & current)
 {
+  // py::object scope
+  //   = py::module::import("__main__").attr("__dict__");
+
+  auto global
+    = py::dict(py::module::import("__main__").attr("__dict__"));
+  auto local
+    = py::dict();
+
+  gos::state::ant_state next
+    = py::eval_file<py::eval_expr>("client.py", global, local)
+        .cast<gos::state::ant_state>();
+
+  return next;
 }
 
 gos::state::ant_state update_ant(
@@ -21,12 +38,19 @@ gos::state::ant_state update_ant(
 
   switch (current.mode) {
     case ant_state::ant_mode::scouting:
-      if (current.events.collision) {
-        if (true || next.rand % 6 <= 2) { next.set_turn(-1); }
-        else                            { next.set_turn(1);  }
+      if (current.events.enemy) {
+        next.set_dir(current.enemy_dir);
+        next.attack();
+      } else if (current.events.collision) {
+        int nturn = 1;
+        if (current.tick_count - current.last_dir_change == 0) {
+          nturn = 2;
+        }
+        // if (current.rand % 2) { nturn *= -1; }
+        next.set_turn(nturn);
         next.move();
       } else if (current.events.food) {
-        if (current.strength < 7) {
+        if (current.strength < 5) {
           next.eat();
           next.set_mode(ant_state::ant_mode::eating);
         } else {
@@ -44,7 +68,7 @@ gos::state::ant_state update_ant(
         next.set_dir(current.enemy_dir);
         next.attack();
       } else if (current.events.food) {
-        if (current.strength >= 7) {
+        if (current.strength >= 5) {
           next.harvest();
           next.set_mode(ant_state::ant_mode::harvesting);
         } else {

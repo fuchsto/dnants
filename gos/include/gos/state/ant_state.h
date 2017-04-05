@@ -18,7 +18,6 @@ struct ant_state {
     waiting    = 0, // do nothing
     detour,         // collision, move failed
     scouting,       // move without following a pheromone trace
-    fighting,       // fighting enemy in adjacent cell
     tracing,        // follow the closes pheromone trace
     eating,         // eat and gain strength
     harvesting,     // eat and gain strength
@@ -62,11 +61,8 @@ struct ant_state {
 
   // Commands:
   inline void set_mode(ant_mode m) noexcept {
-    if (mode != ant_mode::dead &&
-        // fighting while carrying is not allowed:
-        (num_carrying == 0 || m != ant_mode::fighting)) {
-      mode = m;
-    }
+    if (mode == ant_mode::dead) { return; }
+    mode = m;
   }
 
   inline void set_action(ant_action a) noexcept {
