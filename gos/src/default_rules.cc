@@ -1,4 +1,6 @@
 
+#if 0
+
 #include <gos/default_rules.h>
 
 #include <gos/state/ant_state.h>
@@ -19,11 +21,8 @@ using namespace pybind11::literals;
 using namespace gos;
 using namespace gos::state;
 
-// PYBIND11_PLUGIN(pygos)
 PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 {
-  // py::module m("pygos", "GOS client");
-
   py::class_<direction> direction_py(m, "direction");
   direction_py
   //.def(py::init<int, int>())
@@ -41,13 +40,16 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     // Read-only --------------------------------------------------------
     //
     // Attributes
-    .def_readonly("id",           &ant_state::id)
-    .def_readonly("team_id",      &ant_state::team_id)
-    .def_readonly("mode",         &ant_state::mode)
-    .def_readonly("strength",     &ant_state::strength)
-    .def_readonly("num_carrying", &ant_state::num_carrying)
-    .def_readonly("damage",       &ant_state::damage)
-    .def_readonly("dir",          &ant_state::dir)
+    .def_readonly("id",              &ant_state::id)
+    .def_readonly("team_id",         &ant_state::team_id)
+    .def_readonly("mode",            &ant_state::mode)
+    .def_readonly("strength",        &ant_state::strength)
+    .def_readonly("num_carrying",    &ant_state::num_carrying)
+    .def_readonly("damage",          &ant_state::damage)
+    .def_readonly("dir",             &ant_state::dir)
+    .def_readonly("tick_count",      &ant_state::tick_count)
+    .def_readonly("rand",            &ant_state::rand)
+    .def_readonly("last_dir_change", &ant_state::last_dir_change)
     // Events
     .def_readonly("events",       &ant_state::events)
 
@@ -123,43 +125,34 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .value("do_turn",      ant_state::ant_action::do_turn)
     .export_values()
     ;
-
-  // return m.ptr();
 }
 
 namespace gos {
 
-gos::state::ant_state client_callback(
+client::client(int team_id)
+{
+  std::ostringstream ss;
+  ss << "client_" << team_id;
+
+  _module_file = ss.str();
+  _module      = py::module::import(_module_file.c_str());
+}
+
+gos::state::ant_state client::callback(
   const gos::state::ant_state & current)
 {
-  GOS__LOG_DEBUG("client_callback", "()");
-  
-  GOS__LOG_DEBUG("client_callback", "load client ...");
-  auto module = py::module::import("client");
-
-  GOS__LOG_DEBUG("client_callback", "set locals ...");
   auto locals = py::dict(
                   "current"_a=current,
-                  "next"_a=current,
-                  **module.attr("__dict__"));
-
-  GOS__LOG_DEBUG("client_callback", "eval ...");
+                  **_module.attr("__dict__"));
 
   py::eval<py::eval_statements>(R"(
       next = update_state(current))", py::globals(), locals
   );
 
-  GOS__LOG_DEBUG("client_callback", ">");
   return locals["next"].cast<gos::state::ant_state>();
 }
 
-gos::state::ant_state py_update_ant(
-  const gos::state::ant_state & current)
-{
-  return gos::client_callback(current);
-}
-
-gos::state::ant_state update_ant(
+gos::state::ant_state client::default_callback(
   const gos::state::ant_state & current)
 {
   using gos::state::ant_state;
@@ -249,3 +242,4 @@ gos::state::ant_state update_ant(
 
 } // namespace gos
 
+#endif

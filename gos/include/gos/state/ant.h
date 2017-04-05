@@ -5,6 +5,7 @@
 #include <gos/state/game_state.h>
 
 #include <gos/types.h>
+#include <gos/client.h>
 
 #include <gos/util/timestamp.h>
 
@@ -30,6 +31,7 @@ class ant_team {
 
   int                     _team_id;
   size_t                  _team_size;
+  const gos::client       _client;
   game_state            * _game_state;
   std::vector<ant>        _ants;
   std::vector<position>   _spawn_points;
@@ -43,6 +45,7 @@ class ant_team {
     game_state     & gs)
   : _team_id(team_id)
   , _team_size(init_team_size)
+  , _client(team_id)
   , _game_state(&gs) {
     _spawn_points.push_back(spawn_point);
   }
@@ -54,9 +57,11 @@ class ant_team {
 
   void update();
 
-  inline int                      id()   const { return _team_id; }
-  inline std::vector<ant>       & ants()       { return _ants; }
-  inline const std::vector<ant> & ants() const { return _ants; }
+  inline const gos::client      & client() const { return _client; }  
+
+  inline int                      id()     const { return _team_id; }
+  inline std::vector<ant>       & ants()         { return _ants; }
+  inline const std::vector<ant> & ants()   const { return _ants; }
 
   inline const std::vector<position> & spawn_points() const {
     return _spawn_points;

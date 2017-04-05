@@ -8,7 +8,7 @@
 #include <gos/state/population.h>
 
 #include <gos/types.h>
-#include <gos/default_rules.h>
+#include <gos/client.h>
 
 #include <gos/util/random.h>
 #include <gos/util/logging.h>
@@ -217,7 +217,7 @@ void ant::update_reaction() noexcept {
     }
   }
   // Request next state:
-  _state = gos::py_update_ant(_state);
+  _state = this->team().client().callback(_state);
 }
 
 void ant::eat() noexcept {
