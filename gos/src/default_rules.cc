@@ -26,6 +26,7 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 
   py::class_<direction> direction_py(m, "direction");
   direction_py
+  //.def(py::init<int, int>())
     .def(py::init<>())
     .def_readwrite("dx", &direction::dx)
     .def_readwrite("dy", &direction::dy)
@@ -57,12 +58,12 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
                                  &ant_state::set_mode,
            "set mode for the next round")
     .def("set_dir",
-           (void                 (ant_state::*)(direction))
+           (void                 (ant_state::*)(int, int))
                                  &ant_state::set_dir,
            "set direction for the next round")
-    .def("set_turn",
+    .def("turn_dir",
            (void                 (ant_state::*)(int))
-                                 &ant_state::set_turn,
+                                 &ant_state::turn_dir,
            "turn direction for the next round")
 
     // Actions ----------------------------------------------------------
@@ -149,7 +150,7 @@ gos::state::ant_state client_callback(
   );
 
   GOS__LOG_DEBUG("client_callback", ">");
-  return current;
+  return locals["next"].cast<gos::state::ant_state>();
 }
 
 gos::state::ant_state py_update_ant(
@@ -168,7 +169,7 @@ gos::state::ant_state update_ant(
   switch (current.mode) {
     case ant_state::ant_mode::scouting:
       if (current.events.enemy) {
-        next.set_dir(current.enemy_dir);
+        next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
         next.attack();
       } else if (current.events.collision) {
         int nturn = 1;
@@ -176,7 +177,7 @@ gos::state::ant_state update_ant(
           nturn = 2;
         }
         // if (current.rand % 2) { nturn *= -1; }
-        next.set_turn(nturn);
+        next.turn_dir(nturn);
         next.move();
       } else if (current.events.food) {
         if (current.strength < 5) {
@@ -187,14 +188,14 @@ gos::state::ant_state update_ant(
           next.set_mode(ant_state::ant_mode::harvesting);
         }
       } else if (current.tick_count - current.last_dir_change > 4) {
-        next.set_turn(
+        next.turn_dir(
           ((next.rand + next.tick_count) % 3) - 1);
         next.move();
       }
       break;
     case ant_state::ant_mode::eating:
       if (current.events.enemy) {
-        next.set_dir(current.enemy_dir);
+        next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
         next.attack();
       } else if (current.events.food) {
         if (current.strength >= 5) {
