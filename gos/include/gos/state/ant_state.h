@@ -27,7 +27,6 @@ enum ant_mode : int {
 enum ant_action : int {
   do_idle    = 0,
   do_move,
-  do_backtrace,
   do_eat,
   do_harvest,
   do_drop,
@@ -107,8 +106,6 @@ struct ant_state {
                              action = ant_action::do_harvest; }
   inline void drop()       noexcept {
                              action = ant_action::do_drop; }
-  inline void backtrace()  noexcept {
-                             action = ant_action::do_backtrace; }
 };
 
 } // namespace state

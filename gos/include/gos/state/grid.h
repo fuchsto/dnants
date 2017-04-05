@@ -80,6 +80,13 @@ class grid {
     return _cells[y][x];
   }
 
+  void update() {
+    for (int y = 0; y < _extents.h; ++y) {
+      for (int x = 0; x < _extents.w; ++x) {
+        _cells[y][x].update();
+      }
+    }
+  }
 };
 
 class neighbor_grid {

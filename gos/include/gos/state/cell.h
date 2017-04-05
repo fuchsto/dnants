@@ -21,6 +21,8 @@ class cell {
 
   friend cell_state;
 
+  static const int max_trace_age = 200;
+
  public:
   cell(cell_type ct = cell_type::plain)
   : _state(ct, (ct == cell_type::food ? 4 : 0))
@@ -41,8 +43,21 @@ class cell {
   void add_trace(
     int              team_id,
     gos::orientation ort,
-    int              round_count) noexcept {
-    _state._traces[team_id][or2int(ort)] = round_count;
+    int              round_count) noexcept
+  {
+    cell_state::trace & t = _state._traces[team_id][or2int(ort)];
+    int trace_age  = std::max(1, round_count - t.last_visit);
+    t.last_visit   = round_count;
+    t.intensity   += ((10 * max_trace_age) / trace_age) / 10;
+    if (t.intensity > 100) { t.intensity = 100; }
+  }
+
+  void update() {
+    for (auto & t_traces : _state._traces) {
+      for (auto & trace : t_traces) {
+        // trace.intensity--;
+      }
+    }
   }
 };
 

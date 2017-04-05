@@ -47,6 +47,7 @@ game_state::~game_state() {
 void game_state::next() {
   ++_round_count;
   population_state().update();
+  grid_state().update();
 }
 
 } // namespace gos

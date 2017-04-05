@@ -31,10 +31,6 @@ class client {
   gos::state::ant_state callback(
     const gos::state::ant_state & current,
     const gos::state::grid      & grid_state) const;
-
-  gos::state::ant_state default_callback(
-    const gos::state::ant_state & current,
-    const gos::state::grid      & grid_state) const;
 };
 
 } // namespace gos

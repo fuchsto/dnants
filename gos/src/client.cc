@@ -10,9 +10,11 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embedded.h>
+#include <pybind11/stl.h>
 
 #include <sstream>
 #include <string>
+#include <array>
 
 
 namespace py = pybind11;
@@ -26,7 +28,6 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 {
   py::class_<direction> direction_py(m, "direction");
   direction_py
-  //.def(py::init<int, int>())
     .def(py::init<>())
     .def_readwrite("dx", &direction::dx)
     .def_readwrite("dy", &direction::dy)
@@ -93,16 +94,6 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            (void                 (ant_state::*)(void))
                                  &ant_state::drop,
            "drop action")
-    .def("backtrace",
-           (void                 (ant_state::*)(void))
-                                 &ant_state::backtrace,
-           "backtrace action")
-    // Neighbor cell access:
-    //
-  //.def("neighbor",
-  //     [](int dx, dy) -> const cell_state & {
-  //       return          
-  //     })
     ;
 
   py::class_<ant_state::state_events>(ant_state_py, "state_events")
@@ -126,7 +117,6 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
   py::enum_<ant_action>(m, "ant_action")
     .value("do_idle",      ant_action::do_idle)
     .value("do_move",      ant_action::do_move)
-    .value("do_backtrace", ant_action::do_backtrace)
     .value("do_eat",       ant_action::do_eat)
     .value("do_harvest",   ant_action::do_harvest)
     .value("do_drop",      ant_action::do_drop)
@@ -179,6 +169,11 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
                                        &cell_state::type,
            "type of the cell")
     ;
+
+  py::class_<cell_state::trace>(cell_state_py, "trace")
+    .def_readonly("intensity",         &cell_state::trace::intensity)
+    .def_readonly("last_visit",        &cell_state::trace::last_visit)
+    ;
 }
 
 namespace gos {
@@ -207,99 +202,6 @@ gos::state::ant_state client::callback(
   return py::eval<py::eval_expr>(
            R"(update_state(current,grid_state))", py::globals(), locals
          ).cast<const gos::state::ant_state &>();
-//py::eval<py::eval_statements>(R"(
-//    next = update_state(current))", py::globals(), locals
-//);
-//return locals["next"].cast<const gos::state::ant_state &>();
-}
-
-gos::state::ant_state client::default_callback(
-  const gos::state::ant_state & current,
-  const gos::state::grid      & grid_state) const
-{
-  using gos::state::ant_state;
-
-  gos::state::ant_state next = current;
-
-  switch (current.mode) {
-    case ant_mode::scouting:
-      if (current.events.enemy) {
-        next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
-        next.attack();
-      } else if (current.events.collision) {
-        int nturn = 1;
-        if (current.tick_count - current.last_dir_change == 0) {
-          nturn = 2;
-        }
-        // if (current.rand % 2) { nturn *= -1; }
-        next.turn_dir(nturn);
-        next.move();
-      } else if (current.events.food) {
-        if (current.strength < 5) {
-          next.eat();
-          next.set_mode(ant_mode::eating);
-        } else {
-          next.harvest();
-          next.set_mode(ant_mode::harvesting);
-        }
-      } else if (current.tick_count - current.last_dir_change > 4) {
-        next.turn_dir(
-          ((next.rand + next.tick_count) % 3) - 1);
-        next.move();
-      }
-      break;
-    case ant_mode::eating:
-      if (current.events.enemy) {
-        next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
-        next.attack();
-      } else if (current.events.food) {
-        if (current.strength >= 5) {
-          next.harvest();
-          next.set_mode(ant_mode::harvesting);
-        } else {
-          next.eat();
-        }
-      } else {
-        if (current.num_carrying > 0) {
-          next.set_mode(ant_mode::tracing);
-          next.backtrace();
-        } else {
-          next.set_mode(ant_mode::scouting);
-          next.move();
-        }
-      }
-      break;
-    case ant_mode::harvesting:
-      if (current.events.food) {
-        if (current.num_carrying < current.strength) {
-          next.harvest();
-        } else {
-          next.set_mode(ant_mode::tracing);
-          next.backtrace();
-        }
-      } else {
-        if (current.num_carrying > 0) {
-          next.set_mode(ant_mode::tracing);
-          next.backtrace();
-        } else {
-          next.set_mode(ant_mode::scouting);
-          next.move();
-        }
-      }
-      break;
-    case ant_mode::tracing:
-      if (current.num_carrying > 0) {
-        next.backtrace();
-      } else {
-        next.set_mode(ant_mode::scouting);
-        next.move();
-      }
-      break;
-    default:
-      break;
-  }
-
-  return next;
 }
 
 } // namespace gos

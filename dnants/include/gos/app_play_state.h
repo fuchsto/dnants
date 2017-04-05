@@ -200,14 +200,15 @@ class app_play_state : public app_state {
             int team_id          = team.id();
             const auto & traces  = grid_cell.state().team_traces(team_id);
             for (int oidx = 0; oidx < 8; ++oidx) {
-              int trace_rc    = traces[oidx];
+              int trace_val   = traces[oidx].intensity;
               orientation ort = gos::int2or(oidx);
-              int trace_age   = _game_state->round_count() - trace_rc;
-              int trace_val   = n_trace - trace_age;
-              if (trace_rc > 0 && trace_val > 0) {
+              // int trace_age   = _game_state->round_count() - trace_rc;
+              // int trace_val   = n_trace - trace_age;
+              if (trace_val > 0) {
                 render_trace_cell(
                   cell_x, cell_y,
-                  trace_val, ort,
+                  trace_val,
+                  ort,
                   team_id);
               }
             }
@@ -325,7 +326,7 @@ class app_play_state : public app_state {
     orientation  ort,
     int          team_id)
   {
-    int max_trace_rounds = _app->settings().trace_rounds;
+  //int max_trace_rounds = _app->settings().trace_rounds;
     int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
     int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
 
@@ -338,10 +339,13 @@ class app_play_state : public app_state {
     }
 
     const rgba & col = _team_colors[team_id];
+    // Uint8 tcol_a = static_cast<Uint8>(
+    //                  ( ((trace_value * 256) / max_trace_rounds)
+    //                    * 4)
+    //                  / 5);
+    int max_trace_intensity = 100;
     Uint8 tcol_a = static_cast<Uint8>(
-                     ( ((trace_value * 256) / max_trace_rounds)
-                       * 4)
-                     / 5);
+                     ( ((trace_value * 256) / max_trace_intensity) * 4) / 5);
     SDL_SetRenderDrawColor(
       _app->win().renderer(),
       col.r, col.g, col.b, tcol_a);

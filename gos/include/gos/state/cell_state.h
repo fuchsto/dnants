@@ -24,7 +24,12 @@ class cell_state {
   friend cell;
 
  public:
-  typedef std::array<int, 8> traces;
+  struct trace {
+    int intensity;
+    int last_visit;
+  };
+
+  typedef std::array<trace, 8> traces;
 
  private:
   cell_type               _type   = cell_type::plain;

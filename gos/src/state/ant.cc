@@ -145,9 +145,6 @@ void ant::update_position() noexcept {
   if (_state.action == ant_action::do_move) {
     // Updates position and triggers grid cell events:
     move();
-  } else if (_state.action == ant_action::do_backtrace) {
-    backtrace();
-    move();
   }
 
   const auto & current_cell = cell();
@@ -247,64 +244,13 @@ void ant::harvest() noexcept {
   }
 }
 
-void ant::backtrace() noexcept {
-  if (!is_alive()) { return; }
-  int consumed = 0;
-  gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
-
-  direction max_backtrace_dir { };
-  direction sec_max_backtrace_dir { };
-  int max_trace_intensity     = 0;
-  int sec_max_trace_intensity = 0;
-  for (int y = -1; y <= 1; ++y) {
-    for (int x = -1; x <= 1; ++x) {
-      position adj_pos { pos().x + x,
-                         pos().y + y };
-      if ((x == 0 && y == 0) ||
-          !this->game_state().grid_state().contains_position(adj_pos)) {
-        continue;
-      }
-      // find traces in adjacent cells that leads to the ant's current
-      // cell; from those, move to the cell with the most recent trace:
-      const auto & adj_cell   = this->game_state().grid_state()[adj_pos];
-      const auto & adj_traces = adj_cell.state().team_traces(team_id());
-      // for example, the trace in the north-west adjacent cell leading
-      // to this cell has orientation south-east.
-      gos::orientation adj_cell_ort = dir2or(direction { -x, -y });
-      gos::orientation in_trace_ort = dir2or(direction { -x, -y });
-      int in_trace_ort_idx          = or2int(in_trace_ort);
-      int adj_cell_ort_idx          = or2int(adj_cell_ort);
-      int in_trace_intensity        = adj_traces[in_trace_ort_idx];
-      // follow second highest intensity as highest intensity is
-      // would toggle back to last backtraced cell:
-      if (in_trace_intensity > max_trace_intensity) {
-        sec_max_trace_intensity = max_trace_intensity;
-        sec_max_backtrace_dir   = max_backtrace_dir;
-        max_trace_intensity     = in_trace_intensity;
-        max_backtrace_dir       = { x, y };
-      }
-    }
-  }
-  if (sec_max_backtrace_dir.dx != 0 && sec_max_backtrace_dir.dy != 0) {
-    // trace found:
-    if (num_no_dir_change() > 1) {
-      set_dir(sec_max_backtrace_dir);
-    }
-  } else {
-    // no trace found, just turn around:
-    if (num_no_dir_change() > 8) {
-      turn((this->game_state().round_count() % 2) - 1);
-    }
-  }
-}
-
 void ant::move() noexcept {
   if (!is_alive()) { return; }
-  position pos_next { pos().x + dir().dx,
-                      pos().y + dir().dy };
-  if (pos_next == pos()) {
+  if (dir().dx == 0 && dir().dy == 0) {
     return;
   }
+  position pos_next { pos().x + dir().dx,
+                      pos().y + dir().dy };
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
     this->game_state().grid_state()[_state.pos]
                       .leave(*this, this->game_state());
@@ -357,7 +303,6 @@ std::ostream & operator<<(
     case ant_action::do_move:      ss << "move";      break;
     case ant_action::do_attack:    ss << "attack";    break;
     case ant_action::do_harvest:   ss << "harvest";   break;
-    case ant_action::do_backtrace: ss << "backtrace"; break;
     default: ss << "???"; break;
   }
   ss << ")";

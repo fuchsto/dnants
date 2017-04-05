@@ -231,7 +231,6 @@ class ant {
   void attack()     noexcept;
   void eat()        noexcept;
   void harvest()    noexcept;
-  void backtrace()  noexcept;
   void move()       noexcept;
 
 };
