@@ -56,7 +56,7 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     // Modifiers --------------------------------------------------------
     //
     .def("set_mode",
-           (void                 (ant_state::*)(ant_state::ant_mode))
+           (void                 (ant_state::*)(ant_mode))
                                  &ant_state::set_mode,
            "set mode for the next round")
     .def("set_dir",
@@ -103,26 +103,26 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .def_readonly("food",        &ant_state::state_events::food)
     ;
 
-  py::enum_<ant_state::ant_mode>(ant_state_py, "ant_mode")
-    .value("waiting",      ant_state::ant_mode::waiting)
-    .value("detour",       ant_state::ant_mode::detour)
-    .value("scouting",     ant_state::ant_mode::scouting)
-    .value("tracing",      ant_state::ant_mode::tracing)
-    .value("eating",       ant_state::ant_mode::eating)
-    .value("harvesting",   ant_state::ant_mode::harvesting)
-    .value("dead",         ant_state::ant_mode::dead)
+  py::enum_<ant_mode>(m, "ant_mode")
+    .value("waiting",      ant_mode::waiting)
+    .value("detour",       ant_mode::detour)
+    .value("scouting",     ant_mode::scouting)
+    .value("tracing",      ant_mode::tracing)
+    .value("eating",       ant_mode::eating)
+    .value("harvesting",   ant_mode::harvesting)
+    .value("dead",         ant_mode::dead)
     .export_values()
     ;
 
-  py::enum_<ant_state::ant_action>(ant_state_py, "ant_action")
-    .value("do_idle",      ant_state::ant_action::do_idle)
-    .value("do_move",      ant_state::ant_action::do_move)
-    .value("do_backtrace", ant_state::ant_action::do_backtrace)
-    .value("do_eat",       ant_state::ant_action::do_eat)
-    .value("do_harvest",   ant_state::ant_action::do_harvest)
-    .value("do_drop",      ant_state::ant_action::do_drop)
-    .value("do_attack",    ant_state::ant_action::do_attack)
-    .value("do_turn",      ant_state::ant_action::do_turn)
+  py::enum_<ant_action>(m, "ant_action")
+    .value("do_idle",      ant_action::do_idle)
+    .value("do_move",      ant_action::do_move)
+    .value("do_backtrace", ant_action::do_backtrace)
+    .value("do_eat",       ant_action::do_eat)
+    .value("do_harvest",   ant_action::do_harvest)
+    .value("do_drop",      ant_action::do_drop)
+    .value("do_attack",    ant_action::do_attack)
+    .value("do_turn",      ant_action::do_turn)
     .export_values()
     ;
 }
@@ -165,7 +165,7 @@ gos::state::ant_state client::default_callback(
   gos::state::ant_state next = current;
 
   switch (current.mode) {
-    case ant_state::ant_mode::scouting:
+    case ant_mode::scouting:
       if (current.events.enemy) {
         next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
         next.attack();
@@ -180,10 +180,10 @@ gos::state::ant_state client::default_callback(
       } else if (current.events.food) {
         if (current.strength < 5) {
           next.eat();
-          next.set_mode(ant_state::ant_mode::eating);
+          next.set_mode(ant_mode::eating);
         } else {
           next.harvest();
-          next.set_mode(ant_state::ant_mode::harvesting);
+          next.set_mode(ant_mode::harvesting);
         }
       } else if (current.tick_count - current.last_dir_change > 4) {
         next.turn_dir(
@@ -191,50 +191,50 @@ gos::state::ant_state client::default_callback(
         next.move();
       }
       break;
-    case ant_state::ant_mode::eating:
+    case ant_mode::eating:
       if (current.events.enemy) {
         next.set_dir(current.enemy_dir.dx, current.enemy_dir.dy);
         next.attack();
       } else if (current.events.food) {
         if (current.strength >= 5) {
           next.harvest();
-          next.set_mode(ant_state::ant_mode::harvesting);
+          next.set_mode(ant_mode::harvesting);
         } else {
           next.eat();
         }
       } else {
         if (current.num_carrying > 0) {
-          next.set_mode(ant_state::ant_mode::tracing);
+          next.set_mode(ant_mode::tracing);
           next.backtrace();
         } else {
-          next.set_mode(ant_state::ant_mode::scouting);
+          next.set_mode(ant_mode::scouting);
           next.move();
         }
       }
       break;
-    case ant_state::ant_mode::harvesting:
+    case ant_mode::harvesting:
       if (current.events.food) {
         if (current.num_carrying < current.strength) {
           next.harvest();
         } else {
-          next.set_mode(ant_state::ant_mode::tracing);
+          next.set_mode(ant_mode::tracing);
           next.backtrace();
         }
       } else {
         if (current.num_carrying > 0) {
-          next.set_mode(ant_state::ant_mode::tracing);
+          next.set_mode(ant_mode::tracing);
           next.backtrace();
         } else {
-          next.set_mode(ant_state::ant_mode::scouting);
+          next.set_mode(ant_mode::scouting);
           next.move();
         }
       }
       break;
-    case ant_state::ant_mode::tracing:
+    case ant_mode::tracing:
       if (current.num_carrying > 0) {
         next.backtrace();
       } else {
-        next.set_mode(ant_state::ant_mode::scouting);
+        next.set_mode(ant_mode::scouting);
         next.move();
       }
       break;

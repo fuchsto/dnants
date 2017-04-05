@@ -10,58 +10,32 @@
 namespace gos {
 namespace state {
 
-void cell_state::on_enter(
+void cell::enter(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
-  _ant_id = { a.team_id(), a.id() };
-  _taken  = true;
+  _state._ant_id = { a.team_id(), a.id() };
+  _state._taken  = true;
+  if (_state.num_food() > 0) {
+    a.on_food_cell(state());
+  }
+  if (_state._type == cell_type::spawn_point) {
+    a.on_home_cell(state());
+  }
 }
 
-void cell_state::on_exit(
+void cell::leave(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
-  _taken = false;
+  _state._taken = false;
   if (a.is_alive()) {
     add_trace(
       a.team_id(),
       dir2or(a.dir()),
       gs.round_count() - 1);
   }
-  _ant_id = { -1, -1 };
-}
-
-void resource_cell_state::on_enter(
-  gos::state::ant              & a,
-  const gos::state::game_state & gs)
-{
-  cell_state::on_enter(a, gs);
-  if (amount_left() > 0) {
-    a.on_food_cell(*this);
-  }
-}
-
-void resource_cell_state::on_exit(
-  gos::state::ant              & a,
-  const gos::state::game_state & gs)
-{
-  cell_state::on_exit(a, gs);
-}
-
-void food_cell_state::on_enter(
-  gos::state::ant              & a,
-  const gos::state::game_state & gs)
-{
-  resource_cell_state::on_enter(a, gs);
-}
-
-void spawn_cell_state::on_enter(
-  gos::state::ant              & a,
-  const gos::state::game_state & gs)
-{
-  resource_cell_state::on_enter(a, gs);
-  a.on_home_cell(*this);
+  _state._ant_id = { -1, -1 };
 }
 
 std::ostream & operator<<(
@@ -79,10 +53,7 @@ std::ostream & operator<<(
   }
   if (c.type() == cell_type::food ||
       c.type() == cell_type::plain) {
-    const gos::state::resource_cell_state * cs =
-      reinterpret_cast<const gos::state::resource_cell_state *>(
-        c.state());
-    ss << "food:" << cs->amount_left() << " ";
+    ss << "food:" << c.state().num_food() << " ";
   }
   ss << "}";
   return operator<<(os, ss.str());

@@ -198,7 +198,7 @@ class app_play_state : public app_state {
         if (_app->settings().show_traces) {
           for (const auto & team : popul.teams()) {
             int team_id          = team.id();
-            const auto & traces  = grid_cell.state()->get_traces(team_id);
+            const auto & traces  = grid_cell.state().team_traces(team_id);
             for (int oidx = 0; oidx < 8; ++oidx) {
               int trace_rc    = traces[oidx];
               orientation ort = gos::int2or(oidx);
@@ -367,12 +367,11 @@ class app_play_state : public app_state {
   }
 
   void render_food_cell(int cell_x, int cell_y) {
-    const auto & cell = _game_state->grid_state().at(cell_x, cell_y);
-    const gos::state::food_cell_state * cell_state =
-            reinterpret_cast<const gos::state::food_cell_state *>(
-              cell.state());
-    int amount_left = cell_state->amount_left();
-    int amount_max  = cell_state->max_amount();
+    const auto & cell_state = _game_state->grid_state()
+                                 .at(cell_x, cell_y)
+                                 .state();
+    int amount_left = cell_state.num_food();
+    int amount_max  = 4;
     int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
     if (amount_left == 0) { return; }
 

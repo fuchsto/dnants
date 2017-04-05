@@ -1,3 +1,0 @@
-state : scouting {
-  move!
-}

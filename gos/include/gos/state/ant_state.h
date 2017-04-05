@@ -7,33 +7,35 @@
 namespace gos {
 namespace state {
 
+class cell_state;
+
 struct ant_id {
   int team_id;
   int id;
 };
 
-struct ant_state {
- public:
-  enum ant_mode : int {
-    waiting    = 0, // do nothing
-    detour,         // collision, move failed
-    scouting,       // move without following a pheromone trace
-    tracing,        // follow the closes pheromone trace
-    eating,         // eat and gain strength
-    harvesting,     // eat and gain strength
-    dead            // ant has died
-  };
+enum ant_mode : int {
+  waiting    = 0, // do nothing
+  detour,         // collision, move failed
+  scouting,       // move without following a pheromone trace
+  tracing,        // follow the closes pheromone trace
+  eating,         // eat and gain strength
+  harvesting,     // eat and gain strength
+  dead            // ant has died
+};
 
-  enum ant_action : int {
-    do_idle    = 0,
-    do_move,
-    do_backtrace,
-    do_eat,
-    do_harvest,
-    do_drop,
-    do_attack,
-    do_turn
-  };
+enum ant_action : int {
+  do_idle    = 0,
+  do_move,
+  do_backtrace,
+  do_eat,
+  do_harvest,
+  do_drop,
+  do_attack,
+  do_turn
+};
+
+struct ant_state {
 
   struct state_events {
     bool collision = false;
@@ -43,6 +45,7 @@ struct ant_state {
   };
 
   // Read-only:
+  //
   int          id;
   int          team_id;
   position     pos;
@@ -56,10 +59,14 @@ struct ant_state {
   int          tick_count      = 0;
   state_events events;
   direction    enemy_dir       { 0, 0 };
+
+  // Read-write:
+  //
   ant_action   action          = ant_action::do_idle;
   ant_mode     mode            = ant_mode::scouting;
 
   // Commands:
+  //
   inline void set_mode(ant_mode m) noexcept {
     if (mode == ant_mode::dead) { return; }
     mode = m;
@@ -85,7 +92,10 @@ struct ant_state {
     set_dir(turn_dir.dx, turn_dir.dy);
   }
 
+  const cell_state & cell(int dx, int dy);
+
   // Actions:
+  //
   inline void move()       noexcept {
                              action = ant_action::do_move; }
   inline void attack()     noexcept {

@@ -114,8 +114,8 @@ class ant {
     return _state;
   }
 
-  void on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept;
-  void on_food_cell(gos::state::resource_cell_state & food_cell) noexcept;
+  void on_home_cell(gos::state::cell_state & home_cell) noexcept;
+  void on_food_cell(gos::state::cell_state & food_cell) noexcept;
   void on_enemy(gos::state::ant & enemy)    noexcept;
   void on_attacked(gos::state::ant & enemy) noexcept;
   void on_collision() noexcept;
@@ -127,11 +127,11 @@ class ant {
   void die() noexcept;
 
   inline bool is_alive() const noexcept {
-    return mode() != ant_state::ant_mode::dead;
+    return mode() != ant_mode::dead;
   }
 
   inline bool is_blocked() const noexcept {
-    return mode() == ant_state::ant_mode::detour;
+    return mode() == ant_mode::detour;
   }
 
   inline size_t rand() const noexcept {
@@ -162,7 +162,7 @@ class ant {
 
   gos::state::cell & cell() noexcept;
 
-  inline ant_state::ant_mode mode() const noexcept {
+  inline ant_mode mode() const noexcept {
     return _state.mode;
   }
 
@@ -204,7 +204,7 @@ class ant {
     return this->game_state().round_count() - _state.last_dir_change;
   }
 
-  inline void switch_mode(ant_state::ant_mode m) noexcept {
+  inline void switch_mode(ant_mode m) noexcept {
     if (!is_alive()) { return; }
     _state.mode = m;
   }
@@ -238,11 +238,11 @@ class ant {
 
 std::ostream & operator<<(
   std::ostream                          & os,
-  const gos::state::ant_state::ant_mode & m);
+  const gos::state::ant_mode & m);
 
 std::ostream & operator<<(
   std::ostream                            & os,
-  const gos::state::ant_state::ant_action & a);
+  const gos::state::ant_action & a);
 
 std::ostream & operator<<(
   std::ostream                              & os,

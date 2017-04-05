@@ -57,6 +57,8 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.init_team_size = 12;
   app_opts.num_teams      =  1;
   app_opts.trace_rounds   = 20;
+  app_opts.show_grid      = false;
+  app_opts.show_traces    = true;
 
   const char* const short_opts = "g:w:h:t:n:s";
   const option long_opts[] = {

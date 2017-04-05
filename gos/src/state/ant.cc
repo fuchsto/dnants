@@ -39,10 +39,9 @@ ant & ant_team::add_ant_at(const position & pos) {
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     auto & base_cell  = _game_state->grid_state()[spawn_pos];
-    auto   base_state = reinterpret_cast<spawn_cell_state *>(
-                          base_cell.state());
-    if (base_state->amount_left() > 0) {
-      _team_size += base_state->consume();
+    auto & base_state = base_cell.state();
+    if (base_state.num_food() > 0) {
+      _team_size += base_state.take_food();
     }
     if (!(base_cell.is_taken())) {
       if (_ants.size() >= _team_size) { return; }
@@ -53,14 +52,14 @@ void ant_team::spawn_ants() {
 
 
 
-void ant::on_home_cell(gos::state::spawn_cell_state & home_cell) noexcept {
+void ant::on_home_cell(gos::state::cell_state & home_cell) noexcept {
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << num_carrying());
-  home_cell.drop(num_carrying());
+  home_cell.drop_food(num_carrying());
   _state.num_carrying = 0;
-  switch_mode(ant_state::ant_mode::scouting);
+  switch_mode(ant_mode::scouting);
 }
 
-void ant::on_food_cell(gos::state::resource_cell_state & food_cell) noexcept {
+void ant::on_food_cell(gos::state::cell_state & food_cell) noexcept {
   _state.events.food = true;
 }
 
@@ -121,7 +120,7 @@ void ant::die() noexcept {
                  "t:"   << team_id() << " " <<
                  "id:"  << id() << " " <<
                  "at (" << pos().x << "," << pos().y << ")");
-  _state.mode = ant_state::ant_mode::dead;
+  _state.mode = ant_mode::dead;
   this->game_state().grid_state()[_state.pos]
                     .leave(*this, this->game_state());
 }
@@ -143,10 +142,10 @@ void ant::update_position() noexcept {
     --_state.strength;
   }
 
-  if (_state.action == ant_state::ant_action::do_move) {
+  if (_state.action == ant_action::do_move) {
     // Updates position and triggers grid cell events:
     move();
-  } else if (_state.action == ant_state::ant_action::do_backtrace) {
+  } else if (_state.action == ant_action::do_backtrace) {
     backtrace();
     move();
   }
@@ -154,9 +153,7 @@ void ant::update_position() noexcept {
   const auto & current_cell = cell();
   if (current_cell.type() == cell_type::plain ||
       current_cell.type() == cell_type::food) {
-    const resource_cell_state * current_cell_state =
-      reinterpret_cast<const resource_cell_state *>(current_cell.state());
-    if (current_cell_state->amount_left() > 0) {
+    if (current_cell.state().num_food() > 0) {
       _state.events.food = true;
     }
   }
@@ -165,13 +162,13 @@ void ant::update_position() noexcept {
 void ant::update_action() noexcept {
   if (!is_alive()) { return; }
   // Apply actions from current round:
-  if (_state.action == ant_state::ant_action::do_eat) {
+  if (_state.action == ant_action::do_eat) {
     eat();
   }
-  else if (_state.action == ant_state::ant_action::do_harvest) {
+  else if (_state.action == ant_action::do_harvest) {
     harvest();
   }
-  else if (_state.action == ant_state::ant_action::do_attack) {
+  else if (_state.action == ant_action::do_attack) {
     attack();
   }
   // Scan for enemies:
@@ -210,9 +207,7 @@ void ant::update_reaction() noexcept {
     }
     if (num_carrying() > 0) {
       gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
-      auto pos_cell_state = reinterpret_cast<resource_cell_state *>(
-                              pos_cell.state());
-      pos_cell_state->drop(num_carrying());
+      pos_cell.state().drop_food(num_carrying());
       _state.num_carrying = 0;
     }
   }
@@ -225,10 +220,7 @@ void ant::eat() noexcept {
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
   if (pos_cell.type() == gos::state::cell_type::food) {
-    gos::state::cell_state      * c_state   = pos_cell.state();
-    gos::state::food_cell_state * food_cell =
-      reinterpret_cast<gos::state::food_cell_state *>(c_state);
-    consumed = food_cell->consume();
+    consumed = pos_cell.state().take_food();
     if (consumed > 0) {
       _state.nticks_not_fed = 0;
       _state.strength       = std::min(max_strength(),
@@ -246,10 +238,7 @@ void ant::harvest() noexcept {
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
   if (pos_cell.type() == gos::state::cell_type::food) {
-    gos::state::cell_state      * c_state   = pos_cell.state();
-    gos::state::food_cell_state * food_cell =
-      reinterpret_cast<gos::state::food_cell_state *>(c_state);
-    consumed = food_cell->consume();
+    consumed = pos_cell.state().take_food();
     if (consumed > 0) {
       _state.num_carrying += consumed;
     }
@@ -276,7 +265,7 @@ void ant::backtrace() noexcept {
       // find traces in adjacent cells that leads to the ant's current
       // cell; from those, move to the cell with the most recent trace:
       const auto & adj_cell   = this->game_state().grid_state()[adj_pos];
-      const auto & adj_traces = adj_cell.state()->get_traces(team_id());
+      const auto & adj_traces = adj_cell.state().team_traces(team_id());
       // for example, the trace in the north-west adjacent cell leading
       // to this cell has orientation south-east.
       gos::orientation adj_cell_ort = dir2or(direction { -x, -y });
@@ -335,18 +324,18 @@ const gos::state::cell & ant::cell() const noexcept {
 
 std::ostream & operator<<(
   std::ostream                          & os,
-  const gos::state::ant_state::ant_mode & m)
+  const gos::state::ant_mode & m)
 {
   std::ostringstream ss;
   ss << "mode(";
   switch (m) {
-    case ant_state::ant_mode::waiting:    ss << "waiting";     break;
-    case ant_state::ant_mode::scouting:   ss << "scouting";    break;
-    case ant_state::ant_mode::detour:     ss << "detour";      break;
-    case ant_state::ant_mode::eating:     ss << "eating";      break;
-    case ant_state::ant_mode::harvesting: ss << "harvesting";  break;
-    case ant_state::ant_mode::tracing:    ss << "tracing";     break;
-    case ant_state::ant_mode::dead:       ss << "dead";        break;
+    case ant_mode::waiting:    ss << "waiting";     break;
+    case ant_mode::scouting:   ss << "scouting";    break;
+    case ant_mode::detour:     ss << "detour";      break;
+    case ant_mode::eating:     ss << "eating";      break;
+    case ant_mode::harvesting: ss << "harvesting";  break;
+    case ant_mode::tracing:    ss << "tracing";     break;
+    case ant_mode::dead:       ss << "dead";        break;
     default: ss << "???"; break;
   }
   ss << ")";
@@ -355,18 +344,18 @@ std::ostream & operator<<(
 
 std::ostream & operator<<(
   std::ostream                            & os,
-  const gos::state::ant_state::ant_action & a)
+  const gos::state::ant_action & a)
 {
   std::ostringstream ss;
   ss << "action(";
   switch (a) {
-    case ant_state::ant_action::do_idle:      ss << "idle";      break;
-    case ant_state::ant_action::do_eat:       ss << "eat";       break;
-    case ant_state::ant_action::do_drop:      ss << "drop";      break;
-    case ant_state::ant_action::do_move:      ss << "move";      break;
-    case ant_state::ant_action::do_attack:    ss << "attack";    break;
-    case ant_state::ant_action::do_harvest:   ss << "harvest";   break;
-    case ant_state::ant_action::do_backtrace: ss << "backtrace"; break;
+    case ant_action::do_idle:      ss << "idle";      break;
+    case ant_action::do_eat:       ss << "eat";       break;
+    case ant_action::do_drop:      ss << "drop";      break;
+    case ant_action::do_move:      ss << "move";      break;
+    case ant_action::do_attack:    ss << "attack";    break;
+    case ant_action::do_harvest:   ss << "harvest";   break;
+    case ant_action::do_backtrace: ss << "backtrace"; break;
     default: ss << "???"; break;
   }
   ss << ")";
