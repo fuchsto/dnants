@@ -172,7 +172,6 @@ class app_play_state : public app_state {
 
  private:
   void render_map(gos::view::window & win) {
-    auto         ext      = win.view_extents();
     int          n_trace  = _app->settings().trace_rounds;
     const auto & grid     = _game_state->grid_state();
     const auto & grid_ext = grid.extents();

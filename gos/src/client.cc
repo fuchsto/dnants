@@ -35,22 +35,23 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     //
     .def(py::init<>())
 
-    // Read-only --------------------------------------------------------
+    // Attributes  ------------------------------------------------------
     //
-    // Attributes
+    // Read-only
     .def_readonly("id",              &ant_state::id)
     .def_readonly("team_id",         &ant_state::team_id)
-    .def_readonly("mode",            &ant_state::mode)
-    .def_readonly("strength",        &ant_state::strength)
-    .def_readonly("num_carrying",    &ant_state::num_carrying)
-    .def_readonly("damage",          &ant_state::damage)
-    .def_readonly("dir",             &ant_state::dir)
+    .def_readonly("events",          &ant_state::events)
     .def_readonly("enemy_dir",       &ant_state::enemy_dir)
     .def_readonly("tick_count",      &ant_state::tick_count)
     .def_readonly("rand",            &ant_state::rand)
     .def_readonly("last_dir_change", &ant_state::last_dir_change)
-    // Events
-    .def_readonly("events",          &ant_state::events)
+    .def_readonly("num_carrying",    &ant_state::num_carrying)
+    .def_readonly("strength",        &ant_state::strength)
+    .def_readonly("damage",          &ant_state::damage)
+    // Read-write
+    .def_readwrite("mode",           &ant_state::mode)
+    .def_readwrite("dir",            &ant_state::dir)
+    .def_readwrite("action",         &ant_state::action)
 
     // Modifiers --------------------------------------------------------
     //
@@ -148,7 +149,7 @@ gos::state::ant_state client::callback(
       next = update_state(current))", py::globals(), locals
   );
 
-  return locals["next"].cast<gos::state::ant_state>();
+  return locals["next"].cast<const gos::state::ant_state &>();
 }
 
 gos::state::ant_state client::default_callback(
