@@ -58,7 +58,7 @@ class cell_state {
     return ( _type == cell_type::barrier );
   }
 
-  int take_food() noexcept {
+  int take_food(int ntake = 1) noexcept {
     int consumed = std::min<int>(1, _amount);
     _amount -= consumed;
     return consumed;

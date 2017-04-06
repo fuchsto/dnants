@@ -40,8 +40,9 @@ void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     auto & base_cell  = _game_state->grid_state()[spawn_pos];
     auto & base_state = base_cell.state();
-    if (base_state.num_food() > 0) {
-      _team_size += base_state.take_food();
+    if (base_state.num_food() >= 3) {
+      _team_size++;
+      base_state.take_food(3);
     }
     if (!(base_cell.is_taken())) {
       if (_ants.size() >= _team_size) { return; }
@@ -52,14 +53,14 @@ void ant_team::spawn_ants() {
 
 
 
-void ant::on_home_cell(gos::state::cell_state & home_cell) noexcept {
+void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << num_carrying());
-  home_cell.drop_food(num_carrying());
+  cell.drop_food(num_carrying());
   _state.num_carrying = 0;
   switch_mode(ant_mode::scouting);
 }
 
-void ant::on_food_cell(gos::state::cell_state & food_cell) noexcept {
+void ant::on_food_cell(gos::state::cell_state & cell) noexcept {
   _state.events.food = true;
 }
 
@@ -146,18 +147,22 @@ void ant::update_position() noexcept {
     // Updates position and triggers grid cell events:
     move();
   }
-
-  const auto & current_cell = cell();
-  if (current_cell.type() == cell_type::plain ||
-      current_cell.type() == cell_type::food) {
-    if (current_cell.state().num_food() > 0) {
-      _state.events.food = true;
-    }
-  }
 }
 
 void ant::update_action() noexcept {
   if (!is_alive()) { return; }
+
+  const auto & current_cell = cell();
+  if (current_cell.type() != cell_type::spawn_point &&
+      current_cell.state().num_food() > 0) {
+    _state.events.food = true;
+  }
+
+  // Request next state:
+  _state = this->team().client().callback(
+             _state,
+             this->game_state().grid_state());
+
   // Apply actions from current round:
   if (_state.action == ant_action::do_eat) {
     eat();
@@ -208,14 +213,9 @@ void ant::update_reaction() noexcept {
       _state.num_carrying = 0;
     }
   }
-  // Request next state:
-  _state = this->team().client().callback(
-             _state,
-             this->game_state().grid_state());
 }
 
 void ant::eat() noexcept {
-  if (!is_alive()) { return; }
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
   if (pos_cell.type() == gos::state::cell_type::food) {
@@ -229,7 +229,6 @@ void ant::eat() noexcept {
 }
 
 void ant::harvest() noexcept {
-  if (!is_alive()) { return; }
   if (_state.num_carrying >= strength()) {
     // carry capacity reached
     return;

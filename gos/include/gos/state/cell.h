@@ -21,7 +21,7 @@ class cell {
 
   friend cell_state;
 
-  static const int max_trace_age = 200;
+  static const int max_trace_age = 2000;
 
  public:
   cell(cell_type ct = cell_type::plain)
@@ -48,14 +48,14 @@ class cell {
     cell_state::trace & t = _state._traces[team_id][or2int(ort)];
     int trace_age  = std::max(1, round_count - t.last_visit);
     t.last_visit   = round_count;
-    t.intensity   += ((10 * max_trace_age) / trace_age) / 10;
-    if (t.intensity > 100) { t.intensity = 100; }
+    t.intensity   += ((100 * max_trace_age) / trace_age) / 100;
+    if (t.intensity > 2000) { t.intensity = 2000; }
   }
 
   void update() {
     for (auto & t_traces : _state._traces) {
       for (auto & trace : t_traces) {
-        // trace.intensity--;
+        trace.intensity--;
       }
     }
   }

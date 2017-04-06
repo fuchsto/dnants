@@ -51,10 +51,7 @@ std::ostream & operator<<(
     ss << "ant:" << c.ant().id
        << "-t"   << c.ant().team_id << " ";
   }
-  if (c.type() == cell_type::food ||
-      c.type() == cell_type::plain) {
-    ss << "food:" << c.state().num_food() << " ";
-  }
+  ss << "food:" << c.state().num_food() << " ";
   ss << "}";
   return operator<<(os, ss.str());
 }

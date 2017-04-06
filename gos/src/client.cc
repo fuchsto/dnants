@@ -52,10 +52,9 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .def_readonly("num_carrying",    &ant_state::num_carrying)
     .def_readonly("strength",        &ant_state::strength)
     .def_readonly("damage",          &ant_state::damage)
-    // Read-write
-    .def_readwrite("mode",           &ant_state::mode)
-    .def_readwrite("dir",            &ant_state::dir)
-    .def_readwrite("action",         &ant_state::action)
+    .def_readonly("dir",             &ant_state::dir)
+    .def_readonly("mode",            &ant_state::mode)
+    .def_readonly("action",          &ant_state::action)
 
     // Modifiers --------------------------------------------------------
     //
