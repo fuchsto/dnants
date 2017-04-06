@@ -57,7 +57,7 @@ class app_play_state : public app_state {
                                   { 0x84, 0xa8, 0x36, 0xff } };
 
   rgba         _highlight_color { 0xaf, 0x12, 0x12, 0xff };
-  rgba         _blocked_color   { 0xff, 0x12, 0x12, 0xff };
+  rgba         _blocked_color   { 0xff, 0xb9, 0x47, 0xff };
   rgba         _taken_color     { 0x23, 0x45, 0x45, 0xff };
   rgba         _food_color      { 0xfa, 0xb7, 0x05, 0xff };
   rgba         _grass_color     { 0xaa, 0xde, 0x87, 0xff };
@@ -316,6 +316,13 @@ class app_play_state : public app_state {
                      &dst_rect);
 
       SDL_DestroyTexture(texture);
+    }
+    if (ant.state().events.collision) {
+      draw_cell_rectangle(
+        _app->win(),
+        ant.pos().x, ant.pos().y,
+        _grid_spacing - 1,
+        _blocked_color);
     }
   }
 

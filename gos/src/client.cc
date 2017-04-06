@@ -105,9 +105,8 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 
   py::enum_<ant_mode>(m, "ant_mode")
     .value("waiting",      ant_mode::waiting)
-    .value("detour",       ant_mode::detour)
     .value("scouting",     ant_mode::scouting)
-    .value("tracing",      ant_mode::tracing)
+    .value("backtracing",  ant_mode::backtracing)
     .value("eating",       ant_mode::eating)
     .value("harvesting",   ant_mode::harvesting)
     .value("dead",         ant_mode::dead)
@@ -144,6 +143,10 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            (bool                       (cell_state::*)(void))
                                        &cell_state::is_taken,
            "whether the cell is occupied by an ant")
+    .def("is_obstacle",
+           (bool                       (cell_state::*)(void))
+                                       &cell_state::is_obstacle,
+           "whether the cell is an obstacle")
     .def("ant",
            (ant_id                     (cell_state::*)(void))
                                        &cell_state::ant,

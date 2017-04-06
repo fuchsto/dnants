@@ -16,9 +16,8 @@ struct ant_id {
 
 enum ant_mode : int {
   waiting    = 0, // do nothing
-  detour,         // collision, move failed
   scouting,       // move without following a pheromone trace
-  tracing,        // follow the closes pheromone trace
+  backtracing,    // follow the closes pheromone trace
   eating,         // eat and gain strength
   harvesting,     // eat and gain strength
   dead            // ant has died
@@ -61,7 +60,7 @@ struct ant_state {
 
   // Read-write:
   //
-  ant_action   action          = ant_action::do_idle;
+  ant_action   action          = ant_action::do_move;
   ant_mode     mode            = ant_mode::scouting;
 
   // Commands:
@@ -83,6 +82,7 @@ struct ant_state {
 
   inline void turn_dir(int turn) noexcept {
     // for example, turn_dir +4 or -4 is reverse direction:
+    if (turn == 0) { return; }
     int ort_idx = or2int(gos::dir2or(dir));
     ort_idx += turn;
     if (ort_idx < 0) { ort_idx  = 7 + ort_idx; }

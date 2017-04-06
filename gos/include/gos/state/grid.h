@@ -46,8 +46,8 @@ class grid {
   }
 
   inline bool contains_position(const gos::position & pos) const {
-   return ( pos.x > 0 &&
-            pos.y > 0 &&
+   return ( pos.x >= 0 &&
+            pos.y >= 0 &&
             pos.x < _extents.w &&
             pos.y < _extents.h );
   }

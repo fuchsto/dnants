@@ -130,10 +130,6 @@ class ant {
     return mode() != ant_mode::dead;
   }
 
-  inline bool is_blocked() const noexcept {
-    return mode() == ant_mode::detour;
-  }
-
   inline size_t rand() const noexcept {
     return _state.rand;
   }
@@ -236,11 +232,11 @@ class ant {
 };
 
 std::ostream & operator<<(
-  std::ostream                          & os,
+  std::ostream               & os,
   const gos::state::ant_mode & m);
 
 std::ostream & operator<<(
-  std::ostream                            & os,
+  std::ostream                 & os,
   const gos::state::ant_action & a);
 
 std::ostream & operator<<(
