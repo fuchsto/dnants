@@ -41,6 +41,7 @@ class app_play_state : public app_state {
  private:
   bool         _active          = true;
   bool         _paused          = false;
+  bool         _step            = false;
   timestamp_t  _last_round_ms   = 0;
   int          _grid_spacing    = 5;
   extents      _grid_extents;
@@ -122,6 +123,10 @@ class app_play_state : public app_state {
               if (!_paused) {
                 _marked_cell = { -1, -1 };
               }
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_N) {
+              // single-step
+              _step   = true;
+              _paused = false;
             }
             break;
         default:
@@ -140,6 +145,10 @@ class app_play_state : public app_state {
         GOS__LOG_DEBUG("app_play_state.update",
                        "round: " << _game_state->round_count());
         _game_state->next();
+      }
+      if (_step) {
+        _paused = true;
+        _step   = false;
       }
     }
   }
