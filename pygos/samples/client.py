@@ -14,7 +14,6 @@ attack_min_strength  = 5
 
 def handle_enemy(s,g):
     global attack_min_strength
-    print("attack({},{})".format(s.enemy_dir.x, s.enemy_dir.y))
     if s.strength >= attack_min_strength:
         s.set_dir(s.enemy_dir.x, s.enemy_dir.y)
         s.attack()

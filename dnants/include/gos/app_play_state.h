@@ -424,12 +424,12 @@ class app_play_state : public app_state {
   void log_cell(const position & cell_pos) {
     const auto & grid      = _game_state->grid_state();
     const auto & grid_cell = grid.at(cell_pos.x, cell_pos.y);
-    GOS__LOG_DEBUG("app_play_state", "marked cell: " << grid_cell);
+    std::cout << grid_cell << '\n';
     if (grid_cell.is_taken()) {
       gos::state::ant_id aid = grid_cell.ant();
       const auto & popul     = _game_state->population_state();
       const auto & cell_ant  = popul.teams()[aid.team_id].ants()[aid.id];
-      GOS__LOG_DEBUG("app_play_state", "marked ant: " << cell_ant);
+      std::cout << cell_ant << '\n';
     }
   }
 };
