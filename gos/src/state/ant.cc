@@ -251,6 +251,8 @@ void ant::move() noexcept {
   position pos_next { pos().x + dir().dx,
                       pos().y + dir().dy };
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
+    _state.dist.x += dir().dx;
+    _state.dist.y += dir().dy;
     this->game_state().grid_state()[_state.pos]
                       .leave(*this, this->game_state());
     this->game_state().grid_state()[pos_next]

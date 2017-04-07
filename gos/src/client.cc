@@ -53,6 +53,7 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .def_readonly("strength",        &ant_state::strength)
     .def_readonly("damage",          &ant_state::damage)
     .def_readonly("dir",             &ant_state::dir)
+    .def_readonly("dist",            &ant_state::dist)
     .def_readonly("mode",            &ant_state::mode)
     .def_readonly("action",          &ant_state::action)
 
@@ -175,11 +176,6 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
                                        &cell_state::type,
            "type of the cell")
     ;
-
-  // py::class_<cell_state::trace>(cell_state_py, "trace")
-  //   .def_readonly("intensity",         &cell_state::trace::intensity)
-  //   .def_readonly("last_visit",        &cell_state::trace::last_visit)
-  //   ;
 }
 
 namespace gos {
