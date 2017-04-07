@@ -120,6 +120,7 @@ class ant {
   void on_attacked(gos::state::ant & enemy) noexcept;
   void on_collision() noexcept;
 
+  void update_init()     noexcept;
   void update_position() noexcept;
   void update_action()   noexcept;
   void update_reaction() noexcept;

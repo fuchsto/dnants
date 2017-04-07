@@ -47,7 +47,7 @@ struct ant_state {
   int          id;
   int          team_id;
   position     pos;
-  position     dist;
+  position     dist            { 0, 0 };
   direction    dir             { 0, 0 };
   size_t       rand            = 0;
   size_t       last_dir_change = 0;

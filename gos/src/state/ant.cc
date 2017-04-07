@@ -93,9 +93,7 @@ void ant::die() noexcept {
                     .leave(*this, this->game_state());
 }
 
-void ant::update_position() noexcept {
-  if (!is_alive()) { return; }
-  // Apply cell change from last round:
+void ant::update_init() noexcept {
   _state.tick_count       = this->game_state().round_count();
   _state.rand             = gos::random();
   _state.damage           = 0;
@@ -103,6 +101,11 @@ void ant::update_position() noexcept {
   _state.events.food      = false;
   _state.events.collision = false;
   _state.events.attacked  = false;
+}
+
+void ant::update_position() noexcept {
+  if (!is_alive()) { return; }
+  // Apply cell change from last round:
 
   ++_state.nticks_not_fed;
   if (_state.strength > max_strength() / 2 &&

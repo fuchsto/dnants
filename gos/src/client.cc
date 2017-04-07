@@ -29,8 +29,15 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
   py::class_<direction> direction_py(m, "direction");
   direction_py
     .def(py::init<>())
-    .def_readwrite("dx", &direction::dx)
-    .def_readwrite("dy", &direction::dy)
+    .def_readwrite("x", &direction::dx)
+    .def_readwrite("y", &direction::dy)
+    ;
+
+  py::class_<position> position_py(m, "position");
+  position_py
+    .def(py::init<>())
+    .def_readwrite("x", &position::x)
+    .def_readwrite("y", &position::y)
     ;
 
   py::class_<ant_state> ant_state_py(m, "ant_state");

@@ -32,7 +32,7 @@ class population {
 
     for (auto & t : _teams) {
       for (auto & a : t.ants()) {
-        a.update_position();
+        a.update_init();
       }
     }
     for (auto & t : _teams) {
@@ -43,6 +43,11 @@ class population {
     for (auto & t : _teams) {
       for (auto & a : t.ants()) {
         a.update_reaction();
+      }
+    }
+    for (auto & t : _teams) {
+      for (auto & a : t.ants()) {
+        a.update_position();
       }
     }
   }

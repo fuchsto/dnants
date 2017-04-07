@@ -17,7 +17,7 @@ app_play_state app_play_state::_instance;
 void app_play_state::initialize(app_engine * app) {
   GOS__LOG_DEBUG("app_play_state.initialize", "()");
   _active        = true;
-  _paused        = false;
+  _paused        = true;
   _app           = app;
   _grid_extents  = app->settings().grid_extents;
   _grid_spacing  = app->settings().grid_spacing;
