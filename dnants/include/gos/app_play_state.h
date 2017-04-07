@@ -11,6 +11,8 @@
 #include <gos/state/population.h>
 #include <gos/state/game_state.h>
 
+#include <gos/view/svg_texture.h>
+
 #include <gos/types.h>
 
 
@@ -19,6 +21,7 @@ namespace gos {
 class app_play_state : public app_state {
   using game_state  = gos::state::game_state;
   using cell_traces = gos::state::cell_state::traces;
+  using svg_texture = gos::view::svg_texture;
 
   enum class sprite_tag : int {
     rock = 0,
@@ -50,12 +53,14 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
-  std::array<SDL_Surface *, 9> _sprites { };
+  std::array<svg_texture *, 9> _sprites { };
 
   rgba         _team_colors[4]  { { 0xff, 0x12, 0x66, 0xff },
                                   { 0x00, 0xaa, 0x23, 0xff },
                                   { 0x87, 0x57, 0xe8, 0xff },
                                   { 0x84, 0xa8, 0x36, 0xff } };
+
+  rgba         _map_rgb_mode    { 0x00, 0x00, 0x00, 0x00 };
 
   rgba         _highlight_color { 0xaf, 0x12, 0x12, 0xff };
   rgba         _blocked_color   { 0xff, 0xb9, 0x47, 0xff };
@@ -136,9 +141,9 @@ class app_play_state : public app_state {
   }
 
   virtual void update(app_engine * app) {
-    auto ms             = gos::timestamp_ns() / 1000000;
-    auto rounds_per_sec = app->settings().rounds_per_sec;
-    auto ms_per_round   = 1000 / rounds_per_sec;
+    int ms             = gos::timestamp_ns() / 1000000;
+    int rounds_per_sec = app->settings().rounds_per_sec;
+    int ms_per_round   = 1000 / rounds_per_sec;
     if (ms - _last_round_ms >= ms_per_round) {
       _last_round_ms = ms;
       if (!_paused) {
@@ -181,7 +186,6 @@ class app_play_state : public app_state {
 
  private:
   void render_map(gos::view::window & win) {
-    int          n_trace  = _app->settings().trace_rounds;
     auto         tick_now = _game_state->round_count();
     const auto & grid     = _game_state->grid_state();
     const auto & grid_ext = grid.extents();
@@ -255,94 +259,7 @@ class app_play_state : public app_state {
     }
   }
 
-  void render_ant(const gos::state::ant & ant) {
-    if (!ant.is_alive()) {
-      return;
-    }
-
-    int strength_qurt = (((ant.strength() * 100) /
-                           ant.max_strength()) / 25
-                        ) + 1;
-
-    const rgba & col = _team_colors[ant.team_id()];
-
-    int size   = _grid_spacing;
-    int cell_x = ant.pos().x;
-    int cell_y = ant.pos().y;
-    SDL_Point center { (cell_x * _grid_spacing),
-                       (cell_y * _grid_spacing) };
-    SDL_Rect dst_rect;
-    dst_rect.x = center.x + (_grid_spacing - size) / 2;
-    dst_rect.y = center.y + (_grid_spacing - size) / 2;
-    dst_rect.w = _grid_spacing;
-    dst_rect.h = _grid_spacing;
-
-    SDL_SetRenderDrawBlendMode(
-      _app->win().renderer(),
-      SDL_BLENDMODE_BLEND);
-
-    sprite_tag sprite;
-    if      (strength_qurt >= 4) { sprite = sprite_tag::ant_4; }
-    else if (strength_qurt >= 3) { sprite = sprite_tag::ant_3; }
-    else if (strength_qurt >= 2) { sprite = sprite_tag::ant_2; }
-    else                         { sprite = sprite_tag::ant_1; }
-
-    SDL_Surface * surface = _sprites[(int)sprite];
-    SDL_SetColorKey(
-      surface, SDL_TRUE,
-      SDL_MapRGB(surface->format, 255, 0, 255));
-    SDL_Texture * texture =
-      SDL_CreateTextureFromSurface(
-        _app->win().renderer(),
-        surface);
-    SDL_SetTextureColorMod(
-      texture, col.r, col.g, col.b);
-
-    SDL_RenderCopyEx(_app->win().renderer(),
-                     texture,
-                     0,
-                     &dst_rect,
-                     gos::or2deg(ant.orientation()),
-                     0,
-                     SDL_FLIP_NONE);
-
-    SDL_DestroyTexture(texture);
-
-    if (ant.num_carrying() > 0) {
-      int size = _grid_spacing;
-      SDL_Rect dst_rect;
-      dst_rect.x = center.x + ant.dir().dx * (_grid_spacing / 4);
-      dst_rect.y = center.y + ant.dir().dy * (_grid_spacing / 4);
-      dst_rect.w = size;
-      dst_rect.h = size;
-      SDL_SetRenderDrawBlendMode(
-        _app->win().renderer(),
-        SDL_BLENDMODE_BLEND);
-
-      SDL_Surface * surface = _sprites[(int)sprite_tag::sugah_2];
-      SDL_SetColorKey(
-        surface, SDL_TRUE,
-        SDL_MapRGB(surface->format, 255, 0, 255));
-      SDL_Texture * texture =
-        SDL_CreateTextureFromSurface(
-          _app->win().renderer(),
-          surface);
-
-      SDL_RenderCopy(_app->win().renderer(),
-                     texture,
-                     0,
-                     &dst_rect);
-
-      SDL_DestroyTexture(texture);
-    }
-    if (ant.state().events.collision) {
-      draw_cell_rectangle(
-        _app->win(),
-        ant.pos().x, ant.pos().y,
-        _grid_spacing - 1,
-        _blocked_color);
-    }
-  }
+  void render_ant(const gos::state::ant & ant);
 
   void render_cell_in_trace(
     int       cell_x,
@@ -442,10 +359,14 @@ class app_play_state : public app_state {
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = _sprites[(int)sprite];
+    SDL_Surface * surface = _sprites[(int)sprite]->surface();
     SDL_SetColorKey(
       surface, SDL_TRUE,
-      SDL_MapRGB(surface->format, 255, 0, 255));
+      SDL_MapRGB(
+        surface->format,
+        _map_rgb_mode.r,
+        _map_rgb_mode.g,
+        _map_rgb_mode.b));
     SDL_Texture * texture =
       SDL_CreateTextureFromSurface(
         _app->win().renderer(),

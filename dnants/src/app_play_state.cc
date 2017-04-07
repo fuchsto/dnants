@@ -1,9 +1,11 @@
 
 #include <gos/app_play_state.h>
+
 #include <gos/view/svg_texture.h>
 
 #include <gos/state/cell.h>
 #include <gos/state/game_state.h>
+
 #include <gos/util/logging.h>
 
 #include <cmath>
@@ -15,6 +17,8 @@ namespace gos {
 app_play_state app_play_state::_instance;
 
 void app_play_state::initialize(app_engine * app) {
+  using gos::view::svg_texture;
+
   GOS__LOG_DEBUG("app_play_state.initialize", "()");
   _active        = true;
   _paused        = true;
@@ -26,27 +30,17 @@ void app_play_state::initialize(app_engine * app) {
   GOS__LOG_DEBUG("app_play_state.initialize",
                  "grid_spacing:" << _grid_spacing);
 
-  if (_grid_spacing == 16) {
-    _sprites[(int)sprite_tag::rock]    = SDL_LoadBMP("rock_16.bmp");
-    _sprites[(int)sprite_tag::sugah_1] = SDL_LoadBMP("sugah-1_16.bmp");
-    _sprites[(int)sprite_tag::sugah_2] = SDL_LoadBMP("sugah-2_16.bmp");
-    _sprites[(int)sprite_tag::sugah_3] = SDL_LoadBMP("sugah-3_16.bmp");
-    _sprites[(int)sprite_tag::sugah_4] = SDL_LoadBMP("sugah-4_16.bmp");
-    _sprites[(int)sprite_tag::ant_1]   = SDL_LoadBMP("ant-1_16.bmp");
-    _sprites[(int)sprite_tag::ant_2]   = SDL_LoadBMP("ant-2_16.bmp");
-    _sprites[(int)sprite_tag::ant_3]   = SDL_LoadBMP("ant-3_16.bmp");
-    _sprites[(int)sprite_tag::ant_4]   = SDL_LoadBMP("ant-4_16.bmp");
-  } else if (_grid_spacing == 32) {
-    _sprites[(int)sprite_tag::rock]    = SDL_LoadBMP("rock_32.bmp");
-    _sprites[(int)sprite_tag::sugah_1] = SDL_LoadBMP("sugah-1_32.bmp");
-    _sprites[(int)sprite_tag::sugah_2] = SDL_LoadBMP("sugah-2_32.bmp");
-    _sprites[(int)sprite_tag::sugah_3] = SDL_LoadBMP("sugah-3_32.bmp");
-    _sprites[(int)sprite_tag::sugah_4] = SDL_LoadBMP("sugah-4_32.bmp");
-    _sprites[(int)sprite_tag::ant_1]   = SDL_LoadBMP("ant-1_32.bmp");
-    _sprites[(int)sprite_tag::ant_2]   = SDL_LoadBMP("ant-2_32.bmp");
-    _sprites[(int)sprite_tag::ant_3]   = SDL_LoadBMP("ant-3_32.bmp");
-    _sprites[(int)sprite_tag::ant_4]   = SDL_LoadBMP("ant-4_32.bmp");
-  }
+  int px = _grid_spacing;
+  _sprites[(int)sprite_tag::rock]    = new svg_texture("rock.svg", px);
+  _sprites[(int)sprite_tag::sugah_1] = new svg_texture("sugah-1.svg", px);
+  _sprites[(int)sprite_tag::sugah_2] = new svg_texture("sugah-2.svg", px);
+  _sprites[(int)sprite_tag::sugah_3] = new svg_texture("sugah-3.svg", px);
+  _sprites[(int)sprite_tag::sugah_4] = new svg_texture("sugah-4.svg", px);
+  _sprites[(int)sprite_tag::ant_1]   = new svg_texture("ant-1.svg", px);
+  _sprites[(int)sprite_tag::ant_2]   = new svg_texture("ant-2.svg", px);
+  _sprites[(int)sprite_tag::ant_3]   = new svg_texture("ant-3.svg", px);
+  _sprites[(int)sprite_tag::ant_4]   = new svg_texture("ant-4.svg", px);
+
   _active        = true;
   GOS__LOG_DEBUG("app_play_state.initialize", "->");
 }
@@ -55,8 +49,8 @@ void app_play_state::finalize() {
   _active = false;
   delete _game_state;
 
-  for (SDL_Surface * surface : _sprites) {
-    SDL_FreeSurface(surface);
+  for (auto * surface : _sprites) {
+    delete surface;
   }
   _sprites = { };
 }
@@ -87,6 +81,104 @@ void app_play_state::render_grid(gos::view::window & win)
   }
 }
 
+void app_play_state::render_ant(const gos::state::ant & ant)
+{
+  if (!ant.is_alive()) {
+    return;
+  }
+
+  int strength_qurt = (((ant.strength() * 100) /
+                         ant.max_strength()) / 25
+                      ) + 1;
+
+  const rgba & col = _team_colors[ant.team_id()];
+
+  int size   = _grid_spacing;
+  int cell_x = ant.pos().x;
+  int cell_y = ant.pos().y;
+  SDL_Point center { (cell_x * _grid_spacing),
+                     (cell_y * _grid_spacing) };
+  SDL_Rect dst_rect;
+  dst_rect.x = center.x + (_grid_spacing - size) / 2;
+  dst_rect.y = center.y + (_grid_spacing - size) / 2;
+  dst_rect.w = _grid_spacing;
+  dst_rect.h = _grid_spacing;
+
+  SDL_SetRenderDrawBlendMode(
+    _app->win().renderer(),
+    SDL_BLENDMODE_BLEND);
+
+  sprite_tag sprite;
+  if      (strength_qurt >= 4) { sprite = sprite_tag::ant_4; }
+  else if (strength_qurt >= 3) { sprite = sprite_tag::ant_3; }
+  else if (strength_qurt >= 2) { sprite = sprite_tag::ant_2; }
+  else                         { sprite = sprite_tag::ant_1; }
+
+  SDL_Surface * surface = _sprites[(int)sprite]->surface();
+  SDL_SetColorKey(
+    surface, SDL_TRUE,
+    SDL_MapRGB(
+      surface->format,
+      _map_rgb_mode.r,
+      _map_rgb_mode.g,
+      _map_rgb_mode.b));
+  SDL_Texture * texture =
+    SDL_CreateTextureFromSurface(
+      _app->win().renderer(),
+      surface);
+  SDL_SetTextureColorMod(
+    texture, col.r, col.g, col.b);
+
+  SDL_RenderCopyEx(_app->win().renderer(),
+                   texture,
+                   0,
+                   &dst_rect,
+                   gos::or2deg(ant.orientation()),
+                   0,
+                   SDL_FLIP_NONE);
+
+  SDL_DestroyTexture(texture);
+
+  if (ant.num_carrying() > 0) {
+    int size = _grid_spacing;
+    SDL_Rect dst_rect;
+    dst_rect.x = center.x + ant.dir().dx * (_grid_spacing / 4);
+    dst_rect.y = center.y + ant.dir().dy * (_grid_spacing / 4);
+    dst_rect.w = size;
+    dst_rect.h = size;
+    SDL_SetRenderDrawBlendMode(
+      _app->win().renderer(),
+      SDL_BLENDMODE_BLEND);
+
+    SDL_Surface * surface = _sprites[(int)sprite_tag::sugah_2]->surface();
+    SDL_SetColorKey(
+      surface, SDL_TRUE,
+      SDL_MapRGB(
+        surface->format,
+        _map_rgb_mode.r,
+        _map_rgb_mode.g,
+        _map_rgb_mode.b));
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(
+        _app->win().renderer(),
+        surface);
+
+    SDL_RenderCopy(_app->win().renderer(),
+                   texture,
+                   0,
+                   &dst_rect);
+
+    SDL_DestroyTexture(texture);
+  }
+  if (ant.state().events.collision) {
+    draw_cell_rectangle(
+      _app->win(),
+      ant.pos().x, ant.pos().y,
+      _grid_spacing - 1,
+      _blocked_color);
+  }
+}
+
 void app_play_state::render_barrier_cell(
   int cell_x,
   int cell_y)
@@ -103,10 +195,14 @@ void app_play_state::render_barrier_cell(
     _app->win().renderer(),
     SDL_BLENDMODE_BLEND);
 
-  SDL_Surface * surface = _sprites[(int)sprite_tag::rock];
+  SDL_Surface * surface = _sprites[(int)sprite_tag::rock]->surface();
   SDL_SetColorKey(
     surface, SDL_TRUE,
-    SDL_MapRGB(surface->format, 255, 0, 255));
+    SDL_MapRGB(
+      surface->format,
+      _map_rgb_mode.r,
+      _map_rgb_mode.g,
+      _map_rgb_mode.b));
   SDL_Texture * texture =
     SDL_CreateTextureFromSurface(
       _app->win().renderer(),

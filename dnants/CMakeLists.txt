@@ -64,10 +64,8 @@ add_executable(
 
 target_link_libraries(
   ${DNANTS_MAIN_TARGET_NAME}
-# pygos
   gos
   ${SDL2_LIBRARY}
-# Test
   ${PYTHON_LIBRARY}
 )
 
