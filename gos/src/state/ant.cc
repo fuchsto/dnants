@@ -54,6 +54,9 @@ void ant_team::spawn_ants() {
 
 
 void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
+  if (_state.dist.x != 0 || _state.dist.y != 0) {
+    return;
+  }
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << num_carrying());
   cell.drop_food(num_carrying());
   _state.num_carrying = 0;
@@ -99,7 +102,6 @@ void ant::update_init() noexcept {
   _state.damage           = 0;
   _state.events.enemy     = false;
   _state.events.food      = false;
-  _state.events.collision = false;
   _state.events.attacked  = false;
 }
 
@@ -220,6 +222,7 @@ void ant::move() noexcept {
   position pos_next { pos().x + dir().dx,
                       pos().y + dir().dy };
   if (this->game_state().grid_state().allows_move_to(pos_next)) {
+    _state.events.collision = false;
     _state.dist.x += dir().dx;
     _state.dist.y += dir().dy;
     this->game_state().grid_state()[_state.pos]

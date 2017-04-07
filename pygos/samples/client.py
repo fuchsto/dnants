@@ -26,7 +26,7 @@ def handle_collision(s,g):
     nturn = 1
     if s.tick_count % 4 < 2:
         nturn *= -1
-    s.turn_dir(nturn)
+    s.turn_dir(1)
     s.move()
 
 
