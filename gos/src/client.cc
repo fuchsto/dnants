@@ -150,10 +150,14 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            (ant_id                     (cell_state::*)(void))
                                        &cell_state::ant,
            "identifier of ant in cell")
-    .def("team_traces",
+    .def("in_traces",
            (const cell_state::traces & (cell_state::*)(int))
-                                       &cell_state::team_traces,
-           "trace directions of specified team")
+                                       &cell_state::in_traces,
+           "ingoing trace directions of specified team")
+    .def("out_traces",
+           (const cell_state::traces & (cell_state::*)(int))
+                                       &cell_state::out_traces,
+           "outgoing trace directions of specified team")
     .def("num_food",
            (int                        (cell_state::*)(void))
                                        &cell_state::num_food,
@@ -172,10 +176,10 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            "type of the cell")
     ;
 
-  py::class_<cell_state::trace>(cell_state_py, "trace")
-    .def_readonly("intensity",         &cell_state::trace::intensity)
-    .def_readonly("last_visit",        &cell_state::trace::last_visit)
-    ;
+  // py::class_<cell_state::trace>(cell_state_py, "trace")
+  //   .def_readonly("intensity",         &cell_state::trace::intensity)
+  //   .def_readonly("last_visit",        &cell_state::trace::last_visit)
+  //   ;
 }
 
 namespace gos {

@@ -21,8 +21,6 @@ class cell {
 
   friend cell_state;
 
-  static const int max_trace_age = 2000;
-
  public:
   cell(cell_type ct = cell_type::plain)
   : _state(ct, (ct == cell_type::food ? 4 : 0))
@@ -40,24 +38,34 @@ class cell {
   void enter(gos::state::ant & a, const gos::state::game_state & gs);
   void leave(gos::state::ant & a, const gos::state::game_state & gs);
 
-  void add_trace(
+  void add_in_trace(
     int              team_id,
     gos::orientation ort,
-    int              round_count) noexcept
-  {
-    cell_state::trace & t = _state._traces[team_id][or2int(ort)];
-    int trace_age  = std::max(1, round_count - t.last_visit);
-    t.last_visit   = round_count;
-    t.intensity   += ((100 * max_trace_age) / trace_age) / 100;
-    if (t.intensity > 2000) { t.intensity = 2000; }
+    int              round_count) noexcept {
+    auto & t = _state._traces_in[team_id][or2int(ort)];
+    if (t <= 0 || t <= round_count) {
+      t = round_count;
+    }
+    t += 50;
+  }
+
+  void add_out_trace(
+    int              team_id,
+    gos::orientation ort,
+    int              round_count) noexcept {
+    auto & t = _state._traces_out[team_id][or2int(ort)];
+    if (t <= 0 || t <= round_count) {
+      t = round_count;
+    }
+    t += 50;
   }
 
   void update() {
-    for (auto & t_traces : _state._traces) {
-      for (auto & trace : t_traces) {
-        trace.intensity--;
-      }
-    }
+    // for (auto & t_traces : _state._traces) {
+    //   for (auto & trace : t_traces) {
+    //     trace.intensity--;
+    //   }
+    // }
   }
 };
 

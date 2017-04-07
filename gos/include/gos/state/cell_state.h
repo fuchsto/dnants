@@ -24,19 +24,17 @@ class cell_state {
   friend cell;
 
  public:
-  struct trace {
-    int intensity;
-    int last_visit;
-  };
+  typedef int trace;
 
   typedef std::array<trace, 8> traces;
 
  private:
-  cell_type               _type   = cell_type::plain;
-  int                     _amount = 0;
-  bool                    _taken  = false;
-  gos::state::ant_id      _ant_id = { -1, -1 };
-  std::array<traces, 4>   _traces = {{ }};
+  cell_type               _type       = cell_type::plain;
+  int                     _amount     = 0;
+  bool                    _taken      = false;
+  gos::state::ant_id      _ant_id     = { -1, -1 };
+  std::array<traces, 4>   _traces_in  = {{ }};
+  std::array<traces, 4>   _traces_out = {{ }};
 
  public:
   cell_state(cell_type ct, int nfood = 0)
@@ -76,8 +74,12 @@ class cell_state {
     return _taken;
   }
 
-  const traces & team_traces(int team_id) const noexcept {
-    return _traces[team_id];
+  const traces & in_traces(int team_id) const noexcept {
+    return _traces_in[team_id];
+  }
+
+  const traces & out_traces(int team_id) const noexcept {
+    return _traces_out[team_id];
   }
 
   gos::state::ant_id ant() const {

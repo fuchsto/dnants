@@ -74,6 +74,7 @@ struct rgba {
 
 struct app_settings {
   extents grid_extents;
+  int     grid_spacing;
   int     frames_per_sec;
   int     rounds_per_sec;
   int     trace_rounds;

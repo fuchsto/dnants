@@ -12,14 +12,12 @@ namespace gos {
 
 app_engine::app_engine(
   std::string          title,
-  const app_settings & settings,
-  int                  max_width,
-  int                  max_height)
+  const app_settings & settings)
 : _settings(settings)
 , _window(
     *this, title,
-    settings.grid_extents.w * 16, // (max_width / settings.grid_extents.w),
-    settings.grid_extents.h * 16, // (max_width / settings.grid_extents.w),
+    settings.grid_extents.w * settings.grid_spacing,
+    settings.grid_extents.h * settings.grid_spacing,
     0) {
   GOS__LOG_DEBUG("app_engine", "app_engine()");
   GOS__LOG_DEBUG("app_engine", "app_engine >");

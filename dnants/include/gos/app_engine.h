@@ -16,16 +16,9 @@ class rule_engine;
 
 class app_engine
 {
-  std::vector<app_state *>   _states;
-  gos::view::window          _window;
-  bool                       _is_running      = false;
-  uint32_t                   _frame_time      = 0;
-  uint32_t                   _last_frame_time = 0;
-  uint32_t                   _delta_time      = 0;
-
- private:
   gos::app_settings _settings {
                        { 30, 30 }, // grid extents
+                       16,         // cell pixels (16 or 32)
                        30,         // fps
                        5,          // rps
                        30,         // trace rounds
@@ -35,12 +28,17 @@ class app_engine
                        true        // show traces
                     };
 
+  std::vector<app_state *>   _states;
+  gos::view::window          _window;
+  bool                       _is_running      = false;
+  uint32_t                   _frame_time      = 0;
+  uint32_t                   _last_frame_time = 0;
+  uint32_t                   _delta_time      = 0;
+
  public:
   app_engine(
     std::string               title,
-    const gos::app_settings & settings,
-    int                       width,
-    int                       height);
+    const gos::app_settings & settings);
 
   ~app_engine();
 

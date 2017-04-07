@@ -173,6 +173,7 @@ class app_play_state : public app_state {
  private:
   void render_map(gos::view::window & win) {
     int          n_trace  = _app->settings().trace_rounds;
+    auto         tick_now = _game_state->round_count();
     const auto & grid     = _game_state->grid_state();
     const auto & grid_ext = grid.extents();
     const auto & popul    = _game_state->population_state();
@@ -197,18 +198,25 @@ class app_play_state : public app_state {
         }
         if (_app->settings().show_traces) {
           for (const auto & team : popul.teams()) {
-            int team_id          = team.id();
-            const auto & traces  = grid_cell.state().team_traces(team_id);
+            int team_id             = team.id();
+            const auto & in_traces  = grid_cell.state().in_traces(team_id);
+            const auto & out_traces = grid_cell.state().out_traces(team_id);
             for (int oidx = 0; oidx < 8; ++oidx) {
-              int trace_val   = traces[oidx].intensity;
-              orientation ort = gos::int2or(oidx);
-              // int trace_age   = _game_state->round_count() - trace_rc;
-              // int trace_val   = n_trace - trace_age;
-              if (trace_val > 0) {
-                render_trace_cell(
+              direction tdir    = gos::or2dir(gos::int2or(oidx));
+              int in_trace_val  = in_traces[oidx]  - tick_now;
+              int out_trace_val = out_traces[oidx] - tick_now;
+              if (in_trace_val > 0) {
+                render_cell_in_trace(
                   cell_x, cell_y,
-                  trace_val,
-                  ort,
+                  in_trace_val,
+                  tdir,
+                  team_id);
+              }
+              if (out_trace_val > 0) {
+                render_cell_out_trace(
+                  cell_x, cell_y,
+                  out_trace_val,
+                  tdir,
                   team_id);
               }
             }
@@ -248,7 +256,7 @@ class app_play_state : public app_state {
 
     const rgba & col = _team_colors[ant.team_id()];
 
-    int size   = 16;
+    int size   = _grid_spacing;
     int cell_x = ant.pos().x;
     int cell_y = ant.pos().y;
     SDL_Point center { (cell_x * _grid_spacing),
@@ -256,8 +264,8 @@ class app_play_state : public app_state {
     SDL_Rect dst_rect;
     dst_rect.x = center.x + (_grid_spacing - size) / 2;
     dst_rect.y = center.y + (_grid_spacing - size) / 2;
-    dst_rect.w = 16;
-    dst_rect.h = 16;
+    dst_rect.w = _grid_spacing;
+    dst_rect.h = _grid_spacing;
 
     SDL_SetRenderDrawBlendMode(
       _app->win().renderer(),
@@ -291,7 +299,7 @@ class app_play_state : public app_state {
     SDL_DestroyTexture(texture);
 
     if (ant.num_carrying() > 0) {
-      int size = 16;
+      int size = _grid_spacing;
       SDL_Rect dst_rect;
       dst_rect.x = center.x + ant.dir().dx * (_grid_spacing / 4);
       dst_rect.y = center.y + ant.dir().dy * (_grid_spacing / 4);
@@ -326,40 +334,60 @@ class app_play_state : public app_state {
     }
   }
 
-  void render_trace_cell(
-    int          cell_x,
-    int          cell_y,
-    int          trace_value,
-    orientation  ort,
-    int          team_id)
+  void render_cell_in_trace(
+    int       cell_x,
+    int       cell_y,
+    int       trace_value,
+    direction dir,
+    int       team_id)
   {
-  //int max_trace_rounds = _app->settings().trace_rounds;
+    // draw trace from ingoing direction to cell center:
+
     int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
     int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
 
-    if (team_id % 2) {
-      center_x -= 2;
-      center_y -= 2;
-    } else {
-      center_x += 2;
-      center_y += 2;
-    }
-
-    const rgba & col = _team_colors[team_id];
-    // Uint8 tcol_a = static_cast<Uint8>(
-    //                  ( ((trace_value * 256) / max_trace_rounds)
-    //                    * 4)
-    //                  / 5);
-    int max_trace_intensity = 100;
+    const rgba & col           = _team_colors[team_id];
+    const int    max_intensity = 100;
     Uint8 tcol_a = static_cast<Uint8>(
-                     ( ((trace_value * 256) / max_trace_intensity) * 4) / 5);
+                     ((trace_value * 256 * 4) / (max_intensity)) / 5);
     SDL_SetRenderDrawColor(
       _app->win().renderer(),
       col.r, col.g, col.b, tcol_a);
 
-    direction dir = gos::or2dir(ort);
+    int       off = (_grid_spacing / 2);
+    int       len = (_grid_spacing / 4);
+    position from { center_x - (dir.dx * off), center_y - (dir.dy * off) };
+    position to   { from.x   + (dir.dx * len), from.y   + (dir.dy * len) };
+
+    SDL_RenderDrawLine(
+      _app->win().renderer(),
+      from.x, from.y,
+      to.x,   to.y
+    );
+  }
+
+  void render_cell_out_trace(
+    int       cell_x,
+    int       cell_y,
+    int       trace_value,
+    direction dir,
+    int       team_id)
+  {
+    // draw trace from cell center in trace direction:
+
+    int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
+    int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
+
+    const rgba & col           = _team_colors[team_id];
+    const int    max_intensity = 100;
+    Uint8 tcol_a = static_cast<Uint8>(
+                     ((trace_value * 256 * 4) / (max_intensity)) / 5);
+    SDL_SetRenderDrawColor(
+      _app->win().renderer(),
+      col.r, col.g, col.b, tcol_a);
+
     int       off = (_grid_spacing / 6);
-    int       len = (_grid_spacing * 3) / 4;
+    int       len = (_grid_spacing / 2);
     position from { center_x + (dir.dx * off), center_y + (dir.dy * off) };
     position to   { center_x + (dir.dx * len), center_y + (dir.dy * len) };
 
@@ -394,7 +422,7 @@ class app_play_state : public app_state {
 
     SDL_Point center { (cell_x * _grid_spacing),
                        (cell_y * _grid_spacing) };
-    int size = 16;
+    int size = _grid_spacing;
     SDL_Rect dst_rect;
     dst_rect.x = center.x + (_grid_spacing - size) / 2;
     dst_rect.y = center.y + (_grid_spacing - size) / 2;
@@ -421,38 +449,9 @@ class app_play_state : public app_state {
     SDL_DestroyTexture(texture);
   }
 
-  void render_barrier_cell(int cell_x, int cell_y) {
-    SDL_Point center { (cell_x * _grid_spacing),
-                       (cell_y * _grid_spacing) };
-    int size = 16;
-    SDL_Rect dst_rect;
-    dst_rect.x = center.x + (_grid_spacing - size) / 2;
-    dst_rect.y = center.y + (_grid_spacing - size) / 2;
-    dst_rect.w = size;
-    dst_rect.h = size;
-    SDL_SetRenderDrawBlendMode(
-      _app->win().renderer(),
-      SDL_BLENDMODE_BLEND);
-
-    SDL_Surface * surface = _sprites[(int)sprite_tag::rock];
-    SDL_SetColorKey(
-      surface, SDL_TRUE,
-      SDL_MapRGB(surface->format, 255, 0, 255));
-    SDL_Texture * texture =
-      SDL_CreateTextureFromSurface(
-        _app->win().renderer(),
-        surface);
-
-    SDL_RenderCopy(_app->win().renderer(),
-                   texture,
-                   0,
-                   &dst_rect);
-
-    SDL_DestroyTexture(texture);
-  }
+  void render_barrier_cell(int cell_x, int cell_y);
 
   void render_grid(gos::view::window & win);
-
 
   void render_highlight_cell(const position & cell_pos) {
     draw_cell_rectangle(

@@ -14,8 +14,19 @@ void cell::enter(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
+  if (!a.is_alive()) {
+    _state._taken  = false;
+    _state._ant_id = { -1, -1 };
+    return;
+  }
   _state._ant_id = { a.team_id(), a.id() };
   _state._taken  = true;
+
+  add_in_trace(
+    a.team_id(),
+    dir2or(a.dir()),
+    gs.round_count() - 1);
+
   if (_state.num_food() > 0) {
     a.on_food_cell(state());
   }
@@ -30,7 +41,7 @@ void cell::leave(
 {
   _state._taken = false;
   if (a.is_alive()) {
-    add_trace(
+    add_out_trace(
       a.team_id(),
       dir2or(a.dir()),
       gs.round_count() - 1);

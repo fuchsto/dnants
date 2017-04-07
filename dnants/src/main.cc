@@ -33,8 +33,7 @@ int main(int argc, char * argv[])
 
   app_engine app(
     "game'-._.of'._.survive",
-    app_options,
-    900, 900);
+    app_options);
 
   app.run(app_play_state::get());
 
@@ -52,6 +51,7 @@ gos::app_settings process_args(int argc, char** argv)
   gos::app_settings app_opts;
 
   app_opts.grid_extents   = { 30, 30 };
+  app_opts.grid_spacing   = 16;
   app_opts.rounds_per_sec =  3;
   app_opts.frames_per_sec = 30;
   app_opts.init_team_size = 12;
@@ -68,6 +68,7 @@ gos::app_settings process_args(int argc, char** argv)
           {"trace-time", 1, nullptr, 't'},
           {"num-teams",  1, nullptr, 'n'},
           {"team-size",  1, nullptr, 's'},
+          {"big",        0, nullptr, 'b'},
           { nullptr,     0, nullptr,  0 }
   };
   while (true) {
@@ -90,6 +91,8 @@ gos::app_settings process_args(int argc, char** argv)
       case 'n' : app_opts.num_teams      = std::atoi(optarg);
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
+                 break;
+      case 'b' : app_opts.grid_spacing   = 32;
                  break;
       default:   break;
     }
