@@ -60,7 +60,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.show_grid      = false;
   app_opts.show_traces    = true;
 
-  const char* const short_opts = "g:w:h:t:n:s";
+  const char* const short_opts = "g:w:h:t:n:s:b";
   const option long_opts[] = {
           {"grid",       1, nullptr, 'g'},
           {"grid-w",     1, nullptr, 'w'},
@@ -81,18 +81,25 @@ gos::app_settings process_args(int argc, char** argv)
     switch (opt) {
       case 'g' : app_opts.grid_extents.w = std::atoi(optarg);
                  app_opts.grid_extents.h = std::atoi(optarg);
+                 std::cout << "option: -g" << std::endl;
                  break;
       case 'w' : app_opts.grid_extents.w = std::atoi(optarg);
+                 std::cout << "option: w" << std::endl;
                  break;
       case 'h' : app_opts.grid_extents.h = std::atoi(optarg);
+                 std::cout << "option: -h" << std::endl;
                  break;
       case 't' : app_opts.trace_rounds   = std::atoi(optarg);
+                 std::cout << "option: -t" << std::endl;
                  break;
       case 'n' : app_opts.num_teams      = std::atoi(optarg);
+                 std::cout << "option: -n" << std::endl;
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
+                 std::cout << "option: -s" << std::endl;
                  break;
       case 'b' : app_opts.grid_spacing   = 32;
+                 std::cout << "option: -b" << std::endl;
                  break;
       default:   break;
     }

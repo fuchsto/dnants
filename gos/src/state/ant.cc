@@ -83,39 +83,6 @@ void ant::on_collision() noexcept {
 
 
 
-void ant::attack() noexcept {
-  if (num_carrying() > 0) {
-    GOS__LOG_DEBUG("ant.attack", "failed: cannot attack while carrying");
-    return;
-  }
-  if (dir().dx == 0 && dir().dy == 0) {
-    GOS__LOG_DEBUG("ant.attack", "failed: no direction for attack");
-    return;
-  }
-  position enemy_pos { pos().x + dir().dx,
-                       pos().y + dir().dy };
-  if (!this->game_state().grid_state().contains_position(enemy_pos)) {
-    GOS__LOG_DEBUG("ant.attack",
-                   "failed: invalid enemy position " <<
-                   "(" << enemy_pos.x << "," << enemy_pos.y << ")");
-    return;
-  }
-  ant_id enemy_id = this->game_state().grid_state()[enemy_pos].ant();
-  if (enemy_id.id == -1 || enemy_id.team_id == -1 ||
-      enemy_id.team_id == team_id()) {
-    GOS__LOG_DEBUG("ant.attack", "failed: invalid enemy id " <<
-                   "id:" << enemy_id.id << " team:" << enemy_id.team_id);
-    return;
-  }
-  gos::state::ant & enemy = this->game_state().population_state()
-                                              .teams()[enemy_id.team_id]
-                                              .ants()[enemy_id.id];
-  GOS__LOG_DEBUG("ant.attack",
-                 "ant "   << id() << ".t" << team_id() << " attacks "
-                 "enemy " << enemy_id.id << ".t" << enemy_id.team_id);
-  enemy.on_attacked(*this);
-}
-
 void ant::die() noexcept {
   GOS__LOG_DEBUG("ant.die", "ant died: " <<
                  "t:"   << team_id() << " " <<
@@ -157,6 +124,28 @@ void ant::update_action() noexcept {
       current_cell.state().num_food() > 0) {
     _state.events.food = true;
   }
+  // Scan for enemies:
+  _state.events.enemy = false;
+  _state.enemy_dir    = { 0, 0 };
+  gos::state::ant_id enemy_id  { -1, -1 };
+  for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
+    for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
+      position adj_pos { pos().x + x,
+                         pos().y + y };
+      if ((x == 0 && y == 0) ||
+          !this->game_state().grid_state().contains_position(adj_pos)) {
+        continue;
+      }
+      enemy_id = this->game_state().grid_state()[adj_pos].ant();
+      if (enemy_id.id != -1 &&
+          enemy_id.team_id != team_id()) {
+        _state.enemy_dir = { x, y };
+        on_enemy(this->game_state().population_state()
+                                   .teams()[enemy_id.team_id]
+                                   .ants()[enemy_id.id]);
+      }
+    }
+  }
 
   // Request next state:
   _state = this->team().client().callback(
@@ -173,29 +162,6 @@ void ant::update_action() noexcept {
   else if (_state.action == ant_action::do_attack) {
     attack();
   }
-  // Scan for enemies:
-  gos::state::ant_id enemy_id  { -1, -1 };
-  for (int y = -1; enemy_id.id == -1 && y <= 1; ++y) {
-    for (int x = -1; enemy_id.id == -1 && x <= 1; ++x) {
-      position adj_pos { pos().x + x,
-                         pos().y + y };
-      if ((x == 0 && y == 0) ||
-          !this->game_state().grid_state().contains_position(adj_pos)) {
-        continue;
-      }
-      enemy_id = this->game_state().grid_state()[adj_pos].ant();
-      if (enemy_id.id != -1 &&
-          enemy_id.team_id != team_id()) {
-        _state.enemy_dir = { x, y };
-        return on_enemy(this->game_state().population_state()
-                                          .teams()[enemy_id.team_id]
-                                          .ants()[enemy_id.id]);
-      }
-    }
-  }
-  // No enemy in range
-  _state.events.enemy = false;
-  _state.enemy_dir    = { 0, 0 };
 }
 
 void ant::update_reaction() noexcept {
@@ -261,6 +227,39 @@ void ant::move() noexcept {
   } else {
     on_collision();
   }
+}
+
+void ant::attack() noexcept {
+  if (num_carrying() > 0) {
+    GOS__LOG_DEBUG("ant.attack", "failed: cannot attack while carrying");
+    return;
+  }
+  if (dir().dx == 0 && dir().dy == 0) {
+    GOS__LOG_DEBUG("ant.attack", "failed: no direction for attack");
+    return;
+  }
+  position enemy_pos { pos().x + dir().dx,
+                       pos().y + dir().dy };
+  if (!this->game_state().grid_state().contains_position(enemy_pos)) {
+    GOS__LOG_DEBUG("ant.attack",
+                   "failed: invalid enemy position " <<
+                   "(" << enemy_pos.x << "," << enemy_pos.y << ")");
+    return;
+  }
+  ant_id enemy_id = this->game_state().grid_state()[enemy_pos].ant();
+  if (enemy_id.id == -1 || enemy_id.team_id == -1 ||
+      enemy_id.team_id == team_id()) {
+    GOS__LOG_DEBUG("ant.attack", "failed: invalid enemy id " <<
+                   "id:" << enemy_id.id << " team:" << enemy_id.team_id);
+    return;
+  }
+  gos::state::ant & enemy = this->game_state().population_state()
+                                              .teams()[enemy_id.team_id]
+                                              .ants()[enemy_id.id];
+  GOS__LOG_DEBUG("ant.attack",
+                 "ant "   << id() << ".t" << team_id() << " attacks "
+                 "enemy " << enemy_id.id << ".t" << enemy_id.team_id);
+  enemy.on_attacked(*this);
 }
 
 gos::state::cell & ant::cell() noexcept {
@@ -341,6 +340,10 @@ std::ostream & operator<<(
                      << ")";
   }
   ss << " str:"  << a.strength()
+     << " dis:"  << "(" 
+                 << a.state().dist.x << ","
+                 << a.state().dist.y
+                 << ")"
      << " dir:"  << "(" 
                  << a.dir().dx << ","
                  << a.dir().dy
