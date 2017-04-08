@@ -66,11 +66,6 @@ target_link_libraries(
 
 set_target_properties(
   ${DNANTS_LIBGOS_TARGET_NAME}
-  PROPERTIES
-  COMPILE_FLAGS "-Wno-unused"
-)
-set_target_properties(
-  ${DNANTS_LIBGOS_TARGET_NAME}
   PROPERTIES 
   CXX_STANDARD 11
 )
