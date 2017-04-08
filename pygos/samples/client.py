@@ -25,9 +25,12 @@ def random_turn(s,g):
     if s.dir.x == 0 and s.dir.y == 0:
         s.set_dir(0,1)
     nturn = 1
-    if s.tick_count % 4 < 2:
+    if (s.tick_count - s.id) % 8 < 6:
+        nturn += 1
+    if (s.tick_count + s.id) % 8 < 6:
         nturn *= -1
-    s.turn_dir(1)
+    # s.turn_dir(1)
+    s.turn_dir(nturn)
 
 
 def follow_food(s,g):
@@ -63,13 +66,8 @@ def follow_trace(s,g):
                     best_trace_val = trace_val
                     best_trace_dir.x = x
                     best_trace_dir.y = y
-                    print("follow_trace({},{}) : f:{} b:{}"
-                            .format(best_trace_dir.x, best_trace_dir.y,
-                                    fwd_trace, bwd_trace))
     if scnd_trace_dir.x != 0 or scnd_trace_dir.y != 0:
         s.set_dir(scnd_trace_dir.x, scnd_trace_dir.y)
-        print("follow_trace -> dir({},{})"
-                .format(scnd_trace_dir.x, scnd_trace_dir.y))
         return True
     else:
         return False
@@ -79,7 +77,7 @@ def follow_trace(s,g):
 def init_mode(s,g):
     s.set_mode(ant_mode.scouting)
     if not follow_trace(s,g):
-        s.set_dir(0,1)
+        random_turn(s,g)
         nturn = 1
         if (s.tick_count - s.last_dir_change == 0):
             nturn -= 2
@@ -137,12 +135,12 @@ def eat_mode(s,g):
             if s.num_carrying > 0:
                 # Carry to base:
                 s.set_mode(ant_mode.backtracing)
-                s.turn_dir(1 - (s.rand % 2) * 2)
+                s.turn_dir(4)
                 s.move()
             else:
                 # Continue search:
                 s.set_mode(ant_mode.scouting)
-                s.turn_dir(1 - (s.rand % 2) * 2)
+                random_turn(s,g)
                 s.move()
 
 def harvest_mode(s,g):
@@ -164,12 +162,12 @@ def harvest_mode(s,g):
         if s.num_carrying > 0:
             # Carry to base:
             s.set_mode(ant_mode.backtracing)
-            s.turn_dir(1 - (s.rand % 2) * 2)
+            s.turn_dir(4)
             s.move()
         else:
             # Continue search:
             s.set_mode(ant_mode.scouting)
-            s.turn_dir(4)
+            random_turn(s,g)
             s.move()
 
 def backtrace_mode(s,g):

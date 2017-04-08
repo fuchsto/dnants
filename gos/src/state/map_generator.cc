@@ -141,6 +141,15 @@ gos::state::grid * map_generator::make_grid()
         }
       }
     }
+    for (int x = 0; x < _extents.w; ++x) {
+      for (int y = 0; y < _extents.h - x; ++y) {
+        position upper_pos { x, y };
+        position lower_pos { _extents.w - x - 1, _extents.h - y - 1 };
+        if ((*gen_grid)[upper_pos].type() != cell_type::spawn_point) {
+          (*gen_grid)[lower_pos] = (*gen_grid)[upper_pos];
+        }
+      }
+    }
   }
 
   return gen_grid;
@@ -151,14 +160,16 @@ gos::state::population * map_generator::make_population(
 {
   GOS__LOG_DEBUG("map_generator", "make_population()");
   std::vector<ant_team> teams;
+  extents   grid_ext = grid_in->extents();
+  direction spawn_corners[4] { { -1, -1 }, {  1,  1 },
+                               {  1, -1 }, { -1,  1 } };
+  position  center_cell { grid_ext.w / 2,
+                          grid_ext.h / 2 };
   for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
-    position spawn_point { 1, 1 };
-    spawn_point.x += (team_idx % 2) * 3;
-    spawn_point.y += (team_idx % 2) * 3;
-    spawn_point.x *= _extents.w / 5;
-    spawn_point.y *= _extents.h / 5;
-    spawn_point.x -= 1;
-    spawn_point.y -= 1;
+    direction spawn_corner = spawn_corners[team_idx];
+    position spawn_point {
+               center_cell.x + spawn_corner.dx * grid_ext.w / 3,
+               center_cell.y + spawn_corner.dy * grid_ext.h / 3 };
     GOS__LOG_DEBUG("map_generator.make_population",
                    "team "  << team_idx << " " <<
                    "spawn:" << spawn_point.x << "," << spawn_point.y);

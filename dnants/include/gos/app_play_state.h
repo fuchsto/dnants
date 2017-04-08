@@ -23,7 +23,7 @@ class app_play_state : public app_state {
   using cell_traces = gos::state::cell_state::traces;
   using svg_texture = gos::view::svg_texture;
 
-  enum class sprite_tag : int {
+  enum class res_tag : int {
     rock = 0,
     sugah_1,
     sugah_2,
@@ -32,7 +32,10 @@ class app_play_state : public app_state {
     ant_1,
     ant_2,
     ant_3,
-    ant_4
+    ant_4,
+    evt_attacked,
+    evt_enemy,
+    act_attack
   };
 
  protected:
@@ -55,7 +58,7 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
-  std::array<svg_texture *, 9> _sprites { };
+  std::array<svg_texture *, 12> _sprites { };
 
   rgba         _team_colors[4]  { { 0xff, 0x12, 0x66, 0x88 },
                                   { 0x00, 0xaa, 0x23, 0x88 },
@@ -331,6 +334,7 @@ class app_play_state : public app_state {
     gos::view::window & win,
     int  cell_x,
     int  cell_y,
+    int  size,
     const rgba & col);
 
   void log_cell(const position & cell_pos) {

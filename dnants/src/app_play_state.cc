@@ -30,16 +30,18 @@ void app_play_state::initialize(app_engine * app) {
   GOS__LOG_DEBUG("app_play_state.initialize",
                  "grid_spacing:" << _grid_spacing);
 
-  int px = _grid_spacing;
-  _sprites[(int)sprite_tag::rock]    = new svg_texture("rock.svg", px);
-  _sprites[(int)sprite_tag::sugah_1] = new svg_texture("sugah-1.svg", px);
-  _sprites[(int)sprite_tag::sugah_2] = new svg_texture("sugah-2.svg", px);
-  _sprites[(int)sprite_tag::sugah_3] = new svg_texture("sugah-3.svg", px);
-  _sprites[(int)sprite_tag::sugah_4] = new svg_texture("sugah-4.svg", px);
-  _sprites[(int)sprite_tag::ant_1]   = new svg_texture("ant-1.svg", px);
-  _sprites[(int)sprite_tag::ant_2]   = new svg_texture("ant-2.svg", px);
-  _sprites[(int)sprite_tag::ant_3]   = new svg_texture("ant-3.svg", px);
-  _sprites[(int)sprite_tag::ant_4]   = new svg_texture("ant-4.svg", px);
+  _sprites[(int)res_tag::rock]         = new svg_texture("rock.svg");
+  _sprites[(int)res_tag::sugah_1]      = new svg_texture("sugah-1.svg");
+  _sprites[(int)res_tag::sugah_2]      = new svg_texture("sugah-2.svg");
+  _sprites[(int)res_tag::sugah_3]      = new svg_texture("sugah-3.svg");
+  _sprites[(int)res_tag::sugah_4]      = new svg_texture("sugah-4.svg");
+  _sprites[(int)res_tag::ant_1]        = new svg_texture("ant-1.svg");
+  _sprites[(int)res_tag::ant_2]        = new svg_texture("ant-2.svg");
+  _sprites[(int)res_tag::ant_3]        = new svg_texture("ant-3.svg");
+  _sprites[(int)res_tag::ant_4]        = new svg_texture("ant-4.svg");
+  _sprites[(int)res_tag::evt_attacked] = new svg_texture("evt_attacked.svg");
+  _sprites[(int)res_tag::evt_enemy]    = new svg_texture("evt_enemy.svg");
+  _sprites[(int)res_tag::act_attack]   = new svg_texture("act_attack.svg");
 
   _active        = true;
   GOS__LOG_DEBUG("app_play_state.initialize", "->");
@@ -108,36 +110,46 @@ void app_play_state::render_ant(const gos::state::ant & ant)
     _app->win().renderer(),
     SDL_BLENDMODE_BLEND);
 
-  sprite_tag sprite;
-  if      (strength_qurt >= 4) { sprite = sprite_tag::ant_4; }
-  else if (strength_qurt >= 3) { sprite = sprite_tag::ant_3; }
-  else if (strength_qurt >= 2) { sprite = sprite_tag::ant_2; }
-  else                         { sprite = sprite_tag::ant_1; }
+  if (ant.state().events.attacked) {
+    SDL_Surface * surface = _sprites[(int)res_tag::evt_attacked]->surface();
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(_app->win().renderer(), surface);
+    SDL_RenderCopy(_app->win().renderer(), texture, 0, &dst_rect);
+    SDL_DestroyTexture(texture);
+  }
+  if (ant.state().events.enemy) {
+    SDL_Surface * surface = _sprites[(int)res_tag::evt_enemy]->surface();
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(_app->win().renderer(), surface);
+    SDL_RenderCopy(_app->win().renderer(), texture, 0, &dst_rect);
+    SDL_DestroyTexture(texture);
+  }
 
-  SDL_Surface * surface = _sprites[(int)sprite]->surface();
-  // SDL_SetColorKey(
-  //   surface, SDL_TRUE,
-  //   SDL_MapRGB(
-  //     surface->format,
-  //     _map_rgb_mode.r,
-  //     _map_rgb_mode.g,
-  //     _map_rgb_mode.b));
-  SDL_Texture * texture =
-    SDL_CreateTextureFromSurface(
-      _app->win().renderer(),
-      surface);
-  SDL_SetTextureColorMod(
-    texture, col.r, col.g, col.b);
+  if (ant.state().strength > 0) {
+    res_tag sprite;
+    if      (strength_qurt >= 4) { sprite = res_tag::ant_4; }
+    else if (strength_qurt >= 3) { sprite = res_tag::ant_3; }
+    else if (strength_qurt >= 2) { sprite = res_tag::ant_2; }
+    else                         { sprite = res_tag::ant_1; }
 
-  SDL_RenderCopyEx(_app->win().renderer(),
-                   texture,
-                   0,
-                   &dst_rect,
-                   gos::or2deg(ant.orientation()),
-                   0,
-                   SDL_FLIP_NONE);
+    SDL_Surface * surface = _sprites[(int)sprite]->surface();
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(
+        _app->win().renderer(),
+        surface);
+    SDL_SetTextureColorMod(
+      texture, col.r, col.g, col.b);
 
-  SDL_DestroyTexture(texture);
+    SDL_RenderCopyEx(_app->win().renderer(),
+                     texture,
+                     0,
+                     &dst_rect,
+                     gos::or2deg(ant.orientation()),
+                     0,
+                     SDL_FLIP_NONE);
+
+    SDL_DestroyTexture(texture);
+  }
 
   if (ant.num_carrying() > 0) {
     int size = _grid_spacing;
@@ -150,14 +162,7 @@ void app_play_state::render_ant(const gos::state::ant & ant)
       _app->win().renderer(),
       SDL_BLENDMODE_BLEND);
 
-    SDL_Surface * surface = _sprites[(int)sprite_tag::sugah_2]->surface();
-    // SDL_SetColorKey(
-    //   surface, SDL_TRUE,
-    //   SDL_MapRGB(
-    //     surface->format,
-    //     _map_rgb_mode.r,
-    //     _map_rgb_mode.g,
-    //     _map_rgb_mode.b));
+    SDL_Surface * surface = _sprites[(int)res_tag::sugah_2]->surface();
     SDL_Texture * texture =
       SDL_CreateTextureFromSurface(
         _app->win().renderer(),
@@ -170,12 +175,12 @@ void app_play_state::render_ant(const gos::state::ant & ant)
 
     SDL_DestroyTexture(texture);
   }
-  if (ant.state().events.collision) {
-    draw_cell_rectangle(
-      _app->win(),
-      ant.pos().x, ant.pos().y,
-      _grid_spacing - 1,
-      _blocked_color);
+  if (ant.state().action == gos::state::ant_action::do_attack) {
+    SDL_Surface * surface = _sprites[(int)res_tag::act_attack]->surface();
+    SDL_Texture * texture =
+      SDL_CreateTextureFromSurface(_app->win().renderer(), surface);
+    SDL_RenderCopy(_app->win().renderer(), texture, 0, &dst_rect);
+    SDL_DestroyTexture(texture);
   }
 }
 
@@ -195,14 +200,7 @@ void app_play_state::render_barrier_cell(
     _app->win().renderer(),
     SDL_BLENDMODE_BLEND);
 
-  SDL_Surface * surface = _sprites[(int)sprite_tag::rock]->surface();
-  // SDL_SetColorKey(
-  //   surface, SDL_TRUE,
-  //   SDL_MapRGB(
-  //     surface->format,
-  //     _map_rgb_mode.r,
-  //     _map_rgb_mode.g,
-  //     _map_rgb_mode.b));
+  SDL_Surface * surface = _sprites[(int)res_tag::rock]->surface();
   SDL_Texture * texture =
     SDL_CreateTextureFromSurface(
       _app->win().renderer(),
@@ -288,11 +286,11 @@ void app_play_state::render_food_cell(int cell_x, int cell_y) {
   int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
   if (amount_left == 0) { return; }
 
-  sprite_tag sprite;
-  if      (amount_qurt >= 4) { sprite = sprite_tag::sugah_4; }
-  else if (amount_qurt >= 3) { sprite = sprite_tag::sugah_3; }
-  else if (amount_qurt >= 2) { sprite = sprite_tag::sugah_2; }
-  else                       { sprite = sprite_tag::sugah_1; }
+  res_tag sprite;
+  if      (amount_qurt >= 4) { sprite = res_tag::sugah_4; }
+  else if (amount_qurt >= 3) { sprite = res_tag::sugah_3; }
+  else if (amount_qurt >= 2) { sprite = res_tag::sugah_2; }
+  else                       { sprite = res_tag::sugah_1; }
 
   SDL_Point center { (cell_x * _grid_spacing),
                      (cell_y * _grid_spacing) };
@@ -432,9 +430,10 @@ void app_play_state::draw_cell_triangle(
   gos::view::window & win,
   int  cell_x,
   int  cell_y,
+  int  size,
   const rgba & col)
 {
-  int spacing = _grid_spacing;
+  int spacing = size;
   SDL_SetRenderDrawColor(
     win.renderer(), col.r, col.g, col.b, col.a);
   while (spacing--) {

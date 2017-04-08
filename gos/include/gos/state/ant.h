@@ -138,7 +138,7 @@ class ant {
   void die() noexcept;
 
   inline bool is_alive() const noexcept {
-    return mode() != ant_mode::dead && _state.strength > 0;
+    return mode() != ant_mode::dead;
   }
 
   inline size_t rand() const noexcept {

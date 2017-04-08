@@ -33,7 +33,7 @@ class svg_texture {
  public:
   svg_texture(
     const std::string & filename,
-    int                 dpi);
+    int                 dpi = 0);
 
   ~svg_texture();
 

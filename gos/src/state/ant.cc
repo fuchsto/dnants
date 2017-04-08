@@ -71,7 +71,7 @@ void ant::on_food_cell(gos::state::cell_state & cell) noexcept {
 }
 
 void ant::on_enemy(gos::state::ant & enemy) noexcept {
-  _state.events.enemy = true;
+// _state.events.enemy = true;
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {
@@ -112,14 +112,16 @@ void ant::update_position() noexcept {
   // Apply cell change from last round:
 
   ++_state.nticks_not_fed;
-  if (_state.strength > max_strength() / 2 &&
-      ((_state.nticks_not_fed + 1) % 100) == 0) {
-    --_state.strength;
-  }
+// if (_state.strength > max_strength() / 2 &&
+//     ((_state.nticks_not_fed + 1) % 100) == 0) {
+//   --_state.strength;
+// }
 
   if (_state.action == ant_action::do_move) {
     // Updates position and triggers grid cell events:
     move();
+  } else {
+    _state.action = ant_action::do_idle;
   }
 }
 
@@ -148,10 +150,16 @@ void ant::update_action() noexcept {
       enemy_id = this->game_state().grid_state()[adj_pos].ant();
       if (enemy_id.id != -1 &&
           enemy_id.team_id != team_id()) {
-        _state.enemy_dir = { x, y };
-        on_enemy(this->game_state().population_state()
-                                   .teams()[enemy_id.team_id]
-                                   .ants()[enemy_id.id]);
+        const auto & enemy = this->game_state().population_state()
+                                               .teams()[enemy_id.team_id]
+                                               .ants()[enemy_id.id];
+        if (enemy.is_alive()) {
+          _state.enemy_dir = { x, y };
+          _state.events.enemy = true;
+          // on_enemy(this->game_state().population_state()
+          //                            .teams()[enemy_id.team_id]
+          //                            .ants()[enemy_id.id]);
+        }
       }
     }
   }
@@ -164,15 +172,12 @@ void ant::update_action() noexcept {
   // Apply actions from current round:
   if (_state.action == ant_action::do_eat) {
     eat();
-    _state.action = ant_action::do_idle;
   }
   else if (_state.action == ant_action::do_harvest) {
     harvest();
-    _state.action = ant_action::do_idle;
   }
   else if (_state.action == ant_action::do_attack) {
     attack();
-    _state.action = ant_action::do_idle;
   }
 }
 
@@ -181,7 +186,9 @@ void ant::update_reaction() noexcept {
   // Apply results of actions from current round:
   if (strength() <= damage()) {
     if (strength() > 1) {
-      --_state.strength;
+      _state.strength = std::max(
+                          strength() - (damage() / strength()),
+                          0);
     } else {
       die();
     }
