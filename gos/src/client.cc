@@ -131,12 +131,32 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     .export_values()
     ;
 
+  py::enum_<orientation>(m, "orientation")
+    .value("north",        orientation::north)
+    .value("west",         orientation::west)
+    .value("south",        orientation::south)
+    .value("east",         orientation::east)
+    .value("northeast",    orientation::northeast)
+    .value("southeast",    orientation::southeast)
+    .value("southwest",    orientation::southwest)
+    .value("northwest",    orientation::northwest)
+    .export_values()
+    ;
+
   py::class_<neighbor_grid> neighbor_grid_py(m, "neighbor_grid");
   neighbor_grid_py
     .def("at",
            (const cell_state & (neighbor_grid::*)(int,int))
                                &neighbor_grid::state_at,
            "access cell at grid coordinates")
+    .def("in_trace",
+           (int                & (neighbor_grid::*)(int,int))
+                               &neighbor_grid::in_trace,
+           "ingoing trace directions of specified team")
+    .def("out_trace",
+           (int                & (neighbor_grid::*)(int,int))
+                               &neighbor_grid::out_trace,
+           "ingoing trace directions of specified team")
     ;
 
   py::class_<cell_state> cell_state_py(m, "cell_state");
@@ -158,14 +178,6 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
            (ant_id                     (cell_state::*)(void))
                                        &cell_state::ant,
            "identifier of ant in cell")
-    .def("in_traces",
-           (const cell_state::traces & (cell_state::*)(int))
-                                       &cell_state::in_traces,
-           "ingoing trace directions of specified team")
-    .def("out_traces",
-           (const cell_state::traces & (cell_state::*)(int))
-                                       &cell_state::out_traces,
-           "outgoing trace directions of specified team")
     .def("num_food",
            (int                        (cell_state::*)(void))
                                        &cell_state::num_food,
@@ -205,7 +217,11 @@ gos::state::ant_state client::callback(
 {
   auto locals = py::dict(
                   "current"_a=current,
-                  "grid_state"_a=neighbor_grid(grid_state, current.pos),
+                  "grid_state"_a=neighbor_grid(
+                                   grid_state,
+                                   current.pos,
+                                   current.team_id,
+                                   current.tick_count),
                   **_module.attr("__dict__"));
 
   return py::eval<py::eval_expr>(

@@ -14,6 +14,7 @@ attack_min_strength  = 5
 
 def handle_enemy(s,g):
     global attack_min_strength
+    print("attack({},{})".format(s.enemy_dir.x, s.enemy_dir.y))
     if s.strength >= attack_min_strength:
         s.set_dir(s.enemy_dir.x, s.enemy_dir.y)
         s.attack()
@@ -27,6 +28,17 @@ def handle_collision(s,g):
         nturn *= -1
     s.turn_dir(1)
     s.move()
+
+
+def follow_trace(s,g):
+    for x in [ -1,0,1 ]:
+        for y in [ -1,0,1 ]:
+            fwd_trace = g.out_trace(x,y)
+            bwd_trace = g.in_trace(x,y)
+            if fwd_trace > 0 and bwd_trace > 0:
+                print("follow_trace({},{}) : f:{} b:{}"
+                        .format(x,y, fwd_trace, bwd_trace))
+                return
 
 
 
@@ -58,7 +70,8 @@ def scout_mode(s,g):
             if s.events.collision:
                 handle_collision(s,g)
             elif s.tick_count - s.last_dir_change > 4:
-                s.turn_dir((s.rand % 3) - 1)
+                # s.turn_dir((s.rand % 3) - 1)
+                follow_trace(s,g)
                 s.move()
 
 def eat_mode(s,g):

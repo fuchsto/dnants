@@ -94,6 +94,8 @@ class neighbor_grid {
 
   const grid & _grid;
   position     _pos;
+  int          _team_id;
+  int          _tick;
   cell_state   _nil_cell;
 
  public:
@@ -102,18 +104,70 @@ class neighbor_grid {
   neighbor_grid(self_t && other)                = default;
   neighbor_grid & operator=(const self_t & rhs) = default;
   neighbor_grid & operator=(self_t && rhs)      = default;
-  neighbor_grid(const grid & g, const position & pos)
+  neighbor_grid(
+    const grid     & g,
+    const position & pos,
+    int              team_id,
+    int              tick)
   : _grid(g)
   , _pos(pos)
+  , _team_id(team_id)
+  , _tick(tick)
   , _nil_cell(cell_type::barrier)
   { }
 
   inline const cell_state & state_at(int x, int y) const {
-    position neighbor_pos { _pos.x + std::max(-1, std::min(x, 1)),
-                            _pos.y + std::max(-1, std::min(y, 1)) };
-    return ( _grid.contains_position(neighbor_pos)
-             ? _grid[neighbor_pos].state()
+    auto nb_pos = neighbor(x,y);
+    GOS__LOG_DEBUG("neighbor_grid", "state_at" <<
+                   "(" << nb_pos.x <<
+                   "," << nb_pos.y << ")");
+    return ( _grid.contains_position(nb_pos)
+             ? _grid[nb_pos].state()
              : _nil_cell );
+  }
+
+  int in_trace(int dx, int dy) const noexcept {
+    GOS__LOG_DEBUG("neighbor_grid",
+                   "team:" << _team_id << " " <<
+                   "tick:" << _tick << " " <<
+                   "in_trace(" << dx << "," << dy << ") " <<
+                   "oidx:" << gos::dir2int({ dx, dy }));
+    if (dx == 0 && dy == 0) {
+      return 0;
+    }
+    const auto & cs = state_at(0,0);
+    GOS__LOG_DEBUG("neighbor_grid", "got cell state ...");
+    if (cs.type() == cell_type::barrier) {
+      return 0;
+    }
+    const auto & tc = cs.in_traces(_team_id);
+    GOS__LOG_DEBUG("neighbor_grid", "got traces ...");
+    return 0; // tc[gos::dir2int({ dx, dy })] - _tick;
+  }
+
+  int out_trace(int dx, int dy) const noexcept {
+    GOS__LOG_DEBUG("neighbor_grid",
+                   "team:" << _team_id << " " <<
+                   "tick:" << _tick << " " <<
+                   "out_trace(" << dx << "," << dy << ") " <<
+                   "oidx:" << gos::dir2int({ dx, dy }));
+    if (dx == 0 && dy == 0) {
+      return 0;
+    }
+    const auto & cs = state_at(0,0);
+    GOS__LOG_DEBUG("neighbor_grid", "got cell state ...");
+    if (cs.type() == cell_type::barrier) {
+      return 0;
+    }
+    const auto & tc = cs.out_traces(_team_id);
+    GOS__LOG_DEBUG("neighbor_grid", "got traces ...");
+    return 0; // tc[gos::dir2int({ dx, dy })] - _tick;
+  }
+
+ private:
+  position neighbor(int x, int y) const noexcept {
+    return position { _pos.x + std::max(-1, std::min(x, 1)),
+                      _pos.y + std::max(-1, std::min(y, 1)) };
   }
 };
 

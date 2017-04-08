@@ -40,9 +40,9 @@ void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     auto & base_cell  = _game_state->grid_state()[spawn_pos];
     auto & base_state = base_cell.state();
-    if (base_state.num_food() >= 3) {
+    if (base_state.num_food() >= 4) {
       _team_size++;
-      base_state.take_food(3);
+      base_state.take_food(4);
     }
     if (!(base_cell.is_taken())) {
       if (_ants.size() >= _team_size) { return; }
@@ -54,6 +54,8 @@ void ant_team::spawn_ants() {
 
 
 void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
+  GOS__LOG_DEBUG("ant.on_home_cell",
+                 "dist:(" << _state.dist.x << "," << _state.dist.y << ")");
   if (_state.dist.x != 0 || _state.dist.y != 0) {
     return;
   }
@@ -64,7 +66,11 @@ void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
 }
 
 void ant::on_food_cell(gos::state::cell_state & cell) noexcept {
-  _state.events.food = true;
+  if (_state.dist.x == 0 && _state.dist.y == 0) {
+    _state.events.food = false;
+  } else {
+    _state.events.food = true;
+  }
 }
 
 void ant::on_enemy(
@@ -125,6 +131,8 @@ void ant::update_action() noexcept {
   if (!is_alive()) { return; }
 
   const auto & current_cell = cell();
+
+  _state.events.food = false;
   if (current_cell.type() != cell_type::spawn_point &&
       current_cell.state().num_food() > 0) {
     _state.events.food = true;

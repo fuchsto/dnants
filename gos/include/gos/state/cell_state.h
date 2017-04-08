@@ -32,9 +32,9 @@ class cell_state {
   cell_type               _type       = cell_type::plain;
   int                     _amount     = 0;
   bool                    _taken      = false;
-  gos::state::ant_id      _ant_id     = { -1, -1 };
-  std::array<traces, 4>   _traces_in  = {{ }};
-  std::array<traces, 4>   _traces_out = {{ }};
+  gos::state::ant_id      _ant_id     { -1, -1 };
+  std::array<traces, 4>   _traces_in  {{ }};
+  std::array<traces, 4>   _traces_out {{ }};
 
  public:
   cell_state(cell_type ct, int nfood = 0)

@@ -160,6 +160,12 @@ static constexpr direction or2dir(
   };
 }
 
+static int dir2int(
+  const direction & dir)
+{
+  return or2int(dir2or(dir));
+}
+
 static double or2deg(
   const orientation & ort)
 {
