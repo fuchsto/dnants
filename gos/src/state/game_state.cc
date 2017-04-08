@@ -22,7 +22,8 @@ game_state::game_state(
          .set_num_food_regions(_nteams * 2)
          .set_num_barriers(3)
          .set_team_size(_app_settings.init_team_size)
-         .set_num_teams(_nteams);
+         .set_num_teams(_nteams)
+         .symmetric(_nteams > 1);
 
   auto map = map_gen.generate();
 

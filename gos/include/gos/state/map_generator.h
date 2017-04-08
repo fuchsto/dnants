@@ -21,12 +21,13 @@ class map_generator
 
   gos::state::game_state & _game_state;
 
-  extents      _extents           { 80, 80 };
+  extents      _extents           { };
   int          _num_grass_regions = 0;
   int          _num_food_regions  = 0;
   int          _num_barriers      = 0;
   int          _num_teams         = 0;
   int          _team_size         = 0;
+  bool         _symmetric         = false;
 
   struct map {
     gos::state::grid       * grid;
@@ -62,6 +63,11 @@ class map_generator
 
   self_t & set_team_size(int team_size) {
     _team_size = team_size;
+    return *this;
+  }
+
+  self_t & symmetric(bool sym = true) {
+    _symmetric = sym;
     return *this;
   }
 

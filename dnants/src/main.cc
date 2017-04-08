@@ -50,11 +50,11 @@ gos::app_settings process_args(int argc, char** argv)
 {
   gos::app_settings app_opts;
 
-  app_opts.grid_extents   = { 30, 30 };
-  app_opts.grid_spacing   = 16;
-  app_opts.rounds_per_sec =  3;
+  app_opts.grid_extents   = { 20, 20 };
+  app_opts.grid_spacing   = 32;
+  app_opts.rounds_per_sec =  4;
   app_opts.frames_per_sec = 30;
-  app_opts.init_team_size = 12;
+  app_opts.init_team_size =  5;
   app_opts.num_teams      =  1;
   app_opts.trace_rounds   = 20;
   app_opts.show_grid      = false;
@@ -81,28 +81,25 @@ gos::app_settings process_args(int argc, char** argv)
     switch (opt) {
       case 'g' : app_opts.grid_extents.w = std::atoi(optarg);
                  app_opts.grid_extents.h = std::atoi(optarg);
-                 std::cout << "option: -g" << std::endl;
                  break;
       case 'w' : app_opts.grid_extents.w = std::atoi(optarg);
-                 std::cout << "option: w" << std::endl;
                  break;
       case 'h' : app_opts.grid_extents.h = std::atoi(optarg);
-                 std::cout << "option: -h" << std::endl;
                  break;
       case 't' : app_opts.trace_rounds   = std::atoi(optarg);
-                 std::cout << "option: -t" << std::endl;
                  break;
       case 'n' : app_opts.num_teams      = std::atoi(optarg);
-                 std::cout << "option: -n" << std::endl;
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
-                 std::cout << "option: -s" << std::endl;
                  break;
-      case 'b' : app_opts.grid_spacing   = 32;
-                 std::cout << "option: -b" << std::endl;
+      case 'b' : app_opts.grid_spacing   = 16;
                  break;
       default:   break;
     }
+  }
+  if (app_opts.grid_extents.w > 30 ||
+      app_opts.grid_extents.h > 20) {
+    app_opts.grid_spacing = 16;
   }
   return app_opts;
 }

@@ -131,6 +131,18 @@ gos::state::grid * map_generator::make_grid()
     }
   }
 
+  if (_symmetric) {
+    for (int y = 0; y < _extents.h; ++y) {
+      for (int x = 0; x < _extents.w - y; ++x) {
+        position upper_pos { x, y };
+        position lower_pos { _extents.w - x - 1, _extents.h - y - 1 };
+        if ((*gen_grid)[upper_pos].type() != cell_type::spawn_point) {
+          (*gen_grid)[lower_pos] = (*gen_grid)[upper_pos];
+        }
+      }
+    }
+  }
+
   return gen_grid;
 }
 
