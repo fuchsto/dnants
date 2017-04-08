@@ -67,15 +67,10 @@ void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
 }
 
 void ant::on_food_cell(gos::state::cell_state & cell) noexcept {
-  if (_state.dist.x == 0 && _state.dist.y == 0) {
-    _state.events.food = false;
-  } else {
-    _state.events.food = true;
-  }
+  _state.events.food = true;
 }
 
-void ant::on_enemy(
-  gos::state::ant & enemy) noexcept {
+void ant::on_enemy(gos::state::ant & enemy) noexcept {
   _state.events.enemy = true;
 }
 
@@ -176,6 +171,7 @@ void ant::update_action() noexcept {
   else if (_state.action == ant_action::do_attack) {
     attack();
   }
+  _state.action = ant_action::do_idle;
 }
 
 void ant::update_reaction() noexcept {
@@ -253,6 +249,7 @@ void ant::attack() noexcept {
                        pos().y + dir().dy };
   if (!this->game_state().grid_state().contains_position(enemy_pos)) {
     GOS__LOG_DEBUG("ant.attack",
+                   "pos: (" << pos().x << "," << pos().y << ") " <<
                    "failed: invalid enemy position " <<
                    "(" << enemy_pos.x << "," << enemy_pos.y << ")");
     return;
@@ -260,7 +257,9 @@ void ant::attack() noexcept {
   ant_id enemy_id = this->game_state().grid_state()[enemy_pos].ant();
   if (enemy_id.id == -1 || enemy_id.team_id == -1 ||
       enemy_id.team_id == team_id()) {
-    GOS__LOG_DEBUG("ant.attack", "failed: invalid enemy id " <<
+    GOS__LOG_DEBUG("ant.attack",
+                   "pos: (" << pos().x << "," << pos().y << ") " <<
+                   "failed: invalid enemy id " <<
                    "id:" << enemy_id.id << " team:" << enemy_id.team_id);
     return;
   }
@@ -268,6 +267,7 @@ void ant::attack() noexcept {
                                               .teams()[enemy_id.team_id]
                                               .ants()[enemy_id.id];
   GOS__LOG_DEBUG("ant.attack",
+                 "pos: (" << pos().x << "," << pos().y << ") " <<
                  "ant "   << id() << ".t" << team_id() << " attacks "
                  "enemy " << enemy_id.id << ".t" << enemy_id.team_id);
   enemy.on_attacked(*this);
