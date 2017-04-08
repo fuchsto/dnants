@@ -23,7 +23,7 @@ class cell {
 
  public:
   cell(cell_type ct = cell_type::plain)
-  : _state(ct, (ct == cell_type::food ? 4 : 0))
+  : _state(ct, (ct == cell_type::food ? 8 : 0))
   { }
 
   bool is_taken()    const { return _state.is_taken();            }
@@ -46,7 +46,7 @@ class cell {
     if (t <= 0 || t <= round_count) {
       t = round_count;
     }
-    t += 50;
+    t = std::min(round_count + 300, t + 50);
   }
 
   void add_out_trace(
@@ -57,7 +57,7 @@ class cell {
     if (t <= 0 || t <= round_count) {
       t = round_count;
     }
-    t += 50;
+    t = std::min(round_count + 300, t + 50);
   }
 
   void update() {

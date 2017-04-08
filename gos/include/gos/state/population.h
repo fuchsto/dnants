@@ -37,17 +37,17 @@ class population {
     }
     for (auto & t : _teams) {
       for (auto & a : t.ants()) {
+        a.update_position();
+      }
+    }
+    for (auto & t : _teams) {
+      for (auto & a : t.ants()) {
         a.update_action();
       }
     }
     for (auto & t : _teams) {
       for (auto & a : t.ants()) {
         a.update_reaction();
-      }
-    }
-    for (auto & t : _teams) {
-      for (auto & a : t.ants()) {
-        a.update_position();
       }
     }
   }

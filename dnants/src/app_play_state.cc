@@ -216,6 +216,117 @@ void app_play_state::render_barrier_cell(
   SDL_DestroyTexture(texture);
 }
 
+void app_play_state::render_cell_in_trace(
+  int       cell_x,
+  int       cell_y,
+  int       trace_value,
+  direction dir,
+  int       team_id)
+{
+  // draw trace from ingoing direction to cell center:
+
+  int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
+  int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
+
+  const rgba & col           = _team_colors[team_id];
+  const int    max_intensity = 300;
+  Uint8 tcol_a = static_cast<Uint8>(
+                   ((trace_value * 256 * 4) / (max_intensity)) / 5);
+  SDL_SetRenderDrawColor(
+    _app->win().renderer(),
+    col.r, col.g, col.b, tcol_a);
+
+  int       off = (_grid_spacing / 2);
+  int       len = (_grid_spacing / 4);
+  position from { center_x + (dir.dx * off), center_y + (dir.dy * off) };
+  position to   { from.x   - (dir.dx * len), from.y   - (dir.dy * len) };
+
+  SDL_RenderDrawLine(
+    _app->win().renderer(),
+    from.x, from.y,
+    to.x,   to.y
+  );
+}
+
+void app_play_state::render_cell_out_trace(
+  int       cell_x,
+  int       cell_y,
+  int       trace_value,
+  direction dir,
+  int       team_id)
+{
+  // draw trace from cell center in trace direction:
+
+  int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
+  int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
+
+  const rgba & col           = _team_colors[team_id];
+  const int    max_intensity = 300;
+  Uint8 tcol_a = static_cast<Uint8>(
+                   ((trace_value * 256 * 4) / (max_intensity)) / 5);
+  SDL_SetRenderDrawColor(
+    _app->win().renderer(),
+    col.r, col.g, col.b, tcol_a);
+
+  int       len = (_grid_spacing / 4);
+  position from { center_x                 , center_y                  };
+  position to   { center_x + (dir.dx * len), center_y + (dir.dy * len) };
+
+  SDL_RenderDrawLine(
+    _app->win().renderer(),
+    from.x, from.y,
+    to.x,   to.y
+  );
+}
+
+void app_play_state::render_food_cell(int cell_x, int cell_y) {
+  const auto & cell_state = _game_state->grid_state()
+                               .at(cell_x, cell_y)
+                               .state();
+  int amount_left = cell_state.num_food();
+  int amount_max  = 4;
+  int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
+  if (amount_left == 0) { return; }
+
+  sprite_tag sprite;
+  if      (amount_qurt >= 4) { sprite = sprite_tag::sugah_4; }
+  else if (amount_qurt >= 3) { sprite = sprite_tag::sugah_3; }
+  else if (amount_qurt >= 2) { sprite = sprite_tag::sugah_2; }
+  else                       { sprite = sprite_tag::sugah_1; }
+
+  SDL_Point center { (cell_x * _grid_spacing),
+                     (cell_y * _grid_spacing) };
+  int size = _grid_spacing;
+  SDL_Rect dst_rect;
+  dst_rect.x = center.x + (_grid_spacing - size) / 2;
+  dst_rect.y = center.y + (_grid_spacing - size) / 2;
+  dst_rect.w = size;
+  dst_rect.h = size;
+  SDL_SetRenderDrawBlendMode(
+    _app->win().renderer(),
+    SDL_BLENDMODE_BLEND);
+
+  SDL_Surface * surface = _sprites[(int)sprite]->surface();
+  // SDL_SetColorKey(
+  //   surface, SDL_TRUE,
+  //   SDL_MapRGB(
+  //     surface->format,
+  //     _map_rgb_mode.r,
+  //     _map_rgb_mode.g,
+  //     _map_rgb_mode.b));
+  SDL_Texture * texture =
+    SDL_CreateTextureFromSurface(
+      _app->win().renderer(),
+      surface);
+
+  SDL_RenderCopy(_app->win().renderer(),
+                 texture,
+                 0,
+                 &dst_rect);
+
+  SDL_DestroyTexture(texture);
+}
+
 void app_play_state::draw_cell_circle(
   gos::view::window & win,
   int  cell_x,

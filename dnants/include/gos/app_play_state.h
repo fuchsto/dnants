@@ -45,6 +45,8 @@ class app_play_state : public app_state {
   bool         _active          = true;
   bool         _paused          = false;
   bool         _step            = false;
+  bool         _show_in_traces  = true;
+  bool         _show_out_traces = true;
   timestamp_t  _last_round_ms   = 0;
   int          _grid_spacing    = 5;
   extents      _grid_extents;
@@ -111,6 +113,12 @@ class app_play_state : public app_state {
             } else if( event.key.keysym.scancode == SDL_SCANCODE_T) {
               // toggle traces
               app->settings().show_traces = !(app->settings().show_traces);
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_I) {
+              // toggle in traces
+              _show_in_traces = !_show_in_traces;
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_O) {
+              // toggle out traces
+              _show_out_traces = !_show_out_traces;
             } else if( event.key.keysym.scancode == SDL_SCANCODE_S) {
               // speed up
               if (app->settings().rounds_per_sec <
@@ -219,14 +227,14 @@ class app_play_state : public app_state {
               direction tdir    = gos::or2dir(gos::int2or(oidx));
               int in_trace_val  = in_traces[oidx]  - tick_now;
               int out_trace_val = out_traces[oidx] - tick_now;
-              if (in_trace_val > 0) {
+              if (_show_in_traces && in_trace_val > 0) {
                 render_cell_in_trace(
                   cell_x, cell_y,
                   in_trace_val,
                   tdir,
                   team_id);
               }
-              if (out_trace_val > 0) {
+              if (_show_out_traces && out_trace_val > 0) {
                 render_cell_out_trace(
                   cell_x, cell_y,
                   out_trace_val,
@@ -266,64 +274,14 @@ class app_play_state : public app_state {
     int       cell_y,
     int       trace_value,
     direction dir,
-    int       team_id)
-  {
-    // draw trace from ingoing direction to cell center:
-
-    int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
-    int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
-
-    const rgba & col           = _team_colors[team_id];
-    const int    max_intensity = 100;
-    Uint8 tcol_a = static_cast<Uint8>(
-                     ((trace_value * 256 * 4) / (max_intensity)) / 5);
-    SDL_SetRenderDrawColor(
-      _app->win().renderer(),
-      col.r, col.g, col.b, tcol_a);
-
-    int       off = (_grid_spacing / 2);
-    int       len = (_grid_spacing / 4);
-    position from { center_x - (dir.dx * off), center_y - (dir.dy * off) };
-    position to   { from.x   + (dir.dx * len), from.y   + (dir.dy * len) };
-
-    SDL_RenderDrawLine(
-      _app->win().renderer(),
-      from.x, from.y,
-      to.x,   to.y
-    );
-  }
+    int       team_id);
 
   void render_cell_out_trace(
     int       cell_x,
     int       cell_y,
     int       trace_value,
     direction dir,
-    int       team_id)
-  {
-    // draw trace from cell center in trace direction:
-
-    int center_x = (cell_x * _grid_spacing) + (_grid_spacing / 2);
-    int center_y = (cell_y * _grid_spacing) + (_grid_spacing / 2);
-
-    const rgba & col           = _team_colors[team_id];
-    const int    max_intensity = 100;
-    Uint8 tcol_a = static_cast<Uint8>(
-                     ((trace_value * 256 * 4) / (max_intensity)) / 5);
-    SDL_SetRenderDrawColor(
-      _app->win().renderer(),
-      col.r, col.g, col.b, tcol_a);
-
-    int       off = (_grid_spacing / 6);
-    int       len = (_grid_spacing / 2);
-    position from { center_x + (dir.dx * off), center_y + (dir.dy * off) };
-    position to   { center_x + (dir.dx * len), center_y + (dir.dy * len) };
-
-    SDL_RenderDrawLine(
-      _app->win().renderer(),
-      from.x, from.y,
-      to.x,   to.y
-    );
-  }
+    int       team_id);
 
   void render_grass_cell(int cell_x, int cell_y) {
     draw_cell_fill_rectangle(
@@ -332,53 +290,7 @@ class app_play_state : public app_state {
       _grass_color);
   }
 
-  void render_food_cell(int cell_x, int cell_y) {
-    const auto & cell_state = _game_state->grid_state()
-                                 .at(cell_x, cell_y)
-                                 .state();
-    int amount_left = cell_state.num_food();
-    int amount_max  = 4;
-    int amount_qurt = (((amount_left * 100) / amount_max) / 25) + 1;
-    if (amount_left == 0) { return; }
-
-    sprite_tag sprite;
-    if      (amount_qurt >= 4) { sprite = sprite_tag::sugah_4; }
-    else if (amount_qurt >= 3) { sprite = sprite_tag::sugah_3; }
-    else if (amount_qurt >= 2) { sprite = sprite_tag::sugah_2; }
-    else                       { sprite = sprite_tag::sugah_1; }
-
-    SDL_Point center { (cell_x * _grid_spacing),
-                       (cell_y * _grid_spacing) };
-    int size = _grid_spacing;
-    SDL_Rect dst_rect;
-    dst_rect.x = center.x + (_grid_spacing - size) / 2;
-    dst_rect.y = center.y + (_grid_spacing - size) / 2;
-    dst_rect.w = size;
-    dst_rect.h = size;
-    SDL_SetRenderDrawBlendMode(
-      _app->win().renderer(),
-      SDL_BLENDMODE_BLEND);
-
-    SDL_Surface * surface = _sprites[(int)sprite]->surface();
-    // SDL_SetColorKey(
-    //   surface, SDL_TRUE,
-    //   SDL_MapRGB(
-    //     surface->format,
-    //     _map_rgb_mode.r,
-    //     _map_rgb_mode.g,
-    //     _map_rgb_mode.b));
-    SDL_Texture * texture =
-      SDL_CreateTextureFromSurface(
-        _app->win().renderer(),
-        surface);
-
-    SDL_RenderCopy(_app->win().renderer(),
-                   texture,
-                   0,
-                   &dst_rect);
-
-    SDL_DestroyTexture(texture);
-  }
+  void render_food_cell(int cell_x, int cell_y);
 
   void render_barrier_cell(int cell_x, int cell_y);
 

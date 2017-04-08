@@ -24,7 +24,7 @@ void cell::enter(
 
   add_in_trace(
     a.team_id(),
-    dir2or(a.dir()),
+    dir2or({ -a.dir().dx, -a.dir().dy }),
     gs.round_count() - 1);
 
   if (_state.num_food() > 0) {
@@ -39,14 +39,15 @@ void cell::leave(
   gos::state::ant              & a,
   const gos::state::game_state & gs)
 {
-  _state._taken = false;
+  _state._taken  = false;
+  _state._ant_id = { -1, -1 };
+
   if (a.is_alive()) {
     add_out_trace(
       a.team_id(),
       dir2or(a.dir()),
       gs.round_count() - 1);
   }
-  _state._ant_id = { -1, -1 };
 }
 
 std::ostream & operator<<(
@@ -63,7 +64,29 @@ std::ostream & operator<<(
        << "-t"   << c.ant().team_id << " ";
   }
   ss << "food:" << c.state().num_food() << " ";
-  ss << "}";
+  ss << "traces: { ";
+  for (int team_id = 0; team_id < 2; ++team_id) {
+    ss << "team " << team_id << ": { ";
+    const auto & in_traces  = c.state().in_traces(team_id);
+    const auto & out_traces = c.state().out_traces(team_id);
+    ss << "in: (";
+    for (int oidx = 0; oidx < 8; ++oidx) {
+      int in_trace_val  = in_traces[oidx];
+      if (in_trace_val > 0) {
+        ss << oidx << ":" << in_trace_val << " ";
+      }
+    }
+    ss << ") out: (";
+    for (int oidx = 0; oidx < 8; ++oidx) {
+      int out_trace_val = out_traces[oidx];
+      if (out_trace_val > 0) {
+        ss << oidx << ":" << out_trace_val << " ";
+      }
+    }
+    ss << "} )";
+  }
+  ss << " }";
+  ss << " }";
   return operator<<(os, ss.str());
 }
 
