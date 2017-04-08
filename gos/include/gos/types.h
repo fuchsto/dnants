@@ -49,9 +49,6 @@ struct direction {
   int dx;
   int dy;
 
-// constexpr direction(int x, int y)
-//   : dx(x), dy(y) { }
-
   constexpr bool operator==(const direction & rhs) const noexcept {
     return dx == rhs.dx && dy == rhs.dy;
   }

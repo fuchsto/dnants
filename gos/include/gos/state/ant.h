@@ -35,6 +35,7 @@ class ant_team {
   game_state            * _game_state;
   std::vector<ant>        _ants;
   std::vector<position>   _spawn_points;
+  int                     _num_food = 0;
  public:
   ant_team() = delete;
 
@@ -46,7 +47,8 @@ class ant_team {
   : _team_id(team_id)
   , _team_size(init_team_size)
   , _client(team_id)
-  , _game_state(&gs) {
+  , _game_state(&gs)
+  , _num_food(0) {
     _spawn_points.push_back(spawn_point);
   }
 
@@ -62,6 +64,14 @@ class ant_team {
   inline int                      id()     const { return _team_id; }
   inline std::vector<ant>       & ants()         { return _ants; }
   inline const std::vector<ant> & ants()   const { return _ants; }
+
+  inline void store_food(int nfood) noexcept {
+    _num_food += nfood;
+  }
+
+  inline int num_food() const noexcept {
+    return _num_food;
+  }
 
   inline const std::vector<position> & spawn_points() const {
     return _spawn_points;

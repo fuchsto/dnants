@@ -150,11 +150,11 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
                                &neighbor_grid::state_at,
            "access cell at grid coordinates")
     .def("in_trace",
-           (int                & (neighbor_grid::*)(int,int))
+           (int                (neighbor_grid::*)(int,int))
                                &neighbor_grid::in_trace,
            "ingoing trace directions of specified team")
     .def("out_trace",
-           (int                & (neighbor_grid::*)(int,int))
+           (int                (neighbor_grid::*)(int,int))
                                &neighbor_grid::out_trace,
            "ingoing trace directions of specified team")
     ;

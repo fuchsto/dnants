@@ -14,7 +14,6 @@ attack_min_strength  = 5
 
 def handle_enemy(s,g):
     global attack_min_strength
-    print("attack({},{})".format(s.enemy_dir.x, s.enemy_dir.y))
     if s.strength >= attack_min_strength:
         s.set_dir(s.enemy_dir.x, s.enemy_dir.y)
         s.attack()
@@ -22,32 +21,69 @@ def handle_enemy(s,g):
         s.set_dir(-s.enemy_dir.x, -s.enemy_dir.y)
         s.move()
 
-def handle_collision(s,g):
+def random_turn(s,g):
+    if s.dir.x == 0 and s.dir.y == 0:
+        s.set_dir(0,1)
     nturn = 1
     if s.tick_count % 4 < 2:
         nturn *= -1
     s.turn_dir(1)
-    s.move()
+
+
+def follow_food(s,g):
+    food_dir = direction()
+    food_dir.x = 0
+    food_dir.y = 0
+    for x in [ -1,0,1 ]:
+        for y in [ -1,0,1 ]:
+            if (x != 0 or y != 0) and g.at(x,y).num_food() > 0:
+                s.set_dir(x,y)
+                return True
+    return False
 
 
 def follow_trace(s,g):
+    best_trace_dir = direction()
+    best_trace_dir.x = 0
+    best_trace_dir.y = 0
+    best_trace_val = 0
+    scnd_trace_val = 0
+    scnd_trace_dir = best_trace_dir
     for x in [ -1,0,1 ]:
         for y in [ -1,0,1 ]:
             fwd_trace = g.out_trace(x,y)
             bwd_trace = g.in_trace(x,y)
             if fwd_trace > 0 and bwd_trace > 0:
-                print("follow_trace({},{}) : f:{} b:{}"
-                        .format(x,y, fwd_trace, bwd_trace))
-                return
+                trace_val = (((fwd_trace + bwd_trace) / 2)**2 -
+                             (fwd_trace - bwd_trace)**2 )
+                if trace_val > best_trace_val and (
+                        x != -s.dir.x and y != -s.dir.y):
+                    scnd_trace_val = best_trace_val
+                    scnd_trace_dir = best_trace_dir
+                    best_trace_val = trace_val
+                    best_trace_dir.x = x
+                    best_trace_dir.y = y
+                    print("follow_trace({},{}) : f:{} b:{}"
+                            .format(best_trace_dir.x, best_trace_dir.y,
+                                    fwd_trace, bwd_trace))
+    if scnd_trace_dir.x != 0 or scnd_trace_dir.y != 0:
+        s.set_dir(scnd_trace_dir.x, scnd_trace_dir.y)
+        print("follow_trace -> dir({},{})"
+                .format(scnd_trace_dir.x, scnd_trace_dir.y))
+        return True
+    else:
+        return False
 
 
 
 def init_mode(s,g):
     s.set_mode(ant_mode.scouting)
-    nturn = 1
-    if (s.tick_count - s.last_dir_change == 0):
-        nturn -= 2
-    s.turn_dir(nturn)
+    if not follow_trace(s,g):
+        s.set_dir(0,1)
+        nturn = 1
+        if (s.tick_count - s.last_dir_change == 0):
+            nturn -= 2
+        s.turn_dir(nturn)
     s.move()
 
 
@@ -68,10 +104,15 @@ def scout_mode(s,g):
         else:
             # No food:
             if s.events.collision:
-                handle_collision(s,g)
-            elif s.tick_count - s.last_dir_change > 4:
-                # s.turn_dir((s.rand % 3) - 1)
-                follow_trace(s,g)
+                random_turn(s,g)
+                s.move()
+            elif follow_food(s,g):
+                s.move()
+            elif follow_trace(s,g):
+                s.turn_dir(4)
+                s.move()
+            elif (s.tick_count - s.last_dir_change > 4):
+                random_turn(s,g)
                 s.move()
 
 def eat_mode(s,g):
@@ -128,7 +169,7 @@ def harvest_mode(s,g):
         else:
             # Continue search:
             s.set_mode(ant_mode.scouting)
-            s.turn_dir(1 - (s.rand % 2) * 2)
+            s.turn_dir(4)
             s.move()
 
 def backtrace_mode(s,g):
@@ -137,7 +178,8 @@ def backtrace_mode(s,g):
         s.move()
     else:
         if s.events.collision:
-            handle_collision(s,g)
+            random_turn(s,g)
+            s.move()
         else:
             if s.dist.x < 0:
                 s.set_dir( 1, s.dir.y)

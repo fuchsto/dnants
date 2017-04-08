@@ -66,7 +66,7 @@ class cell_state {
     _amount += amount;
   }
 
-  int  num_food() const noexcept {
+  inline int num_food() const noexcept {
     return _amount;
   }
 

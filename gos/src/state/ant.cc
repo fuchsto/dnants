@@ -38,12 +38,11 @@ ant & ant_team::add_ant_at(const position & pos) {
 
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
-    auto & base_cell  = _game_state->grid_state()[spawn_pos];
-    auto & base_state = base_cell.state();
-    if (base_state.num_food() >= 4) {
+    if (num_food() >= 8) {
       _team_size++;
-      base_state.take_food(4);
+      store_food(-8);
     }
+    auto & base_cell = _game_state->grid_state()[spawn_pos];
     if (!(base_cell.is_taken())) {
       if (_ants.size() >= _team_size) { return; }
       add_ant_at(spawn_pos);
@@ -60,7 +59,9 @@ void ant::on_home_cell(gos::state::cell_state & cell) noexcept {
     return;
   }
   GOS__LOG_DEBUG("ant.on_home_cell", "delivered " << num_carrying());
-  cell.drop_food(num_carrying());
+  this->game_state().population_state()
+                    .teams()[_state.team_id]
+                    .store_food(num_carrying());
   _state.num_carrying = 0;
   switch_mode(ant_mode::scouting);
 }
