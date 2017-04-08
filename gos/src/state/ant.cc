@@ -164,14 +164,16 @@ void ant::update_action() noexcept {
   // Apply actions from current round:
   if (_state.action == ant_action::do_eat) {
     eat();
+    _state.action = ant_action::do_idle;
   }
   else if (_state.action == ant_action::do_harvest) {
     harvest();
+    _state.action = ant_action::do_idle;
   }
   else if (_state.action == ant_action::do_attack) {
     attack();
+    _state.action = ant_action::do_idle;
   }
-  _state.action = ant_action::do_idle;
 }
 
 void ant::update_reaction() noexcept {
