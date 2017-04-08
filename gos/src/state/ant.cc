@@ -39,8 +39,8 @@ ant & ant_team::add_ant_at(const position & pos) {
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     if (num_food() >= 8) {
-      _team_size++;
-      store_food(-8);
+    // _team_size++;
+    // store_food(-8);
     }
     auto & base_cell = _game_state->grid_state()[spawn_pos];
     if (!(base_cell.is_taken())) {
@@ -71,7 +71,7 @@ void ant::on_food_cell(gos::state::cell_state & cell) noexcept {
 }
 
 void ant::on_enemy(gos::state::ant & enemy) noexcept {
-// _state.events.enemy = true;
+  _state.events.enemy = true;
 }
 
 void ant::on_attacked(gos::state::ant & enemy) noexcept {

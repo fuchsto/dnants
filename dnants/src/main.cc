@@ -71,6 +71,7 @@ gos::app_settings process_args(int argc, char** argv)
           {"big",        0, nullptr, 'b'},
           { nullptr,     0, nullptr,  0 }
   };
+  bool opt_32_bit = false;
   while (true) {
     const auto opt = getopt_long(
                        argc, argv,
@@ -92,13 +93,15 @@ gos::app_settings process_args(int argc, char** argv)
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
                  break;
-      case 'b' : app_opts.grid_spacing   = 16;
+      case 'b' : app_opts.grid_spacing   = 32;
+                 opt_32_bit              = true;
                  break;
       default:   break;
     }
   }
-  if (app_opts.grid_extents.w > 30 ||
-      app_opts.grid_extents.h > 20) {
+  if (!opt_32_bit &&
+      ( app_opts.grid_extents.w > 30 ||
+        app_opts.grid_extents.h > 20 )) {
     app_opts.grid_spacing = 16;
   }
   return app_opts;

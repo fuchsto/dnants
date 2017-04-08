@@ -82,7 +82,7 @@ class cell_state {
     return _traces_out[team_id];
   }
 
-  gos::state::ant_id ant() const {
+  gos::state::ant_id ant() const noexcept {
     return (_taken ? _ant_id : gos::state::ant_id { -1, -1 });
   }
 };

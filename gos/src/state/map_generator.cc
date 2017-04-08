@@ -161,25 +161,40 @@ gos::state::population * map_generator::make_population(
   GOS__LOG_DEBUG("map_generator", "make_population()");
   std::vector<ant_team> teams;
   extents   grid_ext = grid_in->extents();
-  direction spawn_corners[4] { { -1, -1 }, {  1,  1 },
-                               {  1, -1 }, { -1,  1 } };
   position  center_cell { grid_ext.w / 2,
                           grid_ext.h / 2 };
-  for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
-    direction spawn_corner = spawn_corners[team_idx];
-    position spawn_point {
-               center_cell.x + spawn_corner.dx * grid_ext.w / 3,
-               center_cell.y + spawn_corner.dy * grid_ext.h / 3 };
-    GOS__LOG_DEBUG("map_generator.make_population",
-                   "team "  << team_idx << " " <<
-                   "spawn:" << spawn_point.x << "," << spawn_point.y);
-    teams.emplace_back(ant_team(team_idx,
-                                _team_size,
-                                spawn_point,
-                                _game_state));
-    grid_in->set_cell_type(
-      spawn_point,
-      cell_type::spawn_point);
+  if (_num_teams == 0) {
+    return nullptr;
+  } else if (_num_teams == 1) {
+      GOS__LOG_DEBUG("map_generator.make_population",
+                     "team 0 " <<
+                     "spawn:" << center_cell.x << "," << center_cell.y);
+      teams.emplace_back(ant_team(0,
+                                  _team_size,
+                                  center_cell,
+                                  _game_state));
+      grid_in->set_cell_type(
+        center_cell,
+        cell_type::spawn_point);
+  } else {
+    direction spawn_corners[4] { { -1, -1 }, {  1,  1 },
+                                 {  1, -1 }, { -1,  1 } };
+    for (int team_idx = 0; team_idx < _num_teams; ++team_idx) {
+      direction spawn_corner = spawn_corners[team_idx];
+      position spawn_point {
+                 center_cell.x + spawn_corner.dx * grid_ext.w / 3,
+                 center_cell.y + spawn_corner.dy * grid_ext.h / 3 };
+      GOS__LOG_DEBUG("map_generator.make_population",
+                     "team "  << team_idx << " " <<
+                     "spawn:" << spawn_point.x << "," << spawn_point.y);
+      teams.emplace_back(ant_team(team_idx,
+                                  _team_size,
+                                  spawn_point,
+                                  _game_state));
+      grid_in->set_cell_type(
+        spawn_point,
+        cell_type::spawn_point);
+    }
   }
   gos::state::population * popul = new gos::state::population(
                                          std::move(teams));
