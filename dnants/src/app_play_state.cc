@@ -231,7 +231,7 @@ void app_play_state::render_cell_in_trace(
   const rgba & col           = _team_colors[team_id];
   const int    max_intensity = 300;
   Uint8 tcol_a = static_cast<Uint8>(
-                   ((trace_value * 256 * 4) / (max_intensity)) / 5);
+                   (trace_value * 256) / (max_intensity));
   SDL_SetRenderDrawColor(
     _app->win().renderer(),
     col.r, col.g, col.b, tcol_a);
@@ -263,7 +263,7 @@ void app_play_state::render_cell_out_trace(
   const rgba & col           = _team_colors[team_id];
   const int    max_intensity = 300;
   Uint8 tcol_a = static_cast<Uint8>(
-                   ((trace_value * 256 * 4) / (max_intensity)) / 5);
+                   (trace_value * 256) / (max_intensity));
   SDL_SetRenderDrawColor(
     _app->win().renderer(),
     col.r, col.g, col.b, tcol_a);

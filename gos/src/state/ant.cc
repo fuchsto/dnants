@@ -189,13 +189,11 @@ void ant::update_reaction() noexcept {
 void ant::eat() noexcept {
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
-  if (pos_cell.type() == gos::state::cell_type::food) {
-    consumed = pos_cell.state().take_food();
-    if (consumed > 0) {
-      _state.nticks_not_fed = 0;
-      _state.strength       = std::min(max_strength(),
-                                       strength() + consumed);
-    }
+  consumed = pos_cell.state().take_food();
+  if (consumed > 0) {
+    _state.nticks_not_fed = 0;
+    _state.strength       = std::min(max_strength(),
+                                     strength() + consumed);
   }
 }
 
@@ -206,11 +204,9 @@ void ant::harvest() noexcept {
   }
   int consumed = 0;
   gos::state::cell & pos_cell = this->game_state().grid_state()[pos()];
-  if (pos_cell.type() == gos::state::cell_type::food) {
-    consumed = pos_cell.state().take_food();
-    if (consumed > 0) {
-      _state.num_carrying += consumed;
-    }
+  consumed = pos_cell.state().take_food();
+  if (consumed > 0) {
+    _state.num_carrying += consumed;
   }
 }
 
