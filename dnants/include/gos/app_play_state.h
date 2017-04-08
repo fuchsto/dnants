@@ -360,13 +360,13 @@ class app_play_state : public app_state {
       SDL_BLENDMODE_BLEND);
 
     SDL_Surface * surface = _sprites[(int)sprite]->surface();
-    SDL_SetColorKey(
-      surface, SDL_TRUE,
-      SDL_MapRGB(
-        surface->format,
-        _map_rgb_mode.r,
-        _map_rgb_mode.g,
-        _map_rgb_mode.b));
+    // SDL_SetColorKey(
+    //   surface, SDL_TRUE,
+    //   SDL_MapRGB(
+    //     surface->format,
+    //     _map_rgb_mode.r,
+    //     _map_rgb_mode.g,
+    //     _map_rgb_mode.b));
     SDL_Texture * texture =
       SDL_CreateTextureFromSurface(
         _app->win().renderer(),

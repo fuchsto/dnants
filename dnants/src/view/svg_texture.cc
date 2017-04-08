@@ -55,10 +55,10 @@ svg_texture::svg_texture(
                _extents.w, _extents.h,
                32,              // depth
                4 * _extents.w,  // pitch
-               0,               // Rmask
-               0,               // Gmask
-               0,               // Bmask
-               0                // Amask
+               0x000000FF,      // red mask
+               0x0000FF00,      // green mask
+               0x00FF0000,      // blue mask
+               0xFF000000       // alpha mask (alpha in this format)
              );
   SDL_SetSurfaceBlendMode(
     _surface, SDL_BLENDMODE_BLEND);

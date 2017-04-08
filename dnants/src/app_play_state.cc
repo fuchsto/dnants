@@ -115,13 +115,13 @@ void app_play_state::render_ant(const gos::state::ant & ant)
   else                         { sprite = sprite_tag::ant_1; }
 
   SDL_Surface * surface = _sprites[(int)sprite]->surface();
-  SDL_SetColorKey(
-    surface, SDL_TRUE,
-    SDL_MapRGB(
-      surface->format,
-      _map_rgb_mode.r,
-      _map_rgb_mode.g,
-      _map_rgb_mode.b));
+  // SDL_SetColorKey(
+  //   surface, SDL_TRUE,
+  //   SDL_MapRGB(
+  //     surface->format,
+  //     _map_rgb_mode.r,
+  //     _map_rgb_mode.g,
+  //     _map_rgb_mode.b));
   SDL_Texture * texture =
     SDL_CreateTextureFromSurface(
       _app->win().renderer(),
@@ -151,13 +151,13 @@ void app_play_state::render_ant(const gos::state::ant & ant)
       SDL_BLENDMODE_BLEND);
 
     SDL_Surface * surface = _sprites[(int)sprite_tag::sugah_2]->surface();
-    SDL_SetColorKey(
-      surface, SDL_TRUE,
-      SDL_MapRGB(
-        surface->format,
-        _map_rgb_mode.r,
-        _map_rgb_mode.g,
-        _map_rgb_mode.b));
+    // SDL_SetColorKey(
+    //   surface, SDL_TRUE,
+    //   SDL_MapRGB(
+    //     surface->format,
+    //     _map_rgb_mode.r,
+    //     _map_rgb_mode.g,
+    //     _map_rgb_mode.b));
     SDL_Texture * texture =
       SDL_CreateTextureFromSurface(
         _app->win().renderer(),
@@ -196,13 +196,13 @@ void app_play_state::render_barrier_cell(
     SDL_BLENDMODE_BLEND);
 
   SDL_Surface * surface = _sprites[(int)sprite_tag::rock]->surface();
-  SDL_SetColorKey(
-    surface, SDL_TRUE,
-    SDL_MapRGB(
-      surface->format,
-      _map_rgb_mode.r,
-      _map_rgb_mode.g,
-      _map_rgb_mode.b));
+  // SDL_SetColorKey(
+  //   surface, SDL_TRUE,
+  //   SDL_MapRGB(
+  //     surface->format,
+  //     _map_rgb_mode.r,
+  //     _map_rgb_mode.g,
+  //     _map_rgb_mode.b));
   SDL_Texture * texture =
     SDL_CreateTextureFromSurface(
       _app->win().renderer(),
