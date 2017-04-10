@@ -35,7 +35,19 @@ class app_play_state : public app_state {
     ant_4,
     evt_attacked,
     evt_enemy,
-    act_attack
+    act_attack,
+    ico_play,
+    ico_pause,
+    num_0,
+    num_1,
+    num_2,
+    num_3,
+    num_4,
+    num_5,
+    num_6,
+    num_7,
+    num_8,
+    num_9
   };
 
  protected:
@@ -58,7 +70,7 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
-  std::array<svg_texture *, 12> _sprites { };
+  std::array<svg_texture *, 24> _sprites { };
 
   rgba         _team_colors[4]  { { 0xff, 0x12, 0x66, 0x88 },
                                   { 0x00, 0xaa, 0x23, 0x88 },
@@ -182,7 +194,6 @@ class app_play_state : public app_state {
 
     render_map(app->win());
     render_objects(app->win());
-    render_statusbar(app->win());
 
     if (app->settings().show_grid) {
       render_grid(app->win());
@@ -191,6 +202,8 @@ class app_play_state : public app_state {
     if (_marked_cell.x != -1 && _marked_cell.y != -1) {
       render_highlight_cell(_marked_cell);
     }
+
+    render_statusbar(app->win());
 
     SDL_RenderPresent(
       app->win().renderer());

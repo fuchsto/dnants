@@ -42,6 +42,18 @@ void app_play_state::initialize(app_engine * app) {
   _sprites[(int)res_tag::evt_attacked] = new svg_texture("evt_attacked.svg");
   _sprites[(int)res_tag::evt_enemy]    = new svg_texture("evt_enemy.svg");
   _sprites[(int)res_tag::act_attack]   = new svg_texture("act_attack.svg");
+  _sprites[(int)res_tag::ico_play]     = new svg_texture("ico_play.svg");
+  _sprites[(int)res_tag::ico_pause]    = new svg_texture("ico_pause.svg");
+  _sprites[(int)res_tag::num_0]        = new svg_texture("num_0.svg");
+  _sprites[(int)res_tag::num_1]        = new svg_texture("num_1.svg");
+  _sprites[(int)res_tag::num_2]        = new svg_texture("num_2.svg");
+  _sprites[(int)res_tag::num_3]        = new svg_texture("num_3.svg");
+  _sprites[(int)res_tag::num_4]        = new svg_texture("num_4.svg");
+  _sprites[(int)res_tag::num_5]        = new svg_texture("num_5.svg");
+  _sprites[(int)res_tag::num_6]        = new svg_texture("num_6.svg");
+  _sprites[(int)res_tag::num_7]        = new svg_texture("num_7.svg");
+  _sprites[(int)res_tag::num_8]        = new svg_texture("num_8.svg");
+  _sprites[(int)res_tag::num_9]        = new svg_texture("num_9.svg");
 
   _active        = true;
   GOS__LOG_DEBUG("app_play_state.initialize", "->");
@@ -61,50 +73,34 @@ void app_play_state::render_statusbar(gos::view::window & win)
 {
   SDL_Rect statusbar_rect = win.statusbar_rect();
 
-  int size = statusbar_rect.h - 20;
-  int offs = size / 2;
+  int margin = 5;
+  int size   = statusbar_rect.h - (2 * margin);
 
   // background:
   SDL_SetRenderDrawColor(
-    win.renderer(), 0x89, 0x89, 0x89, 0xFF);
+    win.renderer(), 0xef, 0xef, 0xef, 0xFF);
   SDL_RenderFillRect(
     win.renderer(), &statusbar_rect);
 
   // play/pause indicator:
-  SDL_SetRenderDrawColor(
-    win.renderer(), 0xaf, 0x00, 0x23, 0xFF);
+  SDL_Rect pause_play_rect;
+  pause_play_rect.x = statusbar_rect.x + margin;
+  pause_play_rect.y = statusbar_rect.y + margin;
+  pause_play_rect.h = statusbar_rect.h - (2 * margin);
+  pause_play_rect.w = pause_play_rect.h;
+  SDL_Surface * pause_play_icon;
   if (_paused) {
-    // draw square:
-    SDL_Rect paused_icon;
-    paused_icon.x = statusbar_rect.x + 10;
-    paused_icon.y = statusbar_rect.y + 10;
-    paused_icon.h = statusbar_rect.h - 20;
-    paused_icon.w = paused_icon.h;
-    SDL_RenderFillRect(
-      win.renderer(), &paused_icon);
+    pause_play_icon = _sprites[(int)res_tag::ico_pause]->surface();
   } else {
-    // draw triangle:
-    position icon_center {
-      statusbar_rect.x + 10 + offs, // x
-      statusbar_rect.y + 10 + offs  // y
-    };
-    SDL_Point points[4] = {
-        // top left
-        { icon_center.x - offs,
-          icon_center.y - offs },
-        // center right
-        { icon_center.x + offs,
-          icon_center.y },
-        // bottom left
-        { icon_center.x - offs,
-          icon_center.y + offs },
-        // top left
-        { icon_center.x - offs,
-          icon_center.y - offs }
-      };
-    SDL_RenderDrawLines(
-      win.renderer(), points, 4);
+    pause_play_icon = _sprites[(int)res_tag::ico_play]->surface();
   }
+  SDL_SetRenderDrawBlendMode(
+    _app->win().renderer(),
+    SDL_BLENDMODE_BLEND);
+  SDL_Texture * texture =
+    SDL_CreateTextureFromSurface(_app->win().renderer(), pause_play_icon);
+  SDL_RenderCopy(_app->win().renderer(), texture, 0, &pause_play_rect);
+  SDL_DestroyTexture(texture);
 
   // speed indicator:
   int  spi_w = 100;
@@ -112,21 +108,23 @@ void app_play_state::render_statusbar(gos::view::window & win)
   auto fps   = _app->settings().frames_per_sec;
   auto speed = (rps * spi_w) / fps;
 
-  SDL_SetRenderDrawColor(
-    win.renderer(), 0xaf, 0x00, 0x23, 0xFF);
-
   SDL_Rect speed_rect;
-  speed_rect.x = statusbar_rect.x + 10 + 2 * size;
-  speed_rect.y = statusbar_rect.y + 10;
+  speed_rect.x = statusbar_rect.x + margin + 2 * size;
+  speed_rect.y = statusbar_rect.y + margin;
   speed_rect.w = spi_w;
-  speed_rect.h = statusbar_rect.h - 20;
+  speed_rect.h = statusbar_rect.h - (2 * margin);
 
-  // speed indicator outline:
-  SDL_RenderDrawRect(
-    win.renderer(), &speed_rect);
   // speed indicator fill:
   speed_rect.w = speed;
+  SDL_SetRenderDrawColor(
+    win.renderer(), 0x71, 0xc8, 0x37, 0xFF);
   SDL_RenderFillRect(
+    win.renderer(), &speed_rect);
+  // speed indicator outline:
+  speed_rect.w = spi_w;
+  SDL_SetRenderDrawColor(
+    win.renderer(), 0x44, 0x78, 0x21, 0xFF);
+  SDL_RenderDrawRect(
     win.renderer(), &speed_rect);
 
 }
