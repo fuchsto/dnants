@@ -16,7 +16,7 @@
    inkscape:version="0.48.5 r10040"
    width="32"
    height="32"
-   sodipodi:docname="num_5.svg"><defs
+   sodipodi:docname="num_6.svg"><defs
    id="defs33">
     
   
@@ -69,20 +69,14 @@
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
-         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><text
-   xml:space="preserve"
-   style="font-size:33.85200119px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
-   x="33.390728"
-   y="62.349567"
-   id="text2993"
-   sodipodi:linespacing="125%"><tspan
-     sodipodi:role="line"
-     id="tspan2995"
-     x="33.390728"
-     y="62.349567"
-     style="font-size:99.44024658px;text-align:center;text-anchor:middle;fill:#4d4d4d">6</tspan></text>
+         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><g
+   style="font-size:33.85200119px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#666666;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
+   id="text2993"><path
+     d="m 15.236256,38.314958 c -0.02997,6.814407 1.468663,12.481012 4.495911,16.999831 3.027238,4.518833 7.762925,6.863757 14.207078,7.034778 4.883768,-0.07581 9.016475,-1.743708 12.398133,-5.003686 3.381594,-3.259967 5.144695,-7.657139 5.289308,-13.191529 -0.07409,-5.102395 -1.153106,-9.009426 -3.237057,-11.721105 -2.084019,-2.711619 -4.728669,-4.079785 -7.933959,-4.1045 -1.630895,0.03001 -2.939116,0.308577 -3.924667,0.835711 -0.985596,0.5272 -1.764886,1.123127 -2.337872,1.787785 -0.248616,0.25039 -0.44961,0.426699 -0.60298,0.528929 -0.153409,0.102291 -0.290931,0.151659 -0.412567,0.148102 -0.132251,-0.0053 -0.248616,-0.07931 -0.349094,-0.222152 -0.100517,-0.14278 -0.15341,-0.322616 -0.158679,-0.539508 l 0,-14.556172 c 0.02466,-0.507727 0.186871,-0.888557 0.486617,-1.142492 0.299709,-0.25384 0.588857,-0.380783 0.867445,-0.380829 0.648801,-0.03521 1.043736,0.331511 1.184805,1.100176 0.141027,0.768758 0.197446,2.151029 0.169258,4.146817 0.0035,0.216901 0.05992,0.396737 0.169258,0.539507 0.109291,0.142854 0.250339,0.216904 0.423144,0.222153 l 14.640801,-0.592403 c 0.213299,-0.0458 0.37903,-0.144533 0.497195,-0.296202 0.11809,-0.151584 0.178036,-0.334946 0.179837,-0.550087 C 51.19469,13.171405 49.477431,8.3651929 46.136387,4.9394303 42.795278,1.5137825 38.391053,-0.22463393 32.923698,-0.27582427 27.891791,-0.18760683 23.716769,1.7941181 20.398619,5.6693565 17.080457,9.5447082 15.359671,14.784643 15.236256,21.389176 l 0,16.925782 z m 20.057051,6.008652 c -0.01412,0.490161 -0.155173,0.800467 -0.423144,0.930918 -0.268013,0.130486 -0.578319,0.186905 -0.930918,0.169258 -0.386139,0.0053 -0.692919,-0.06874 -0.92034,-0.222152 -0.22746,-0.153373 -0.343825,-0.417838 -0.349094,-0.793395 l 0,-3.13127 c 0.0035,-0.588856 0.123398,-1.019053 0.359673,-1.290593 0.236237,-0.271495 0.567699,-0.40549 0.994389,-0.401985 0.386099,-0.0035 0.692878,0.130493 0.920339,0.401989 0.227419,0.27154 0.343784,0.701736 0.349095,1.290589 l 0,3.046641 z"
+     style="font-size:84.62999725px;font-weight:bold;fill:#666666;font-family:Poplar Std;-inkscape-font-specification:Poplar Std Bold"
+     id="path2984" /></g>
 </svg>

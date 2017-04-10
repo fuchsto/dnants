@@ -16,7 +16,7 @@
    inkscape:version="0.48.5 r10040"
    width="32"
    height="32"
-   sodipodi:docname="num_3.svg"><defs
+   sodipodi:docname="num_4.svg"><defs
    id="defs33">
     
   
@@ -69,20 +69,14 @@
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
-         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><text
-   xml:space="preserve"
-   style="font-size:33.85200119px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
-   x="33.390728"
-   y="62.349567"
-   id="text2993"
-   sodipodi:linespacing="125%"><tspan
-     sodipodi:role="line"
-     id="tspan2995"
-     x="33.390728"
-     y="62.349567"
-     style="font-size:99.44024658px;text-align:center;text-anchor:middle;fill:#4d4d4d">4</tspan></text>
+         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><g
+   style="font-size:33.85200119000000300px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#666666;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
+   id="text2993"><path
+     d="m 31.053932,61.757165 c 0.0088,0.172784 0.0758,0.313832 0.200993,0.423145 0.125163,0.109312 0.255632,0.165731 0.391409,0.169257 l 15.740977,0 c 0.213302,-0.0035 0.379033,-0.05994 0.497194,-0.169257 0.118094,-0.109313 0.17804,-0.250361 0.179837,-0.423145 l 0,-10.493984 c 0.02289,-0.305007 0.230932,-0.56242 0.624138,-0.77224 0.393137,-0.209796 0.833913,-0.319108 1.322327,-0.327936 0.49187,0.0088 0.94675,-0.02996 1.364641,-0.116366 0.417817,-0.08638 0.639968,-0.273268 0.666453,-0.560666 l 0,-13.032851 c -0.01767,-0.371989 -0.257451,-0.62235 -0.719347,-0.751083 -0.461969,-0.128679 -1.040266,-0.188624 -1.734891,-0.179835 -0.581859,-0.01408 -0.983847,-0.155125 -1.205965,-0.423145 -0.222185,-0.267965 -0.327971,-0.57827 -0.317356,-0.930918 l 0,-33.76693401 c -0.0071,-0.17624767 -0.07761,-0.33140094 -0.211573,-0.46546025 -0.13403,-0.13393448 -0.289183,-0.20445808 -0.465458,-0.21157101 l -12.525078,0 c -0.176332,0.007115 -0.352642,0.0776382 -0.528932,0.21157101 -0.17633,0.13405763 -0.310325,0.28921089 -0.401986,0.46546025 L 15.059068,35.01443 c -0.0476,0.132261 -0.100497,0.290941 -0.158679,0.476038 -0.05818,0.185152 -0.08992,0.364988 -0.09521,0.539509 l 0,13.540625 c 0.0088,0.172797 0.07581,0.313845 0.200993,0.423145 0.125179,0.109325 0.255648,0.165744 0.391409,0.169258 l 15.233203,0 c 0.267975,0.01412 0.409023,0.155166 0.423145,0.423144 l 0,11.171016 z m -0.846289,-32.4975 c 0.169242,-0.338483 0.338499,-0.50774 0.507773,-0.507774 0.08814,3.4e-5 0.165715,0.04235 0.23273,0.126942 0.06698,0.08466 0.102243,0.211605 0.105786,0.380832 l 0,5.839394 c -0.0053,0.128734 -0.0582,0.230993 -0.158679,0.306778 -0.100514,0.07584 -0.216878,0.114628 -0.349094,0.116367 -1.518046,0.0088 -2.480698,-0.0088 -2.887961,-0.05289 -0.40729,-0.04405 -0.544812,-0.167468 -0.412567,-0.370251 l 2.962012,-5.839394 z"
+     style="font-size:84.62999725000000200px;font-weight:bold;font-family:Poplar Std;-inkscape-font-specification:Poplar Std Bold;fill:#666666"
+     id="path2984" /></g>
 </svg>
