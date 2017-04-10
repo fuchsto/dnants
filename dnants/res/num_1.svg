@@ -73,11 +73,10 @@
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
-         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><g
-   style="font-size:33.85200119px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#999999;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
-   id="text2993"><path
-     d="m 26.32327,61.902829 c 0.0088,0.172785 0.07581,0.313833 0.200993,0.423145 0.125175,0.109312 0.255645,0.165732 0.391409,0.169258 l 15.825606,0 c 0.172763,-0.0071 0.313811,-0.07758 0.423144,-0.211574 0.109292,-0.133997 0.165711,-0.289149 0.169258,-0.465458 l 0,-61.27132879 c -0.0071,-0.17624768 -0.0776,-0.33140094 -0.211573,-0.46546025 -0.134018,-0.13393449 -0.28917,-0.20445809 -0.465458,-0.21157101 l -18.533731,0 c -0.216864,0.007115 -0.396701,0.0776382 -0.539511,0.21157101 -0.142812,0.13405763 -0.216862,0.28921089 -0.222149,0.46546025 l 0,17.26429679 c -0.03526,0.283905 0.09873,0.456689 0.401989,0.518352 0.303252,0.06175 0.987335,0.08644 2.052249,0.07405 0.132229,0.0053 0.248594,0.05823 0.349094,0.15868 0.100493,0.10054 0.153386,0.216905 0.15868,0.349093 l 0,42.991485 z"
-     style="font-size:84.62999725px;font-weight:bold;fill:#999999;font-family:Poplar Std;-inkscape-font-specification:Poplar Std Bold"
-     id="path2984"
-     inkscape:connector-curvature="0" /></g>
-</svg>
+         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
+<g
+   style="font-size:67.70400238px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#999999;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
+   id="text2983"><path
+     d="m 53.102431,60.324215 -37.319021,0 0,-7.363802 15.27307,0 0,-43.3646114 -14.227592,7.7274464 -2.909157,-6.727424 18.909516,-9.95476924 7.000158,0 0,52.31935824 13.273026,0 z"
+     style="font-size:93.09300232px;fill:#999999"
+     id="path3002" /></g></svg>
