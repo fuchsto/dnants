@@ -7,7 +7,9 @@
 #include <gos/util/logging.h>
 
 #include <cstdlib>
+#if defined(_POSIX_VERSION)
 #include <getopt.h>
+#endif
 
 #include <pybind11/embedded.h>
 
@@ -59,7 +61,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.trace_rounds   = 20;
   app_opts.show_grid      = false;
   app_opts.show_traces    = true;
-
+#if defined(_POSIX_VERSION)
   const char* const short_opts = "g:w:h:t:n:s:b";
   const option long_opts[] = {
           {"grid",       1, nullptr, 'g'},
@@ -97,6 +99,7 @@ gos::app_settings process_args(int argc, char** argv)
       default:   break;
     }
   }
+#endif
   if (app_opts.grid_extents.w > 30 ||
       app_opts.grid_extents.h > 20) {
     app_opts.grid_spacing = 16;
