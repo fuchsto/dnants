@@ -14,8 +14,8 @@
    viewBox="0 0 67.704 61.238"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   width="32"
-   height="32"
+   width="16"
+   height="16"
    sodipodi:docname="num_0.svg"><defs
    id="defs33">
     
@@ -74,11 +74,11 @@
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata><g
-   style="font-size:33.85200119000000300px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#666666;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
+   style="font-size:33.85200119px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#999999;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
    id="text2993"
    transform="translate(8.4641106,0)"><path
      d="m 7.7850767,43.646579 c 0.068761,5.518522 1.6661311,9.989744 4.7921143,13.41368 3.12597,3.423947 7.367989,5.187048 12.72607,5.289308 5.328071,-0.10226 9.587721,-1.865361 12.778965,-5.289308 3.19118,-3.423936 4.827337,-7.895158 4.908476,-13.41368 l 0,-25.473301 C 42.914853,12.776471 41.289274,8.3792981 38.113961,4.981746 34.938585,1.5843086 30.668355,-0.16821304 25.303261,-0.27582427 19.945179,-0.16821304 15.703158,1.584309 12.577187,4.9817473 9.4512032,8.3793002 7.8538348,12.776473 7.7850767,18.173278 l 0,25.473301 z M 24.033827,18.427164 c 0.0035,-0.511255 0.123399,-0.906189 0.359673,-1.184804 0.236238,-0.278525 0.567701,-0.419573 0.99439,-0.423145 0.426651,0.0018 0.758114,0.146384 0.994389,0.433724 0.236236,0.28743 0.356127,0.707048 0.359673,1.258854 l 0,24.79627 c -0.0088,0.55187 -0.139306,0.971487 -0.391409,1.258855 -0.252144,0.287402 -0.573028,0.431977 -0.962653,0.433723 -0.426689,-0.0017 -0.758153,-0.146321 -0.994391,-0.433725 -0.236275,-0.287368 -0.356165,-0.706985 -0.359672,-1.258853 l 0,-24.880899 z"
-     style="font-size:84.62999724999998800px;font-weight:bold;font-family:Poplar Std;-inkscape-font-specification:Poplar Std Bold;fill:#666666"
+     style="font-size:84.62999725px;font-weight:bold;fill:#999999;font-family:Poplar Std;-inkscape-font-specification:Poplar Std Bold"
      id="path2984"
      inkscape:connector-curvature="0" /></g>
 </svg>
