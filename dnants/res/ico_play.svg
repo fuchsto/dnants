@@ -14,8 +14,8 @@
    viewBox="0 0 67.704 61.238"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   width="32"
-   height="32"
+   width="16"
+   height="16"
    sodipodi:docname="ico_play.svg"><defs
    id="defs33">
     
@@ -56,38 +56,41 @@
    inkscape:window-width="1920"
    inkscape:window-height="1057"
    id="namedview31"
-   showgrid="false"
-   inkscape:zoom="14.113845"
-   inkscape:cx="-0.4197937"
-   inkscape:cy="15.764836"
+   showgrid="true"
+   inkscape:zoom="19.959991"
+   inkscape:cx="9.2456602"
+   inkscape:cy="14.575"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
    inkscape:window-maximized="1"
-   inkscape:current-layer="svg2" />
+   inkscape:current-layer="svg2"
+   inkscape:snap-grids="false"><inkscape:grid
+     type="xygrid"
+     id="grid3007" /></sodipodi:namedview>
   
 <metadata
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <path
    sodipodi:type="star"
-   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-   id="path2991"
+   style="color:#000000;fill:#71c837;fill-opacity:1;fill-rule:nonzero;stroke:#447821;stroke-width:0.50000000000000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   id="path3011"
    sodipodi:sides="3"
-   sodipodi:cx="3.755178"
-   sodipodi:cy="7.4142122"
-   sodipodi:r1="15.819299"
-   sodipodi:r2="7.9096494"
+   sodipodi:cx="-7"
+   sodipodi:cy="4"
+   sodipodi:r1="7.75"
+   sodipodi:r2="3.5"
    sodipodi:arg1="0"
    sodipodi:arg2="1.0471976"
    inkscape:flatsided="true"
    inkscape:rounded="0"
    inkscape:randomized="0"
-   d="m 19.574477,7.4142122 -23.7289484,13.6999148 0,-27.3998294 z"
-   transform="matrix(2.11575,0,0,2.11575,17.78176,15.038349)"
-   inkscape:transform-center-x="-8.3674206" /></svg>
+   d="m 0.75,4 -11.625,6.711697 0,-13.4233939 z"
+   transform="matrix(4.2315,0,0,4.2315,56.067375,13.692999)"
+   inkscape:transform-center-x="-7.4051249" /></svg>

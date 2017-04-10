@@ -14,8 +14,8 @@
    viewBox="0 0 67.704 61.238"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   width="32"
-   height="32"
+   width="16"
+   height="16"
    sodipodi:docname="ico_pause.svg"><defs
    id="defs33">
     
@@ -56,14 +56,17 @@
    inkscape:window-width="1920"
    inkscape:window-height="1057"
    id="namedview31"
-   showgrid="false"
-   inkscape:zoom="14.113845"
-   inkscape:cx="12.987368"
-   inkscape:cy="15.764836"
+   showgrid="true"
+   inkscape:zoom="19.959991"
+   inkscape:cx="9.2456602"
+   inkscape:cy="14.575"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
    inkscape:window-maximized="1"
-   inkscape:current-layer="svg2" />
+   inkscape:current-layer="svg2"
+   inkscape:snap-grids="false"><inkscape:grid
+     type="xygrid"
+     id="grid3007" /></sodipodi:namedview>
   
 <metadata
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
@@ -75,15 +78,15 @@
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <rect
-   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:1.05787504;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-   id="rect3763"
-   width="25.190067"
-   height="57.977409"
-   x="4.7604375"
-   y="1.7331531" /><rect
-   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:1.05787504;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-   id="rect3763-1"
-   width="25.190067"
-   height="57.977409"
-   x="36.496689"
-   y="1.7331531" /></svg>
+   style="color:#000000;fill:#71c837;fill-opacity:1;fill-rule:nonzero;stroke:#447821;stroke-width:1.93931925000000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   id="rect2983-1"
+   width="24.419342"
+   height="57.371899"
+   x="4.2315001"
+   y="1.897936" /><rect
+   style="color:#000000;fill:#71c837;fill-opacity:1;fill-rule:nonzero;stroke:#447821;stroke-width:1.93931925000000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   id="rect2983-1-7"
+   width="24.419342"
+   height="57.371899"
+   x="38.083458"
+   y="1.8979379" /></svg>
