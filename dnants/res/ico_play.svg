@@ -58,7 +58,7 @@
    id="namedview31"
    showgrid="true"
    inkscape:zoom="19.959991"
-   inkscape:cx="9.2456602"
+   inkscape:cx="1.4300254"
    inkscape:cy="14.575"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
@@ -72,14 +72,14 @@
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <path
    sodipodi:type="star"
-   style="color:#000000;fill:#71c837;fill-opacity:1;fill-rule:nonzero;stroke:#447821;stroke-width:0.50000000000000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   style="color:#000000;fill:#71c837;fill-opacity:1;fill-rule:nonzero;stroke:#447821;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
    id="path3011"
    sodipodi:sides="3"
    sodipodi:cx="-7"
