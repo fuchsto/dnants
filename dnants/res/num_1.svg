@@ -58,7 +58,7 @@
    id="namedview31"
    showgrid="false"
    inkscape:zoom="10.900238"
-   inkscape:cx="-20.725186"
+   inkscape:cx="-35.954211"
    inkscape:cy="14.157579"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
@@ -76,7 +76,9 @@
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <g
    style="font-size:67.70400238px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#999999;fill-opacity:1;stroke:none;font-family:Consolas;-inkscape-font-specification:Consolas"
-   id="text2983"><path
+   id="text2983"
+   transform="matrix(0.8,0,0,0.8,6.7022162,6.096527)"><path
      d="m 53.102431,60.324215 -37.319021,0 0,-7.363802 15.27307,0 0,-43.3646114 -14.227592,7.7274464 -2.909157,-6.727424 18.909516,-9.95476924 7.000158,0 0,52.31935824 13.273026,0 z"
      style="font-size:93.09300232px;fill:#999999"
-     id="path3002" /></g></svg>
+     id="path3002"
+     inkscape:connector-curvature="0" /></g></svg>
