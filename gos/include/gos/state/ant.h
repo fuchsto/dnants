@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 
 namespace gos {
@@ -64,6 +65,8 @@ class ant_team {
   inline int                      id()     const { return _team_id; }
   inline std::vector<ant>       & ants()         { return _ants; }
   inline const std::vector<ant> & ants()   const { return _ants; }
+
+  int num_ants() const noexcept;
 
   inline void store_food(int nfood) noexcept {
     _num_food += nfood;

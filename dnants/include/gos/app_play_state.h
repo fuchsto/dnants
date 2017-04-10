@@ -47,7 +47,8 @@ class app_play_state : public app_state {
     num_6,
     num_7,
     num_8,
-    num_9
+    num_9,
+    num_res_tags
   };
 
  protected:
@@ -70,7 +71,7 @@ class app_play_state : public app_state {
   app_engine * _app             = nullptr;
   game_state * _game_state      = nullptr;
 
-  std::array<svg_texture *, 24> _sprites { };
+  std::array<svg_texture *, (size_t)res_tag::num_res_tags> _sprites { };
 
   rgba         _team_colors[4]  { { 0xff, 0x12, 0x66, 0x88 },
                                   { 0x00, 0xaa, 0x23, 0x88 },
@@ -287,6 +288,12 @@ class app_play_state : public app_state {
   void render_grid(gos::view::window & win);
 
   void render_statusbar(gos::view::window & win);
+
+  void render_number(
+    gos::view::window & win,
+    const SDL_Rect    & rect,
+    const rgba        & col,
+    int                 num);
 
   void render_ant(const gos::state::ant & ant);
 

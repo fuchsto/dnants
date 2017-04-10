@@ -15,10 +15,18 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 
 namespace gos {
 namespace state {
+
+int ant_team::num_ants() const noexcept {
+  return std::count_if(_ants.begin(), _ants.end(),
+                       [](const ant & a) {
+                         return a.is_alive();
+                       });
+}
 
 void ant_team::update() {
   if (_game_state->round_count() % 20 == 1) {
@@ -39,8 +47,8 @@ ant & ant_team::add_ant_at(const position & pos) {
 void ant_team::spawn_ants() {
   for (auto & spawn_pos : _spawn_points) {
     if (num_food() >= 8) {
-    // _team_size++;
-    // store_food(-8);
+      _team_size++;
+      store_food(-8);
     }
     auto & base_cell = _game_state->grid_state()[spawn_pos];
     if (!(base_cell.is_taken())) {

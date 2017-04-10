@@ -127,6 +127,63 @@ void app_play_state::render_statusbar(gos::view::window & win)
   SDL_RenderDrawRect(
     win.renderer(), &speed_rect);
 
+  // team stats:
+  SDL_Rect ant_icon_rect;
+  ant_icon_rect.x  = statusbar_rect.x + 150;
+  ant_icon_rect.y  = statusbar_rect.y + margin;
+  ant_icon_rect.h  = statusbar_rect.h - (2 * margin);
+  ant_icon_rect.w  = ant_icon_rect.h;
+  int team_stats_x_offs = 0;
+  for (const auto & team : _game_state->population_state().teams()) {
+    const rgba & col       = _team_colors[team.id()];
+    ant_icon_rect.x       += team_stats_x_offs;
+    SDL_Surface * ant_icon = _sprites[(int)res_tag::ant_4]->surface();
+    SDL_Texture * texture  =
+      SDL_CreateTextureFromSurface(_app->win().renderer(), ant_icon);
+    SDL_SetTextureColorMod(
+      texture, col.r, col.g, col.b);
+    SDL_RenderCopy(_app->win().renderer(), texture, 0, &ant_icon_rect);
+    SDL_DestroyTexture(texture);
+
+    team_stats_x_offs += (ant_icon_rect.w + margin);
+
+    SDL_Rect num_ants_rect;
+    num_ants_rect.x = ant_icon_rect.x + ant_icon_rect.w + margin;
+    num_ants_rect.y = ant_icon_rect.y;
+    num_ants_rect.w = ant_icon_rect.w;
+    num_ants_rect.h = ant_icon_rect.h;
+
+    render_number(win, num_ants_rect, col, team.num_ants());
+
+    team_stats_x_offs += (ant_icon_rect.w * 4) + margin;
+  }
+}
+
+void app_play_state::render_number(
+  gos::view::window & win,
+  const SDL_Rect    & rect,
+  const rgba        & col,
+  int                 num)
+{
+  SDL_Rect num_icon_rect = rect;
+  double num_d           = num;
+  int    n_places        = (num == 0 ? 0 : std::log10(num_d)) + 1;
+  for (int p = n_places - 1; p >= 0; --p) {
+    double base = std::pow(10, p);
+    int n          = (int)num_d / (int)base;
+    int sprite_idx = ((int)res_tag::num_0) + n;
+
+    SDL_Surface * num_icon = _sprites[sprite_idx]->surface();
+    SDL_Texture * texture  =
+      SDL_CreateTextureFromSurface(win.renderer(), num_icon);
+    SDL_SetTextureColorMod(
+      texture, col.r, col.g, col.b);
+    SDL_RenderCopy(win.renderer(), texture, 0, &num_icon_rect);
+    SDL_DestroyTexture(texture);
+    num_icon_rect.x += (rect.w - 4);
+
+    num_d -= n * base;
+  }
 }
 
 void app_play_state::render_grid(gos::view::window & win)
