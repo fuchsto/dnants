@@ -16,7 +16,7 @@
    inkscape:version="0.48.5 r10040"
    width="32"
    height="32"
-   sodipodi:docname="pause.svg"><defs
+   sodipodi:docname="ico_play.svg"><defs
    id="defs33">
     
   
@@ -58,7 +58,7 @@
    id="namedview31"
    showgrid="false"
    inkscape:zoom="14.113845"
-   inkscape:cx="10.633183"
+   inkscape:cx="-0.4197937"
    inkscape:cy="15.764836"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
@@ -69,14 +69,14 @@
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <path
    sodipodi:type="star"
-   style="color:#000000;fill:#d40000;fill-opacity:1;fill-rule:nonzero;stroke:#800000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
    id="path2991"
    sodipodi:sides="3"
    sodipodi:cx="3.755178"
@@ -89,5 +89,5 @@
    inkscape:rounded="0"
    inkscape:randomized="0"
    d="m 19.574477,7.4142122 -23.7289484,13.6999148 0,-27.3998294 z"
-   transform="matrix(2.11575,0,0,2.11575,17.539562,14.93238)"
+   transform="matrix(2.11575,0,0,2.11575,17.78176,15.038349)"
    inkscape:transform-center-x="-8.3674206" /></svg>

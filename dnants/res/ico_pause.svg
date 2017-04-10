@@ -16,7 +16,7 @@
    inkscape:version="0.48.5 r10040"
    width="32"
    height="32"
-   sodipodi:docname="play.svg"><defs
+   sodipodi:docname="ico_pause.svg"><defs
    id="defs33">
     
   
@@ -58,7 +58,7 @@
    id="namedview31"
    showgrid="false"
    inkscape:zoom="14.113845"
-   inkscape:cx="10.633183"
+   inkscape:cx="12.987368"
    inkscape:cy="15.764836"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
@@ -69,21 +69,21 @@
    id="metadata29"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
          rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
-           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title /></cc:Work><cc:License
        rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
          rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
          rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata>
 <rect
-   style="color:#000000;fill:#d40000;fill-opacity:1;fill-rule:nonzero;stroke:#800000;stroke-width:2.1098907;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:1.05787504;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
    id="rect3763"
    width="25.190067"
    height="57.977409"
-   x="5.2864451"
-   y="1.6302953" /><rect
-   style="color:#000000;fill:#d40000;fill-opacity:1;fill-rule:nonzero;stroke:#800000;stroke-width:2.1098907;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   x="4.7604375"
+   y="1.7331531" /><rect
+   style="color:#000000;fill:#00ccff;fill-opacity:1;fill-rule:nonzero;stroke:#006680;stroke-width:1.05787504;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
    id="rect3763-1"
    width="25.190067"
    height="57.977409"
-   x="37.234268"
-   y="1.6302954" /></svg>
+   x="36.496689"
+   y="1.7331531" /></svg>
