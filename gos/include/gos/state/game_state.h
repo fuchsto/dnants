@@ -27,6 +27,10 @@ class game_state {
   game_state(const app_settings & app_settings);
   ~game_state();
 
+  const app_settings & settings() const noexcept {
+    return _app_settings;
+  }
+
   /// Blocks until back state is ready, then swaps front and back state
   /// and performs asynchronous update of new back state.
   void next();

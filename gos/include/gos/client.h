@@ -26,7 +26,7 @@ class client {
   client(client && other)                = default;
   client & operator=(client && rhs)      = default;
 
-  client(int team_id);
+  client(int team_id, const std::string & module_name);
 
   gos::state::ant_state callback(
     const gos::state::ant_state & current,

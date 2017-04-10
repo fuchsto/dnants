@@ -47,7 +47,7 @@ class ant_team {
     game_state     & gs)
   : _team_id(team_id)
   , _team_size(init_team_size)
-  , _client(team_id)
+  , _client(team_id, gs.settings().team_codes[team_id])
   , _game_state(&gs)
   , _num_food(0) {
     _spawn_points.push_back(spawn_point);

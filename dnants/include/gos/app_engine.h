@@ -18,12 +18,12 @@ class app_engine
 {
   gos::app_settings _settings {
                        { 30, 30 }, // grid extents
-                       16,         // cell pixels (16 or 32)
+                       16,         // cell height and width in pixels
                        30,         // fps
-                       5,          // rps
-                       30,         // trace rounds
-                       50,         // initial team size
-                       2,          // number of teams
+                       10,         // rps
+                       300,        // trace rounds
+                       15,         // initial team size
+                       0,          // number of teams
                        true,       // show grid
                        true        // show traces
                     };

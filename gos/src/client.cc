@@ -199,16 +199,12 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 
 namespace gos {
 
-client::client(int team_id)
+client::client(int team_id, const std::string & module_name)
+: _module_file(module_name)
 {
-  std::ostringstream ss;
-  ss << "client_" << team_id;
-
-  _module_file = ss.str();
-
   GOS__LOG_DEBUG("client", "loading client module " << _module_file);
 
-  _module      = py::module::import(_module_file.c_str());
+  _module = py::module::import(_module_file.c_str());
 }
 
 gos::state::ant_state client::callback(

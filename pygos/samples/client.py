@@ -96,9 +96,9 @@ def follow_trace(s,g):
                 if fwd_trace > 0 and bwd_trace > 0:
                     trace_val = abs((2 * abs(fwd_trace + bwd_trace)) -
                                     (8 * abs(fwd_trace - bwd_trace)))
-                    print("ant {} tracing({},{}) fwd({}) bwd({}) -> {}"
-                            .format(s.id, x, y, fwd_trace, bwd_trace,
-                                    trace_val))
+                    # print("ant {} tracing({},{}) fwd({}) bwd({}) -> {}"
+                    #         .format(s.id, x, y, fwd_trace, bwd_trace,
+                    #                 trace_val))
                     if trace_val > best_trace_val and (
                             x != -s.dir.x or y != -s.dir.y):
                         scnd_trace_val = best_trace_val

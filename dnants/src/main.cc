@@ -57,23 +57,23 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.rounds_per_sec =  4;
   app_opts.frames_per_sec = 30;
   app_opts.init_team_size =  5;
-  app_opts.num_teams      =  1;
+  app_opts.num_teams      =  0;
   app_opts.trace_rounds   = 20;
   app_opts.show_grid      = false;
   app_opts.show_traces    = true;
 
   bool use_32px           = false;
 #if defined(_POSIX_VERSION)
-  const char* const short_opts = "g:w:h:t:n:s:b";
+  const char* const short_opts = "g:w:h:r:t:s:b";
   const option long_opts[] = {
-          {"grid",       1, nullptr, 'g'},
-          {"grid-w",     1, nullptr, 'w'},
-          {"grid-h",     1, nullptr, 'h'},
-          {"trace-time", 1, nullptr, 't'},
-          {"num-teams",  1, nullptr, 'n'},
-          {"team-size",  1, nullptr, 's'},
-          {"big",        0, nullptr, 'b'},
-          { nullptr,     0, nullptr,  0 }
+          {"grid",         1, nullptr, 'g'},
+          {"grid-w",       1, nullptr, 'w'},
+          {"grid-h",       1, nullptr, 'h'},
+          {"trace-rounds", 1, nullptr, 'r'},
+          {"team",         1, nullptr, 't'},
+          {"team-size",    1, nullptr, 's'},
+          {"big",          0, nullptr, 'b'},
+          { nullptr,       0, nullptr,  0 }
   };
   while (true) {
     const auto opt = getopt_long(
@@ -90,9 +90,9 @@ gos::app_settings process_args(int argc, char** argv)
                  break;
       case 'h' : app_opts.grid_extents.h = std::atoi(optarg);
                  break;
-      case 't' : app_opts.trace_rounds   = std::atoi(optarg);
+      case 'r' : app_opts.trace_rounds   = std::atoi(optarg);
                  break;
-      case 'n' : app_opts.num_teams      = std::atoi(optarg);
+      case 't' : app_opts.team_codes.push_back(optarg);
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
                  break;
@@ -102,6 +102,7 @@ gos::app_settings process_args(int argc, char** argv)
       default:   break;
     }
   }
+  app_opts.num_teams = app_opts.team_codes.size();
 #endif
   if (app_opts.grid_extents.w > 30 ||
       app_opts.grid_extents.h > 20) {

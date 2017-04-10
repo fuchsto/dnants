@@ -2,6 +2,8 @@
 #define GOS__TYPES_H__INCLUDED
 
 #include <array>
+#include <vector>
+#include <string>
 
 
 namespace gos {
@@ -70,15 +72,16 @@ struct rgba {
 };
 
 struct app_settings {
-  extents grid_extents;
-  int     grid_spacing;
-  int     frames_per_sec;
-  int     rounds_per_sec;
-  int     trace_rounds;
-  int     init_team_size;
-  int     num_teams;
-  bool    show_grid;
-  bool    show_traces;
+  extents                  grid_extents;
+  int                      grid_spacing;
+  int                      frames_per_sec;
+  int                      rounds_per_sec;
+  int                      trace_rounds;
+  int                      init_team_size;
+  int                      num_teams;
+  bool                     show_grid;
+  bool                     show_traces;
+  std::vector<std::string> team_codes;
 };
 
 
