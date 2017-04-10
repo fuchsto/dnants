@@ -152,10 +152,10 @@ class app_play_state : public app_state {
   }
 
   virtual void update(app_engine * app) {
-    int ms             = gos::timestamp_ns() / 1000000;
-    int rounds_per_sec = app->settings().rounds_per_sec;
-    int ms_per_round   = 1000 / rounds_per_sec;
-    if (ms - _last_round_ms >= ms_per_round) {
+    long ms             = gos::timestamp_ns() / 1000000;
+    long rounds_per_sec = app->settings().rounds_per_sec;
+    long ms_per_round   = 1000 / rounds_per_sec;
+    if (ms - static_cast<long>(_last_round_ms) >= ms_per_round) {
       _last_round_ms = ms;
       if (!_paused) {
         GOS__LOG_DEBUG("app_play_state.update",
@@ -182,6 +182,7 @@ class app_play_state : public app_state {
 
     render_map(app->win());
     render_objects(app->win());
+    render_statusbar(app->win());
 
     if (app->settings().show_grid) {
       render_grid(app->win());
@@ -270,6 +271,10 @@ class app_play_state : public app_state {
     }
   }
 
+  void render_grid(gos::view::window & win);
+
+  void render_statusbar(gos::view::window & win);
+
   void render_ant(const gos::state::ant & ant);
 
   void render_cell_in_trace(
@@ -296,8 +301,6 @@ class app_play_state : public app_state {
   void render_food_cell(int cell_x, int cell_y);
 
   void render_barrier_cell(int cell_x, int cell_y);
-
-  void render_grid(gos::view::window & win);
 
   void render_highlight_cell(const position & cell_pos) {
     draw_cell_rectangle(

@@ -57,9 +57,83 @@ void app_play_state::finalize() {
   _sprites = { };
 }
 
+void app_play_state::render_statusbar(gos::view::window & win)
+{
+  SDL_Rect statusbar_rect = win.statusbar_rect();
+
+  int size = statusbar_rect.h - 20;
+  int offs = size / 2;
+
+  // background:
+  SDL_SetRenderDrawColor(
+    win.renderer(), 0x89, 0x89, 0x89, 0xFF);
+  SDL_RenderFillRect(
+    win.renderer(), &statusbar_rect);
+
+  // play/pause indicator:
+  SDL_SetRenderDrawColor(
+    win.renderer(), 0xaf, 0x00, 0x23, 0xFF);
+  if (_paused) {
+    // draw square:
+    SDL_Rect paused_icon;
+    paused_icon.x = statusbar_rect.x + 10;
+    paused_icon.y = statusbar_rect.y + 10;
+    paused_icon.h = statusbar_rect.h - 20;
+    paused_icon.w = paused_icon.h;
+    SDL_RenderFillRect(
+      win.renderer(), &paused_icon);
+  } else {
+    // draw triangle:
+    position icon_center {
+      statusbar_rect.x + 10 + offs, // x
+      statusbar_rect.y + 10 + offs  // y
+    };
+    SDL_Point points[4] = {
+        // top left
+        { icon_center.x - offs,
+          icon_center.y - offs },
+        // center right
+        { icon_center.x + offs,
+          icon_center.y },
+        // bottom left
+        { icon_center.x - offs,
+          icon_center.y + offs },
+        // top left
+        { icon_center.x - offs,
+          icon_center.y - offs }
+      };
+    SDL_RenderDrawLines(
+      win.renderer(), points, 4);
+  }
+
+  // speed indicator:
+  int  spi_w = 100;
+  auto rps   = _app->settings().rounds_per_sec;
+  auto fps   = _app->settings().frames_per_sec;
+  auto speed = (rps * spi_w) / fps;
+
+  SDL_SetRenderDrawColor(
+    win.renderer(), 0xaf, 0x00, 0x23, 0xFF);
+
+  SDL_Rect speed_rect;
+  speed_rect.x = statusbar_rect.x + 10 + 2 * size;
+  speed_rect.y = statusbar_rect.y + 10;
+  speed_rect.w = spi_w;
+  speed_rect.h = statusbar_rect.h - 20;
+
+  // speed indicator outline:
+  SDL_RenderDrawRect(
+    win.renderer(), &speed_rect);
+  // speed indicator fill:
+  speed_rect.w = speed;
+  SDL_RenderFillRect(
+    win.renderer(), &speed_rect);
+
+}
+
 void app_play_state::render_grid(gos::view::window & win)
 {
-  auto ext     = win.view_extents();
+  auto ext     = win.map_extents();
   int  nrows   = ext.h / _grid_spacing;
   int  ncols   = ext.w / _grid_spacing;
   // line color:
@@ -305,13 +379,6 @@ void app_play_state::render_food_cell(int cell_x, int cell_y) {
     SDL_BLENDMODE_BLEND);
 
   SDL_Surface * surface = _sprites[(int)sprite]->surface();
-  // SDL_SetColorKey(
-  //   surface, SDL_TRUE,
-  //   SDL_MapRGB(
-  //     surface->format,
-  //     _map_rgb_mode.r,
-  //     _map_rgb_mode.g,
-  //     _map_rgb_mode.b));
   SDL_Texture * texture =
     SDL_CreateTextureFromSurface(
       _app->win().renderer(),

@@ -7,6 +7,42 @@ from pygos import(
     cell_state,
     neighbor_grid)
 
+#   ant.mode
+#        { ant_mode.scouting,
+#          ant_mode.eating,
+#          ant_mode.harvesting,
+#          ant_mode.backtrace }
+#
+#   ant.set_mode(ant_mode)
+#
+#   ant.dir:
+#        .x
+#        .y
+#
+#   ant.set_dir(x,y)
+#   ant.turn(d)
+#   
+#   ant.strength
+#   ant.damage
+#   ant.num_carrying
+#   
+#   ant.events:
+#        .enemy
+#        .food
+#        .attacked
+#        .collision
+#
+#   ant.dist:
+#        .x
+#        .y
+#   
+#   ant.attack()
+#   ant.move()
+#   ant.harvest()
+#   ant.drop(n)
+#   ant.eat()
+#   
+
 
 harvest_min_strength = 5
 attack_min_strength  = 5
@@ -25,7 +61,7 @@ def random_turn(s,g):
     if s.dir.x == 0 and s.dir.y == 0:
         s.set_dir(0,1)
     nturn = 1
-    if (s.tick_count - s.id) % 8 < 6:
+    if (s.tick_count - (s.id * 3)) % 4 < 2:
         nturn += 1
     if (s.tick_count + s.id) % 8 < 6:
         nturn *= -1
@@ -54,20 +90,24 @@ def follow_trace(s,g):
     scnd_trace_dir = best_trace_dir
     for x in [ -1,0,1 ]:
         for y in [ -1,0,1 ]:
-            fwd_trace = g.out_trace(x,y)
-            bwd_trace = g.in_trace(x,y)
-            if fwd_trace > 0 and bwd_trace > 0:
-                trace_val = (((fwd_trace + bwd_trace) / 2)**2 -
-                             (fwd_trace - bwd_trace)**2 )
-                if trace_val > best_trace_val and (
-                        x != -s.dir.x and y != -s.dir.y):
-                    scnd_trace_val = best_trace_val
-                    scnd_trace_dir = best_trace_dir
-                    best_trace_val = trace_val
-                    best_trace_dir.x = x
-                    best_trace_dir.y = y
-    if scnd_trace_dir.x != 0 or scnd_trace_dir.y != 0:
-        s.set_dir(scnd_trace_dir.x, scnd_trace_dir.y)
+            if x != 0 or y != 0:
+                fwd_trace = g.out_trace(x,y)
+                bwd_trace = g.in_trace(x,y)
+                if fwd_trace > 0 and bwd_trace > 0:
+                    trace_val = abs((2 * abs(fwd_trace + bwd_trace)) -
+                                    (8 * abs(fwd_trace - bwd_trace)))
+                    print("ant {} tracing({},{}) fwd({}) bwd({}) -> {}"
+                            .format(s.id, x, y, fwd_trace, bwd_trace,
+                                    trace_val))
+                    if trace_val > best_trace_val and (
+                            x != -s.dir.x or y != -s.dir.y):
+                        scnd_trace_val = best_trace_val
+                        scnd_trace_dir = best_trace_dir
+                        best_trace_val = trace_val
+                        best_trace_dir.x = x
+                        best_trace_dir.y = y
+    if best_trace_dir.x != 0 or best_trace_dir.y != 0:
+        s.set_dir(best_trace_dir.x, best_trace_dir.y)
         return True
     else:
         return False
@@ -107,9 +147,8 @@ def scout_mode(s,g):
             elif follow_food(s,g):
                 s.move()
             elif follow_trace(s,g):
-                s.turn_dir(4)
                 s.move()
-            elif (s.tick_count - s.last_dir_change > 4):
+            elif (s.tick_count - s.last_dir_change > 7):
                 random_turn(s,g)
                 s.move()
 
@@ -118,9 +157,6 @@ def eat_mode(s,g):
     if s.events.enemy:
         handle_enemy(s,g)
     else:
-        # cell_food = g.at(0,0).num_food()
-        # print("events.food:{} cell.num_food:{}"
-        #         .format(s.events.food, cell_food))
         if s.events.food:
             # Food at current cell:
             if s.strength < harvest_min_strength:
@@ -144,9 +180,6 @@ def eat_mode(s,g):
                 s.move()
 
 def harvest_mode(s,g):
-    # cell_food = g.at(0,0).num_food()
-    # print("events.food:{} cell.num_food:{}"
-    #         .format(s.events.food, cell_food))
     if s.events.food:
         # Food at current cell:
         if s.num_carrying < s.strength:
@@ -162,7 +195,7 @@ def harvest_mode(s,g):
         if s.num_carrying > 0:
             # Carry to base:
             s.set_mode(ant_mode.backtracing)
-            s.turn_dir(4)
+            random_turn(s,g)
             s.move()
         else:
             # Continue search:
@@ -173,6 +206,7 @@ def harvest_mode(s,g):
 def backtrace_mode(s,g):
     if s.num_carrying == 0:
         s.set_mode(ant_mode.scouting)
+        follow_trace(s,g)
         s.move()
     else:
         if s.events.collision:

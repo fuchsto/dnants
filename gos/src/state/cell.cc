@@ -83,7 +83,7 @@ std::ostream & operator<<(
         ss << oidx << ":" << out_trace_val << " ";
       }
     }
-    ss << "} )";
+    ss << ") }";
   }
   ss << " }";
   ss << " }";
