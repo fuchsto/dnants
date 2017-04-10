@@ -61,6 +61,8 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.trace_rounds   = 20;
   app_opts.show_grid      = false;
   app_opts.show_traces    = true;
+
+  bool use_32px           = false;
 #if defined(_POSIX_VERSION)
   const char* const short_opts = "g:w:h:t:n:s:b";
   const option long_opts[] = {
@@ -94,7 +96,8 @@ gos::app_settings process_args(int argc, char** argv)
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
                  break;
-      case 'b' : app_opts.grid_spacing   = 16;
+      case 'b' : app_opts.grid_spacing   = 32;
+                 use_32px                = true;
                  break;
       default:   break;
     }
@@ -103,6 +106,9 @@ gos::app_settings process_args(int argc, char** argv)
   if (app_opts.grid_extents.w > 30 ||
       app_opts.grid_extents.h > 20) {
     app_opts.grid_spacing = 16;
+  }
+  if (use_32px) {
+    app_opts.grid_spacing = 32;
   }
   return app_opts;
 }

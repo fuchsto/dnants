@@ -36,7 +36,7 @@ class window {
     int               bpp = 0)
   : _app(app)
   , _map_ext({ width, height })
-  , _statusbar_ext({ width, 30 })
+  , _statusbar_ext({ width, 26 })
   {
     GOS__LOG_DEBUG("view::window", "initialize window ...");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
