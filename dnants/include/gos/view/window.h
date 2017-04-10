@@ -24,6 +24,9 @@ class window {
   SDL_Window      * _window;
   SDL_Renderer    * _renderer;
 
+  gos::extents      _map_ext;
+  gos::extents      _statusbar_ext;
+
  public:
   window(
     gos::app_engine & app,
@@ -32,6 +35,8 @@ class window {
     int               height,
     int               bpp = 0)
   : _app(app)
+  , _map_ext({ width, height })
+  , _statusbar_ext({ width, 30 })
   {
     GOS__LOG_DEBUG("view::window", "initialize window ...");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -43,7 +48,7 @@ class window {
     GOS__LOG_DEBUG("view::window", "SDL initialized ...");
     if (SDL_CreateWindowAndRenderer(
           width,
-          height,
+          height + _statusbar_ext.h,
           SDL_WINDOW_SHOWN, // | SDL_RENDERER_ACCELERATED,
           &_window,
           &_renderer) != 0) {
@@ -72,6 +77,32 @@ class window {
     extents ext;
     SDL_GetRendererOutputSize(_renderer, &ext.w, &ext.h);
     return ext;
+  }
+
+  extents map_extents() const noexcept {
+    return _map_ext;
+  }
+
+  extents statusbar_extents() const noexcept {
+    return _statusbar_ext;
+  }
+
+  SDL_Rect map_rect() const noexcept {
+    SDL_Rect rect;
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = _map_ext.w;
+    rect.h = _map_ext.h;
+    return rect;
+  }
+
+  SDL_Rect statusbar_rect() const noexcept {
+    SDL_Rect rect;
+    rect.x = 0;
+    rect.y = _map_ext.h;
+    rect.w = _statusbar_ext.w;
+    rect.h = _statusbar_ext.h;
+    return rect;
   }
 
 };
