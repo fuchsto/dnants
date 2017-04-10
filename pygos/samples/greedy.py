@@ -76,28 +76,27 @@ def update_state(s,g):
                 s.set_mode(ant_mode.scouting)
                 s.move()
     elif s.mode == ant_mode.backtracing:
-        if s.num_carrying == 0:
+        if s.events.collision:
+            s.turn_dir(1)
+            s.move()
+        elif s.num_carrying == 0:
             s.set_mode(ant_mode.scouting)
             random_turn(s,g)
             s.move()
         else:
-            if s.events.collision:
-                s.turn_dir(1)
-                s.move()
+            if s.dist.x < 0:
+                s.set_dir( 1, s.dir.y)
+            elif s.dist.x > 0:
+                s.set_dir(-1, s.dir.y)
             else:
-                if s.dist.x < 0:
-                    s.set_dir( 1, s.dir.y)
-                elif s.dist.x > 0:
-                    s.set_dir(-1, s.dir.y)
-                else:
-                    s.set_dir( 0, s.dir.y)
-                if s.dist.y < 0:
-                    s.set_dir(s.dir.x,  1)
-                elif s.dist.y > 0:
-                    s.set_dir(s.dir.x, -1)
-                else:
-                    s.set_dir(s.dir.x,  0)
-                s.move()
+                s.set_dir( 0, s.dir.y)
+            if s.dist.y < 0:
+                s.set_dir(s.dir.x,  1)
+            elif s.dist.y > 0:
+                s.set_dir(s.dir.x, -1)
+            else:
+                s.set_dir(s.dir.x,  0)
+            s.move()
 
     return s
 

@@ -202,6 +202,12 @@ namespace gos {
 client::client(int team_id, const std::string & module_name)
 : _module_file(module_name)
 {
+  // modulename.py -> modulename
+  auto file_ext_pos = _module_file.rfind(".py");
+  if (file_ext_pos != std::string::npos) {
+    _module_file.resize(file_ext_pos);
+  }
+
   GOS__LOG_DEBUG("client", "loading client module " << _module_file);
 
   _module = py::module::import(_module_file.c_str());
