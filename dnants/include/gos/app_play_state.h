@@ -152,7 +152,7 @@ class app_play_state : public app_state {
               if (app->settings().rounds_per_sec > 1) {
                 app->settings().rounds_per_sec--;
               }
-            } else if( event.key.keysym.scancode == SDL_SCANCODE_P) {
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
               // pause
               _paused = !_paused;
               if (!_paused) {
