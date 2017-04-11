@@ -33,6 +33,12 @@ int main(int argc, char * argv[])
 
   auto app_options = process_args(argc, argv);
 
+  if (app_options.num_teams <= 0) {
+    std::cout << "No team code specified (-t <module name>)"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
   app_engine app(
     "game'-._.of'._.survive",
     app_options);
@@ -92,7 +98,9 @@ gos::app_settings process_args(int argc, char** argv)
                  break;
       case 'r' : app_opts.trace_rounds   = std::atoi(optarg);
                  break;
-      case 't' : app_opts.team_codes.push_back(optarg);
+      case 't' : if (app_opts.team_codes.size() < 4) {
+                   app_opts.team_codes.push_back(optarg);
+                 }
                  break;
       case 's' : app_opts.init_team_size = std::atoi(optarg);
                  break;
@@ -104,6 +112,18 @@ gos::app_settings process_args(int argc, char** argv)
   }
   app_opts.num_teams = app_opts.team_codes.size();
 #endif
+  if (app_opts.grid_extents.w < 11) {
+    app_opts.grid_extents.w = 11;
+  }
+  if (app_opts.grid_extents.h < 11) {
+    app_opts.grid_extents.h = 11;
+  }
+  if (app_opts.grid_extents.w > 60) {
+    app_opts.grid_extents.w = 60;
+  }
+  if (app_opts.grid_extents.h > 60) {
+    app_opts.grid_extents.h = 60;
+  }
   if (app_opts.grid_extents.w > 30 ||
       app_opts.grid_extents.h > 23) {
     app_opts.grid_spacing = 16;

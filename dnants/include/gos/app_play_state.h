@@ -141,13 +141,13 @@ class app_play_state : public app_state {
             } else if( event.key.keysym.scancode == SDL_SCANCODE_O) {
               // toggle out traces
               _show_out_traces = !_show_out_traces;
-            } else if( event.key.keysym.scancode == SDL_SCANCODE_S) {
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
               // speed up
               if (app->settings().rounds_per_sec <
                   app->settings().frames_per_sec) {
                 app->settings().rounds_per_sec++;
               }
-            } else if( event.key.keysym.scancode == SDL_SCANCODE_A) {
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
               // slow down
               if (app->settings().rounds_per_sec > 1) {
                 app->settings().rounds_per_sec--;
