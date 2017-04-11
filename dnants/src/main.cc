@@ -52,7 +52,7 @@ gos::app_settings process_args(int argc, char** argv)
 {
   gos::app_settings app_opts;
 
-  app_opts.grid_extents   = { 20, 20 };
+  app_opts.grid_extents   = { 23, 23 };
   app_opts.grid_spacing   = 32;
   app_opts.rounds_per_sec =  4;
   app_opts.frames_per_sec = 30;
@@ -105,7 +105,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.num_teams = app_opts.team_codes.size();
 #endif
   if (app_opts.grid_extents.w > 30 ||
-      app_opts.grid_extents.h > 20) {
+      app_opts.grid_extents.h > 23) {
     app_opts.grid_spacing = 16;
   }
   if (use_32px) {

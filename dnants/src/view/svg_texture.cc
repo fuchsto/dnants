@@ -11,6 +11,8 @@
 
 #include <gos/view/svg_texture.h>
 
+#include <sstream>
+
 
 namespace gos {
 namespace view {
@@ -20,17 +22,21 @@ svg_texture::svg_texture(
   int                 dpi)
 : _filename(filename)
 {
+  std::ostringstream ss;
+  ss << "res/" << _filename;
+  auto filepath = ss.str();
+
   _svg_image = nsvgParseFromFile(
-                 _filename.c_str(), "px", 96.0);
+                 filepath.c_str(), "px", 96.0);
   if (_svg_image == nullptr) {
     GOS__LOG_ERROR("svg_texture",
-                   "failed to parse SVG from file " << _filename);
+                   "failed to parse SVG from file " << filepath);
     return;
   }
   _extents = { (int)_svg_image->width,
                (int)_svg_image->height };
 
-  GOS__LOG_DEBUG("svg_texture", "file: " << _filename << " " <<
+  GOS__LOG_DEBUG("svg_texture", "file: " << filepath << " " <<
                  "svg size: " <<
                  "(" << _svg_image->width <<
                  "," << _svg_image->height << ")");
@@ -38,7 +44,7 @@ svg_texture::svg_texture(
   _rasterizer = nsvgCreateRasterizer();
   if (_rasterizer == nullptr) {
     GOS__LOG_ERROR("svg_texture",
-                   "failed to create rasterizer for file " << _filename);
+                   "failed to create rasterizer for file " << filepath);
     return;
   }
 
@@ -74,6 +80,19 @@ svg_texture::~svg_texture() {
   if (_surface != nullptr) {
     SDL_FreeSurface(_surface);
   }
+}
+
+void svg_texture::render(
+  SDL_Renderer   * renderer,
+  const SDL_Rect & rect) const
+{
+  SDL_SetRenderDrawBlendMode(
+    renderer,
+    SDL_BLENDMODE_BLEND);
+  SDL_Texture * texture =
+    SDL_CreateTextureFromSurface(renderer, _surface);
+  SDL_RenderCopy(renderer, texture, 0, &rect);
+  SDL_DestroyTexture(texture);
 }
 
 } // namespace view

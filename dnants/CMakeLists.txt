@@ -89,5 +89,5 @@ install(
 
 install(
   DIRECTORY res/
-  DESTINATION bin)
+  DESTINATION bin/res)
 

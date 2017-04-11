@@ -30,6 +30,7 @@ void app_play_state::initialize(app_engine * app) {
   GOS__LOG_DEBUG("app_play_state.initialize",
                  "grid_spacing:" << _grid_spacing);
 
+  _sprites[(int)res_tag::commands]     = new svg_texture("commands.svg");
   _sprites[(int)res_tag::rock]         = new svg_texture("rock.svg");
   _sprites[(int)res_tag::sugah_1]      = new svg_texture("sugah-1.svg");
   _sprites[(int)res_tag::sugah_2]      = new svg_texture("sugah-2.svg");
@@ -88,19 +89,13 @@ void app_play_state::render_statusbar(gos::view::window & win)
   pause_play_rect.y = statusbar_rect.y + margin;
   pause_play_rect.h = statusbar_rect.h - (2 * margin);
   pause_play_rect.w = pause_play_rect.h;
-  SDL_Surface * pause_play_icon;
+  const svg_texture * pause_play_icon;
   if (_paused) {
-    pause_play_icon = _sprites[(int)res_tag::ico_pause]->surface();
+    pause_play_icon = _sprites[(int)res_tag::ico_pause];
   } else {
-    pause_play_icon = _sprites[(int)res_tag::ico_play]->surface();
+    pause_play_icon = _sprites[(int)res_tag::ico_play];
   }
-  SDL_SetRenderDrawBlendMode(
-    _app->win().renderer(),
-    SDL_BLENDMODE_BLEND);
-  SDL_Texture * texture =
-    SDL_CreateTextureFromSurface(_app->win().renderer(), pause_play_icon);
-  SDL_RenderCopy(_app->win().renderer(), texture, 0, &pause_play_rect);
-  SDL_DestroyTexture(texture);
+  pause_play_icon->render(_app->win().renderer(), pause_play_rect);
 
   // speed indicator:
   int  spi_w = 100;
@@ -133,10 +128,8 @@ void app_play_state::render_statusbar(gos::view::window & win)
   ant_icon_rect.y  = statusbar_rect.y + margin;
   ant_icon_rect.h  = statusbar_rect.h - (2 * margin);
   ant_icon_rect.w  = ant_icon_rect.h;
-  int team_stats_x_offs = 0;
   for (const auto & team : _game_state->population_state().teams()) {
     const rgba & col       = _team_colors[team.id()];
-    ant_icon_rect.x       += team_stats_x_offs;
     SDL_Surface * ant_icon = _sprites[(int)res_tag::ant_4]->surface();
     SDL_Texture * texture  =
       SDL_CreateTextureFromSurface(_app->win().renderer(), ant_icon);
@@ -144,8 +137,6 @@ void app_play_state::render_statusbar(gos::view::window & win)
       texture, col.r, col.g, col.b);
     SDL_RenderCopy(_app->win().renderer(), texture, 0, &ant_icon_rect);
     SDL_DestroyTexture(texture);
-
-    team_stats_x_offs += (ant_icon_rect.w + margin);
 
     SDL_Rect num_ants_rect;
     num_ants_rect.x = ant_icon_rect.x + ant_icon_rect.w + margin;
@@ -155,7 +146,7 @@ void app_play_state::render_statusbar(gos::view::window & win)
 
     render_number(win, num_ants_rect, col, team.num_ants());
 
-    team_stats_x_offs += (ant_icon_rect.w * 4) + margin;
+    ant_icon_rect.x += (ant_icon_rect.w * 4) + (2 * margin);
   }
 }
 

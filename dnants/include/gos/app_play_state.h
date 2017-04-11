@@ -24,7 +24,8 @@ class app_play_state : public app_state {
   using svg_texture = gos::view::svg_texture;
 
   enum class res_tag : int {
-    rock = 0,
+    commands = 0,
+    rock,
     sugah_1,
     sugah_2,
     sugah_3,
@@ -61,6 +62,7 @@ class app_play_state : public app_state {
   bool         _active          = true;
   bool         _paused          = false;
   bool         _step            = false;
+  bool         _show_commands   = true;
   bool         _show_in_traces  = true;
   bool         _show_out_traces = true;
   timestamp_t  _last_round_ms   = 0;
@@ -120,6 +122,10 @@ class app_play_state : public app_state {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
               // reset
               app->change_state(app_play_state::get());
+              _show_commands = false;
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_H) {
+              // help
+              _show_commands = !_show_commands;
             } else if( event.key.keysym.scancode == SDL_SCANCODE_Q) {
               // quit
               app->quit();
@@ -152,6 +158,7 @@ class app_play_state : public app_state {
               if (!_paused) {
                 _marked_cell = { -1, -1 };
               }
+              _show_commands = false;
             } else if( event.key.keysym.scancode == SDL_SCANCODE_N) {
               // single-step
               _step   = true;
@@ -205,6 +212,10 @@ class app_play_state : public app_state {
     }
 
     render_statusbar(app->win());
+
+    if (_show_commands) {
+      render_commands_overlay(app->win());
+    }
 
     SDL_RenderPresent(
       app->win().renderer());
@@ -283,6 +294,16 @@ class app_play_state : public app_state {
         render_ant(ant);
       }
     }
+  }
+
+  void render_commands_overlay(gos::view::window & win) {
+    const svg_texture * commands_layer = _sprites[(int)res_tag::commands];
+    SDL_Rect commands_rect;
+    commands_rect.w = 320;
+    commands_rect.h = 320;
+    commands_rect.x = (win.map_rect().w / 2) - (commands_rect.w / 2);
+    commands_rect.y = (win.map_rect().h / 2) - (commands_rect.h / 2);
+    commands_layer->render(win.renderer(), commands_rect);
   }
 
   void render_grid(gos::view::window & win);

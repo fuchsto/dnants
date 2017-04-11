@@ -10,9 +10,6 @@
 
 #include <SDL.h>
 
-// #include <nanosvg/nanosvg.h>
-// #include <nanosvg/nanosvgrast.h>
-
 #include <string>
 #include <vector>
 
@@ -40,6 +37,8 @@ class svg_texture {
   SDL_Surface * surface() {
     return _surface;
   }
+
+  void render(SDL_Renderer * renderer, const SDL_Rect & rect) const;
 };
 
 } // namespace view
