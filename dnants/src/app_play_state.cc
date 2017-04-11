@@ -98,7 +98,7 @@ void app_play_state::render_statusbar(gos::view::window & win)
   pause_play_icon->render(_app->win().renderer(), pause_play_rect);
 
   // speed indicator:
-  int  spi_w = 100;
+  int  spi_w = 50;
   auto rps   = _app->settings().rounds_per_sec;
   auto fps   = _app->settings().frames_per_sec;
   auto speed = (rps * spi_w) / fps;
@@ -124,7 +124,7 @@ void app_play_state::render_statusbar(gos::view::window & win)
 
   // team stats:
   SDL_Rect ant_icon_rect;
-  ant_icon_rect.x  = statusbar_rect.x + 150;
+  ant_icon_rect.x  = speed_rect.x + speed_rect.w + margin;
   ant_icon_rect.y  = statusbar_rect.y + margin;
   ant_icon_rect.h  = statusbar_rect.h - (2 * margin);
   ant_icon_rect.w  = ant_icon_rect.h;
@@ -148,6 +148,15 @@ void app_play_state::render_statusbar(gos::view::window & win)
 
     ant_icon_rect.x += (ant_icon_rect.w * 4) + (2 * margin);
   }
+
+  // round number:
+  SDL_Rect round_count_rect;
+  round_count_rect.x = statusbar_rect.x + statusbar_rect.w - 100;
+  round_count_rect.y = statusbar_rect.y + margin;
+  round_count_rect.h = statusbar_rect.h - (2 * margin);
+  round_count_rect.w = round_count_rect.h;
+  render_number(
+    win, round_count_rect, _blocked_color, _game_state->round_count());
 }
 
 void app_play_state::render_number(
