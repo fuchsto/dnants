@@ -75,7 +75,6 @@ void app_play_state::render_statusbar(gos::view::window & win)
   SDL_Rect statusbar_rect = win.statusbar_rect();
 
   int margin = 5;
-  int size   = statusbar_rect.h - (2 * margin);
 
   // background:
   SDL_SetRenderDrawColor(
@@ -104,7 +103,7 @@ void app_play_state::render_statusbar(gos::view::window & win)
   auto speed = (rps * spi_w) / fps;
 
   SDL_Rect speed_rect;
-  speed_rect.x = statusbar_rect.x + margin + 2 * size;
+  speed_rect.x = pause_play_rect.x + pause_play_rect.w + margin;
   speed_rect.y = statusbar_rect.y + margin;
   speed_rect.w = spi_w;
   speed_rect.h = statusbar_rect.h - (2 * margin);

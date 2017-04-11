@@ -152,6 +152,12 @@ class app_play_state : public app_state {
               if (app->settings().rounds_per_sec > 1) {
                 app->settings().rounds_per_sec--;
               }
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+              // min speed
+              app->settings().rounds_per_sec = 1;
+            } else if( event.key.keysym.scancode == SDL_SCANCODE_UP) {
+              // max speed
+              app->settings().rounds_per_sec = app->settings().frames_per_sec;
             } else if( event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
               // pause
               _paused = !_paused;
@@ -391,6 +397,7 @@ class app_play_state : public app_state {
       const auto & cell_ant  = popul.teams()[aid.team_id].ants()[aid.id];
       std::cout << cell_ant << '\n';
     }
+    std::cout << std::endl;
   }
 };
 

@@ -59,14 +59,14 @@ gos::app_settings process_args(int argc, char** argv)
   gos::app_settings app_opts;
 
   app_opts.grid_extents   = { 23, 23 };
-  app_opts.grid_spacing   = 32;
-  app_opts.rounds_per_sec =  4;
-  app_opts.frames_per_sec = 30;
-  app_opts.init_team_size =  5;
-  app_opts.num_teams      =  0;
-  app_opts.trace_rounds   = 20;
+  app_opts.grid_spacing   =  32;
+  app_opts.rounds_per_sec =   4;
+  app_opts.frames_per_sec =  30;
+  app_opts.init_team_size =   5;
+  app_opts.num_teams      =   0;
+  app_opts.trace_rounds   = 300;
   app_opts.show_grid      = false;
-  app_opts.show_traces    = true;
+  app_opts.show_traces    = false;
 
   bool use_32px           = false;
 #if defined(_POSIX_VERSION)

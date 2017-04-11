@@ -8,39 +8,43 @@ from pygos import(
     neighbor_grid)
 
 #   ant.mode
-#        { ant_mode.scouting,
-#          ant_mode.eating,
-#          ant_mode.harvesting,
-#          ant_mode.backtrace }
+#        { ant_mode.waiting,     - warten
+#          ant_mode.scouting,    - Zucker suchen
+#          ant_mode.eating,      - essen
+#          ant_mode.harvesting,  - ernten
+#          ant_mode.homing       - zurueck zur Basis
+#        }
 #
-#   ant.set_mode(ant_mode)
+#   ant.set_mode(ant_mode)       - setze Modus in naechster Runde
 #
-#   ant.dir:
+#   ant.dir:         - zum Beispie: x:0,y:1 = unten, x:-1,y:-1 = links oben
 #        .x
 #        .y
 #
-#   ant.set_dir(x,y)
-#   ant.turn(d)
+#   ant.set_dir(x,y) - Setze Richtung der Ameise
+#   ant.turn(d)      - Drehe Richtung der Ameise, z.B. d=-2 => 90 Grad links,
+#                      d=4 => umkehren, d=1 => 45 Grad rechts
 #   
-#   ant.strength
-#   ant.damage
-#   ant.num_carrying
+#   ant.strength     - Staerke der Ameise (1-10)
+#   ant.damage       - in letzter Runde erlittener Schaden
+#   ant.num_carrying - Einheiten Zucker, die die Ameise transportiert
 #   
 #   ant.events:
-#        .enemy
-#        .food
-#        .attacked
-#        .collision
+#        .enemy      - Feind in Nachbarzelle
+#        .food       - Zucker in aktueller Zelle
+#        .attacked   - wurde angegriffen
+#        .collision  - letzte Bewegung wurde durch Hindernis blockiert
 #
-#   ant.dist:
+#   ant.dist:        - Entfernung (Pfadintegral) von Basis
 #        .x
 #        .y
 #   
-#   ant.attack()
-#   ant.move()
-#   ant.harvest()
-#   ant.drop(n)
-#   ant.eat()
+#   ant.idle()       - tue nichts
+#   ant.attack()     - greife Zelle in aktueller Richtung an
+#   ant.move()       - bewege zu Zelle in aktueller Richtung
+#   ant.harvest()    - ernte eine Einheit Zucker
+#   ant.drop(n)      - lasse n Einheiten Zucker in der aktuellen Zelle fallen
+#   ant.eat()        - iss eine Einheit Zucker
 #   
 
 
@@ -48,40 +52,40 @@ harvest_min_strength = 5
 attack_min_strength  = 5
 
 
-def handle_enemy(s,g):
+def handle_enemy(ant,g):
     global attack_min_strength
-    if s.strength >= attack_min_strength:
-        s.set_dir(s.enemy_dir.x, s.enemy_dir.y)
-        s.attack()
+    if ant.strength >= attack_min_strength:
+        ant.set_dir(ant.enemy_dir.x, ant.enemy_dir.y)
+        ant.attack()
     else:
-        s.set_dir(-s.enemy_dir.x, -s.enemy_dir.y)
-        s.move()
+        ant.set_dir(-ant.enemy_dir.x, -ant.enemy_dir.y)
+        ant.move()
 
-def random_turn(s,g):
-    if s.dir.x == 0 and s.dir.y == 0:
-        s.set_dir(0,1)
+def random_turn(ant,g):
+    if ant.dir.x == 0 and ant.dir.y == 0:
+        ant.set_dir(0,1)
     nturn = 1
-    if (s.tick_count - (s.id * 3)) % 4 < 2:
+    if (ant.tick_count - (ant.id * 3)) % 4 < 2:
         nturn += 1
-    if (s.tick_count + s.id) % 8 < 6:
+    if (ant.tick_count + ant.id) % 8 < 6:
         nturn *= -1
-    # s.turn_dir(1)
-    s.turn_dir(nturn)
+    # ant.turn_dir(1)
+    ant.turn_dir(nturn)
 
 
-def follow_food(s,g):
+def follow_food(ant,g):
     food_dir = direction()
     food_dir.x = 0
     food_dir.y = 0
     for x in [ -1,0,1 ]:
         for y in [ -1,0,1 ]:
             if (x != 0 or y != 0) and g.at(x,y).num_food() > 0:
-                s.set_dir(x,y)
+                ant.set_dir(x,y)
                 return True
     return False
 
 
-def follow_trace(s,g):
+def follow_trace(ant,g):
     best_trace_dir = direction()
     best_trace_dir.x = 0
     best_trace_dir.y = 0
@@ -97,147 +101,147 @@ def follow_trace(s,g):
                     trace_val = abs((2 * abs(fwd_trace + bwd_trace)) -
                                     (8 * abs(fwd_trace - bwd_trace)))
                     # print("ant {} tracing({},{}) fwd({}) bwd({}) -> {}"
-                    #         .format(s.id, x, y, fwd_trace, bwd_trace,
+                    #         .format(ant.id, x, y, fwd_trace, bwd_trace,
                     #                 trace_val))
                     if trace_val > best_trace_val and (
-                            x != -s.dir.x or y != -s.dir.y):
+                            x != -ant.dir.x or y != -ant.dir.y):
                         scnd_trace_val = best_trace_val
                         scnd_trace_dir = best_trace_dir
                         best_trace_val = trace_val
                         best_trace_dir.x = x
                         best_trace_dir.y = y
     if best_trace_dir.x != 0 or best_trace_dir.y != 0:
-        s.set_dir(best_trace_dir.x, best_trace_dir.y)
+        ant.set_dir(best_trace_dir.x, best_trace_dir.y)
         return True
     else:
         return False
 
 
 
-def init_mode(s,g):
-    s.set_mode(ant_mode.scouting)
-    if not follow_trace(s,g):
-        random_turn(s,g)
+def init_mode(ant,g):
+    ant.set_mode(ant_mode.scouting)
+    if not follow_trace(ant,g):
+        random_turn(ant,g)
         nturn = 1
-        if (s.tick_count - s.last_dir_change == 0):
+        if (ant.tick_count - ant.last_dir_change == 0):
             nturn -= 2
-        s.turn_dir(nturn)
-    s.move()
+        ant.turn_dir(nturn)
+    ant.move()
 
 
-def scout_mode(s,g):
+def scout_mode(ant,g):
     global harvest_min_strength
     # Prioritize attack and defense:
-    if s.events.enemy:
-        handle_enemy(s,g)
+    if ant.events.enemy:
+        handle_enemy(ant,g)
     else:
-        if s.events.food:
+        if ant.events.food:
             # Food found:
-            if (s.strength < harvest_min_strength):
-                s.eat();
-                s.set_mode(ant_mode.eating)
+            if (ant.strength < harvest_min_strength):
+                ant.eat();
+                ant.set_mode(ant_mode.eating)
             else:
-                s.harvest()
-                s.set_mode(ant_mode.harvesting)
+                ant.harvest()
+                ant.set_mode(ant_mode.harvesting)
         else:
             # No food:
-            if s.events.collision:
-                random_turn(s,g)
-                s.move()
-            elif follow_food(s,g):
-                s.move()
-            elif follow_trace(s,g):
-                s.move()
-            elif (s.tick_count - s.last_dir_change > 7):
-                random_turn(s,g)
-                s.move()
+            if ant.events.collision:
+                random_turn(ant,g)
+                ant.move()
+            elif follow_food(ant,g):
+                ant.move()
+            elif follow_trace(ant,g):
+                ant.move()
+            elif (ant.tick_count - ant.last_dir_change > 7):
+                random_turn(ant,g)
+                ant.move()
 
-def eat_mode(s,g):
+def eat_mode(ant,g):
     global harvest_min_strength
-    if s.events.enemy:
-        handle_enemy(s,g)
+    if ant.events.enemy:
+        handle_enemy(ant,g)
     else:
-        if s.events.food:
+        if ant.events.food:
             # Food at current cell:
-            if s.strength < harvest_min_strength:
+            if ant.strength < harvest_min_strength:
                 # Eat until strength threshold:
-                s.eat()
+                ant.eat()
             else:
                 # Start harvesting:
-                s.harvest()
-                s.set_mode(ant_mode.harvesting)
+                ant.harvest()
+                ant.set_mode(ant_mode.harvesting)
         else:
             # No more food:
-            if s.num_carrying > 0:
+            if ant.num_carrying > 0:
                 # Carry to base:
-                s.set_mode(ant_mode.backtracing)
-                s.turn_dir(4)
-                s.move()
+                ant.set_mode(ant_mode.homing)
+                ant.turn_dir(4)
+                ant.move()
             else:
                 # Continue search:
-                s.set_mode(ant_mode.scouting)
-                random_turn(s,g)
-                s.move()
+                ant.set_mode(ant_mode.scouting)
+                random_turn(ant,g)
+                ant.move()
 
-def harvest_mode(s,g):
-    if s.events.food:
+def harvest_mode(ant,g):
+    if ant.events.food:
         # Food at current cell:
-        if s.num_carrying < s.strength:
+        if ant.num_carrying < ant.strength:
             # Carry capacity available:
-            s.harvest()
+            ant.harvest()
         else:
             # Carry capacity reached:
-            s.set_mode(ant_mode.backtracing)
-            s.turn_dir(3)
-            s.move()
+            ant.set_mode(ant_mode.homing)
+            ant.turn_dir(3)
+            ant.move()
     else:
         # No more food:
-        if s.num_carrying > 0:
+        if ant.num_carrying > 0:
             # Carry to base:
-            s.set_mode(ant_mode.backtracing)
-            random_turn(s,g)
-            s.move()
+            ant.set_mode(ant_mode.homing)
+            random_turn(ant,g)
+            ant.move()
         else:
             # Continue search:
-            s.set_mode(ant_mode.scouting)
-            random_turn(s,g)
-            s.move()
+            ant.set_mode(ant_mode.scouting)
+            random_turn(ant,g)
+            ant.move()
 
-def backtrace_mode(s,g):
-    if s.num_carrying == 0:
-        s.set_mode(ant_mode.scouting)
-        follow_trace(s,g)
-        s.move()
+def backtrace_mode(ant,g):
+    if ant.num_carrying == 0:
+        ant.set_mode(ant_mode.scouting)
+        follow_trace(ant,g)
+        ant.move()
     else:
-        if s.events.collision:
-            random_turn(s,g)
-            s.move()
+        if ant.events.collision:
+            random_turn(ant,g)
+            ant.move()
         else:
-            if s.dist.x < 0:
-                s.set_dir( 1, s.dir.y)
-            elif s.dist.x > 0:
-                s.set_dir(-1, s.dir.y)
+            if ant.dist.x < 0:
+                ant.set_dir( 1, ant.dir.y)
+            elif ant.dist.x > 0:
+                ant.set_dir(-1, ant.dir.y)
             else:
-                s.set_dir( 0, s.dir.y)
-            if s.dist.y < 0:
-                s.set_dir(s.dir.x,  1)
-            elif s.dist.y > 0:
-                s.set_dir(s.dir.x, -1)
+                ant.set_dir( 0, ant.dir.y)
+            if ant.dist.y < 0:
+                ant.set_dir(ant.dir.x,  1)
+            elif ant.dist.y > 0:
+                ant.set_dir(ant.dir.x, -1)
             else:
-                s.set_dir(s.dir.x,  0)
-            s.move()
+                ant.set_dir(ant.dir.x,  0)
+            ant.move()
 
 
-def update_state(s,g):
-    if s.mode == ant_mode.scouting:
-        scout_mode(s,g)
-    elif s.mode == ant_mode.eating:
-        eat_mode(s,g)
-    elif s.mode == ant_mode.harvesting:
-        harvest_mode(s,g)
-    elif s.mode == ant_mode.backtracing:
-        backtrace_mode(s,g)
+def update_state(ant,g):
+    if ant.mode == ant_mode.scouting:
+        scout_mode(ant,g)
+    elif ant.mode == ant_mode.eating:
+        eat_mode(ant,g)
+    elif ant.mode == ant_mode.harvesting:
+        harvest_mode(ant,g)
+    elif ant.mode == ant_mode.homing:
+        backtrace_mode(ant,g)
     else:
-        init_mode(s,g)
-    return s
+        init_mode(ant,g)
+    return ant
 

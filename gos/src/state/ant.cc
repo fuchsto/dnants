@@ -309,7 +309,7 @@ std::ostream & operator<<(
     case ant_mode::scouting:    ss << "scouting";    break;
     case ant_mode::eating:      ss << "eating";      break;
     case ant_mode::harvesting:  ss << "harvesting";  break;
-    case ant_mode::backtracing: ss << "backtracing"; break;
+    case ant_mode::homing:      ss << "homing";      break;
     case ant_mode::dead:        ss << "dead";        break;
     default: ss << "???"; break;
   }

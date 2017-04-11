@@ -58,7 +58,7 @@ from pygos import(
 #   cell.ant()
 #   cell.num_food()
 
-def random_turn(ant,g):
+def random_turn(ant,grid):
     if ant.dir.x == 0 and ant.dir.y == 0:
         ant.set_dir(0,1)
     nturn = 1
@@ -69,84 +69,21 @@ def random_turn(ant,g):
     ant.turn_dir(nturn)
 
 
-def update_state(ant,g):
+def update_state(ant,grid):
     food_dir = ant.dir
     for y in [ -1, 0, 1 ]:
         for x in [ -1, 0, 1 ]:
-            if g.at(x, y).num_food() > 0:
+            if grid.at(x, y).num_food() > 0:
                 food_dir.x = x
                 food_dir.y = y
 
     if ant.mode == ant_mode.scouting:
-        if ant.events.enemy:
-            ant.set_dir(ant.enemy_dir.x,
-                      ant.enemy_dir.y)
-            ant.attack()
-        elif ant.events.collision:
-            ant.turn_dir(1)
-            ant.move()
-        elif ant.events.food:
-            if (ant.strength < 5):
-                ant.eat()
-                ant.set_mode(ant_mode.eating)
-            else:
-                ant.harvest()
-                ant.set_mode(ant_mode.harvesting)
-        elif food_dir.x != 0 and food_dir.y != 0:
-            ant.set_dir(food_dir.x, food_dir.y)
-            ant.move()
-        elif ant.tick_count - ant.last_dir_change > 7:
-            ant.turn_dir(((ant.rand + ant.tick_count) % 3) - 1)
-            ant.move()
+        ant.move()
     elif ant.mode == ant_mode.eating:
-        if ant.events.enemy:
-            ant.set_dir(ant.enemy_dir.x,
-                      ant.enemy_dir.y)
-            ant.attack()
-        elif ant.events.food:
-            if (ant.strength >= 5):
-                ant.harvest()
-                ant.set_mode(ant_mode.harvesting)
-            else:
-                ant.eat()
-        else:
-            ant.set_mode(ant_mode.scouting)
-            ant.move()
+        ant.eat()
     elif ant.mode == ant_mode.harvesting:
-        if ant.events.food:
-            if ant.num_carrying < ant.strength:
-                ant.harvest()
-            else:
-                ant.set_mode(ant_mode.homing)
-                ant.move()
-        else:
-            if ant.num_carrying > 0:
-                ant.set_mode(ant_mode.homing)
-                ant.move()
-            else:
-                ant.set_mode(ant_mode.scouting)
-                ant.move()
+        ant.harvest()
     elif ant.mode == ant_mode.homing:
-        if ant.events.collision:
-            ant.turn_dir(1)
-            ant.move()
-        elif ant.num_carrying == 0:
-            ant.set_mode(ant_mode.scouting)
-            random_turn(ant,g)
-            ant.move()
-        else:
-            if ant.dist.x < 0:
-                ant.set_dir( 1, ant.dir.y)
-            elif ant.dist.x > 0:
-                ant.set_dir(-1, ant.dir.y)
-            else:
-                ant.set_dir( 0, ant.dir.y)
-            if ant.dist.y < 0:
-                ant.set_dir(ant.dir.x,  1)
-            elif ant.dist.y > 0:
-                ant.set_dir(ant.dir.x, -1)
-            else:
-                ant.set_dir(ant.dir.x,  0)
-            ant.move()
+        ant.move()
     return ant
 

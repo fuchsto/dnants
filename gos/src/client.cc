@@ -81,6 +81,10 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
 
     // Actions ----------------------------------------------------------
     //
+    .def("idle",
+           (void                 (ant_state::*)(void))
+                                 &ant_state::idle,
+           "idle action")
     .def("move",
            (void                 (ant_state::*)(void))
                                  &ant_state::move,
@@ -113,7 +117,7 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
   py::enum_<ant_mode>(m, "ant_mode")
     .value("waiting",      ant_mode::waiting)
     .value("scouting",     ant_mode::scouting)
-    .value("backtracing",  ant_mode::backtracing)
+    .value("homing",       ant_mode::homing)
     .value("eating",       ant_mode::eating)
     .value("harvesting",   ant_mode::harvesting)
     .value("dead",         ant_mode::dead)

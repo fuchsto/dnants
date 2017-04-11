@@ -17,7 +17,7 @@ struct ant_id {
 enum ant_mode : int {
   waiting    = 0, // do nothing
   scouting,       // move without following a pheromone trace
-  backtracing,    // follow the closes pheromone trace
+  homing,         // follow the closes pheromone trace
   eating,         // eat and gain strength
   harvesting,     // eat and gain strength
   dead            // ant has died
@@ -96,6 +96,8 @@ struct ant_state {
 
   // Actions:
   //
+  inline void idle()       noexcept {
+                             action = ant_action::do_idle; }
   inline void move()       noexcept {
                              action = ant_action::do_move; }
   inline void attack()     noexcept {
