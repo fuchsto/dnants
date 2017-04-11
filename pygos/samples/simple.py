@@ -58,26 +58,16 @@ from pygos import(
 #   cell.ant()
 #   cell.num_food()
 
-def random_turn(ant,grid):
-    if ant.dir.x == 0 and ant.dir.y == 0:
-        ant.set_dir(0,1)
-    nturn = 1
-    if (ant.tick_count - (ant.id * 3)) % 4 < 2:
-        nturn += 1
-    if (ant.tick_count + ant.id) % 8 < 6:
-        nturn *= -1
-    ant.turn_dir(nturn)
-
 
 def update_state(ant,grid):
-    food_dir = ant.dir
-    for y in [ -1, 0, 1 ]:
-        for x in [ -1, 0, 1 ]:
-            if grid.at(x, y).num_food() > 0:
-                food_dir.x = x
-                food_dir.y = y
-
     if ant.mode == ant_mode.scouting:
+        if ant.events.collision:
+            ant.turn_dir(1)
+        else:
+            if ant.tick_count % 6 == 0:
+                ant.turn_dir(1)
+            elif ant.tick_count % 3 == 0:
+                ant.turn_dir(-1)
         ant.move()
     elif ant.mode == ant_mode.eating:
         ant.eat()
