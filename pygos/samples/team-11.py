@@ -116,11 +116,16 @@ def update_state(ant,grid):
                     ant.turn_dir(-1)
             ant.move()
     elif ant.mode == ant_mode.eating:
-        if ant.strength < 10:
-            ant.eat()
+        if ant.events.food:
+            if ant.strength < 10:
+                ant.eat()
+            else:
+                ant.set_mode(ant_mode.harvesting)
+                ant.harvest()
         else:
-            ant.set_mode(ant_mode.harvesting)
-            ant.harvest()
+            ant.set_mode(ant_mode.scouting)
+            random_turn(ant,grid)
+            ant.move()
     elif ant.mode == ant_mode.harvesting:
         if ant.strength > ant.num_carrying and ant.events.food:
             ant.harvest()
