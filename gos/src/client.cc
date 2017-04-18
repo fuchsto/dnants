@@ -221,18 +221,26 @@ gos::state::ant_state client::callback(
   const gos::state::ant_state & current,
   const gos::state::grid      & grid_state) const
 {
-  auto locals = py::dict(
-                  "current"_a=current,
-                  "grid_state"_a=neighbor_grid(
-                                   grid_state,
-                                   current.pos,
-                                   current.team_id,
-                                   current.tick_count),
-                  **_module.attr("__dict__"));
-
-  return py::eval<py::eval_expr>(
-           R"(update_state(current,grid_state))", py::globals(), locals
-         ).cast<const gos::state::ant_state &>();
+  // auto locals = py::dict(
+  //                 "current"_a=current,
+  //                 "grid_state"_a=neighbor_grid(
+  //                                  grid_state,
+  //                                  current.pos,
+  //                                  current.team_id,
+  //                                  current.tick_count),
+  //                 **_module.attr("__dict__"));
+  auto update_state = _module.attr("update_state");
+  return update_state(
+           current,
+           neighbor_grid(
+             grid_state,
+             current.pos,
+             current.team_id,
+             current.tick_count)
+        ).cast<gos::state::ant_state &>();
+  // return py::eval<py::eval_expr>(
+  //          R"(update_state(current,grid_state))", py::globals(), locals
+  //        ).cast<const gos::state::ant_state &>();
 }
 
 } // namespace gos
