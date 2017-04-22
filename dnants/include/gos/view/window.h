@@ -3,7 +3,6 @@
 
 #include <gos/types.h>
 #include <gos/util/logging.h>
-#include <gos/view/utils.h>
 
 #include <SDL.h>
 

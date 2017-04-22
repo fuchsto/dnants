@@ -79,6 +79,7 @@ struct app_settings {
   int                      trace_rounds;
   int                      init_team_size;
   int                      num_teams;
+  int                      spawn_interval_ticks;
   bool                     show_grid;
   bool                     show_traces;
   std::vector<std::string> team_codes;

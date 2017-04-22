@@ -29,7 +29,8 @@ int ant_team::num_ants() const noexcept {
 }
 
 void ant_team::update() {
-  if (_game_state->round_count() % 20 == 1) {
+  if (_game_state->round_count()
+        % _game_state->settings().spawn_interval_ticks == 1) {
     spawn_ants();
   }
 }
@@ -52,7 +53,7 @@ void ant_team::spawn_ants() {
     }
     auto & base_cell = _game_state->grid_state()[spawn_pos];
     if (!(base_cell.is_taken())) {
-      if (_ants.size() >= _team_size) { return; }
+      if (_ants.size() >= _team_size) { break; }
       add_ant_at(spawn_pos);
     }
   }
