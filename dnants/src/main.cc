@@ -9,6 +9,8 @@
 #include <cstdlib>
 #if defined(_POSIX_VERSION)
 #include <getopt.h>
+#else
+#include "getopt.h"
 #endif
 
 #include <pybind11/embedded.h>
@@ -40,7 +42,7 @@ int main(int argc, char * argv[])
   }
 
   app_engine app(
-    "game'-._.of'._.survive",
+    "game-of-survive",
     app_options);
 
   app.run(app_play_state::get());
@@ -61,7 +63,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.grid_extents   = { 23, 23 };
   app_opts.grid_spacing   =  32;
   app_opts.rounds_per_sec =   4;
-  app_opts.frames_per_sec =  30;
+  app_opts.frames_per_sec =  60;
   app_opts.init_team_size =   5;
   app_opts.num_teams      =   0;
   app_opts.trace_rounds   = 300;
@@ -69,7 +71,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.show_traces    = false;
 
   bool use_32px           = false;
-#if defined(_POSIX_VERSION)
+
   const char* const short_opts = "g:w:h:r:t:s:b";
   const option long_opts[] = {
           {"grid",         1, nullptr, 'g'},
@@ -111,7 +113,7 @@ gos::app_settings process_args(int argc, char** argv)
     }
   }
   app_opts.num_teams = app_opts.team_codes.size();
-#endif
+
   if (app_opts.grid_extents.w < 11) {
     app_opts.grid_extents.w = 11;
   }
