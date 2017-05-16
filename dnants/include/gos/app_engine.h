@@ -24,6 +24,7 @@ class app_engine
                        300,        // trace rounds
                        15,         // initial team size
                        0,          // number of teams
+                       5,          // spawn interval
                        true,       // show grid
                        true        // show traces
                     };
