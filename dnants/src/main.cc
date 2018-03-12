@@ -7,13 +7,14 @@
 #include <gos/util/logging.h>
 
 #include <cstdlib>
-#if defined(_POSIX_VERSION)
-#include <getopt.h>
+
+#ifdef _WINDOWS
+#  include "getopt-win.h"
 #else
-#include "getopt.h"
+#  include <getopt.h>
 #endif
 
-#include <pybind11/embedded.h>
+#include <pybind11/embed.h>
 
 
 
@@ -71,8 +72,8 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.show_grid            = false;
   app_opts.show_traces          = false;
 
-  bool use_32px           = false;
-#if defined(_POSIX_VERSION)
+  bool use_32px                 = false;
+
   const char* const short_opts = "g:w:h:r:t:s:d:b";
   const option long_opts[] = {
           {"grid",         1, nullptr, 'g'},

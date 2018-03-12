@@ -4,7 +4,7 @@
 #include <gos/state/ant_state.h>
 
 #include <pybind11/pybind11.h>
-#include <pybind11/embedded.h>
+#include <pybind11/embed.h>
 
 #include <string>
 

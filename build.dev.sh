@@ -1,7 +1,7 @@
 
 BUILD_DIR=./build.dev
 
-export PYBIND11_BASE=${HOME}/opt/pybind11embedded
+export PYBIND11_BASE=${HOME}/opt/pybind11
 
 
 mkdir -p $BUILD_DIR

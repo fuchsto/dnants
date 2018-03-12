@@ -9,7 +9,7 @@
 #include <gos/types.h>
 
 #include <pybind11/pybind11.h>
-#include <pybind11/embedded.h>
+#include <pybind11/embed.h>
 #include <pybind11/stl.h>
 
 #include <sstream>
@@ -24,7 +24,7 @@ using namespace pybind11::literals;
 using namespace gos;
 using namespace gos::state;
 
-PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
+PYBIND11_EMBEDDED_MODULE(pygos, m)
 {
   py::class_<direction> direction_py(m, "direction");
   direction_py
@@ -168,7 +168,7 @@ PYBIND11_ADD_EMBEDDED_MODULE(pygos)(py::module &m)
     // Attributes  ------------------------------------------------------
     //
     // Read-only
-    .def_readonly("id",              &ant_state::id)
+    // .def_readonly("id",              &ant_state::id)
     //
     .def("is_taken",
            (bool                       (cell_state::*)(void))
