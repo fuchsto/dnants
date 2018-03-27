@@ -58,6 +58,7 @@ struct ant_state {
   int          tick_count      = 0;
   state_events events;
   direction    enemy_dir       { 0, 0 };
+  bool         recruiting      = false;
 
   // Read-write:
   //
@@ -90,6 +91,14 @@ struct ant_state {
     if (ort_idx > 7) { ort_idx -= ort_idx;     }
     auto turn_dir = or2dir(int2or(ort_idx));
     set_dir(turn_dir.dx, turn_dir.dy);
+  }
+
+  inline void start_recruiting() noexcept {
+    recruiting = true;
+  }
+
+  inline void stop_recruiting() noexcept {
+    recruiting = false;
   }
 
   const cell_state & cell(int dx, int dy);

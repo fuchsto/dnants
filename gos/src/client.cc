@@ -63,6 +63,7 @@ PYBIND11_EMBEDDED_MODULE(pygos, m)
     .def_readonly("dist",            &ant_state::dist)
     .def_readonly("mode",            &ant_state::mode)
     .def_readonly("action",          &ant_state::action)
+    .def_readonly("recruiting",      &ant_state::recruiting)
 
     // Modifiers --------------------------------------------------------
     //
@@ -105,6 +106,14 @@ PYBIND11_EMBEDDED_MODULE(pygos, m)
            (void                 (ant_state::*)(void))
                                  &ant_state::drop,
            "drop action")
+    .def("start_recruiting",
+           (void                 (ant_state::*)(void))
+                                 &ant_state::start_recruiting,
+           "start trace for recruiting")
+    .def("stop_recruiting",
+           (void                 (ant_state::*)(void))
+                                 &ant_state::stop_recruiting,
+           "stop trace for recruiting")
     ;
 
   py::class_<ant_state::state_events>(ant_state_py, "state_events")
