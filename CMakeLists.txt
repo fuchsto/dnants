@@ -1,6 +1,6 @@
-project(project_dnants)
-
 cmake_minimum_required (VERSION 2.8.11)
+
+project(project_dnants)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeExt)
 
@@ -32,8 +32,9 @@ endif(POLICY CMP0016)
 option(ENABLE_LOGGING
        "Specify whether logging should be enabled" off)
 
+set(CMAKE_BUILD_TYPE       "Debug")
 set(CMAKE_RULE_MESSAGES    ON)
-# set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
 ## Install path
