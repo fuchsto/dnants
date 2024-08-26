@@ -214,10 +214,6 @@ class ant {
     return this->game_state().round_count() - _state.last_dir_change;
   }
 
-  inline bool is_recruiting() const noexcept {
-    return _state.recruiting;
-  }
-
   inline void switch_mode(ant_mode m) noexcept {
     if (!is_alive()) { return; }
     _state.mode = m;

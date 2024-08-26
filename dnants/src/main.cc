@@ -68,7 +68,7 @@ gos::app_settings process_args(int argc, char** argv)
   app_opts.init_team_size       =   5;
   app_opts.spawn_interval_ticks =   5;
   app_opts.num_teams            =   0;
-  app_opts.trace_rounds         = 900;
+  app_opts.trace_rounds         = 300;
   app_opts.show_grid            = false;
   app_opts.show_traces          = false;
 

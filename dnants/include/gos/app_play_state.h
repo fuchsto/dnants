@@ -179,8 +179,8 @@ class app_play_state : public app_state {
 
   virtual void update(app_engine * app) {
     auto ms             = gos::timestamp_ns() / 1000000;
-    auto rounds_per_sec = app->settings().rounds_per_sec;
-    auto ms_per_round   = 1000 / rounds_per_sec;
+	auto rounds_per_sec = app->settings().rounds_per_sec;
+	auto ms_per_round   = 1000 / rounds_per_sec;
     if (ms - _last_round_ms >= ms_per_round) {
       _last_round_ms = ms;
       if (!_paused) {
